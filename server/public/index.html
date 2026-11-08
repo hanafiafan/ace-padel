@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ace Padel — Booking Lapangan Padel</title>
+<meta name="description" content="Ace Padel: booking lapangan padel real-time, bayar QRIS/VA, e-ticket QR, cari lawan main (mabar), coaching, dan dashboard untuk pemilik lapangan.">
+<meta name="theme-color" content="#151C4E">
+<link rel="icon" href="/favicon.png">
+<link rel="canonical" href="/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ace Padel — Booking Lapangan Padel">
+<meta property="og:description" content="Booking lapangan padel real-time, bayar QRIS/VA, e-ticket QR, mabar, dan coaching dalam satu aplikasi.">
+<meta property="og:image" content="/img/banner.jpg">
+<meta property="og:locale" content="id_ID">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/css/tokens.css">
+<link rel="stylesheet" href="/css/landing.css">
+<script>
+document.documentElement.classList.add('js');try{var t=localStorage.getItem('ace-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Ace Padel","applicationCategory":"SportsApplication","operatingSystem":"Android, iOS, Web","description":"Platform booking lapangan padel dengan pembayaran QRIS/VA, e-ticket QR, mabar, coaching, dan dashboard pemilik lapangan.","image":"/img/banner.jpg","inLanguage":"id-ID","offers":{"@type":"Offer","price":"0","priceCurrency":"IDR"}}
+</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-cal" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></symbol>
+  <symbol id="i-qr" viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM20 14v3M14 20h3M20 20h1"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24"><path d="M3 6h18v12H3zM3 10h18M7 15h3"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+  <symbol id="i-whistle" viewBox="0 0 24 24"><circle cx="9" cy="15" r="6"/><path d="M13 11l8-5-2 7M9 12v3"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M20 12l-8 8-9-9V3h8zM7.5 7.5h.01"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18M7 15l4-4 3 3 5-6"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><path d="M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.3 4.7 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.6 9 9z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12zM12 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
+</svg>
+
+<a class="skip" href="#main">Lewati ke konten</a>
+
+<header class="nav" id="nav">
+  <div class="wrap nav__in">
+    <a class="brand" href="/" aria-label="Ace Padel beranda"><img src="/img/logo.png" alt="" width="36" height="36"><span>ACE PADEL</span></a>
+    <nav class="nav__links" id="menu" aria-label="Navigasi utama">
+      <a href="#fitur">Fitur</a>
+      <a href="#cara-kerja">Cara kerja</a>
+      <a href="#lapangan">Lapangan</a>
+      <a href="#pemilik">Pemilik</a>
+      <a href="#faq">FAQ</a>
+      <a class="nav__mobile-only" href="/app/#/login">Masuk</a>
+    </nav>
+    <div class="nav__act">
+      <button class="icon-btn" id="theme" type="button" aria-label="Ganti tema terang/gelap"><svg class="ic ic-moon"><use href="#i-moon"/></svg><svg class="ic ic-sun"><use href="#i-sun"/></svg></button>
+      <a class="btn btn--ghost nav__login" href="/app/#/login">Masuk</a>
+      <a class="btn btn--lime" href="#unduh">Download App</a>
+      <button class="icon-btn nav__burger" id="burger" type="button" aria-label="Buka menu" aria-expanded="false" aria-controls="menu"><svg class="ic"><use href="#i-menu"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<!-- HERO -->
+<section class="hero">
+  <div class="hero__bg" aria-hidden="true"><i class="hero__grid"></i><i class="hero__orb o1"></i><i class="hero__orb o2"></i></div>
+  <div class="wrap hero__in">
+    <div class="hero__copy reveal">
+      <span class="pill"><i class="dot"></i> Booking real-time &middot; Seluruh Indonesia</span>
+      <h1>MAIN PADEL,<br><span class="hl">TANPA RIBET.</span></h1>
+      <p class="lead">Pilih lapangan, kunci jam main, bayar QRIS dalam hitungan detik, lalu check-in dengan e-ticket QR. Cari lawan, ikut coaching, dan naik peringkat &mdash; semua dalam satu aplikasi.</p>
+      <div class="hero__cta">
+        <a class="btn btn--lime btn--lg beam" href="/app/#/login">Booking Sekarang <svg class="ic"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn--outline btn--lg" href="/app/#/register?role=owner">Untuk Pemilik Lapangan</a>
+      </div>
+      <ul class="hero__proof">
+        <li><svg class="ic"><use href="#i-check"/></svg> Anti double-booking</li>
+        <li><svg class="ic"><use href="#i-check"/></svg> QRIS &amp; Virtual Account</li>
+        <li><svg class="ic"><use href="#i-check"/></svg> Gratis untuk pemain</li>
+      </ul>
+    </div>
+    <div class="hero__stage reveal" aria-hidden="true">
+      <div class="phone">
+        <div class="phone__notch"></div>
+        <div class="phone__screen">
+          <div class="ps-top"><div><small>Halo, Pemain</small><b>Mau main di mana?</b></div><span class="ps-av">A</span></div>
+          <div class="ps-card">
+            <img src="/img/court_space_pik2.webp" alt="" width="400" height="300">
+            <div class="ps-card__tx"><b>High-Tech Glass Arena</b><small>PIK 2, Tangerang</small><span>Rp240rb/jam</span></div>
+          </div>
+          <div class="ps-dates"><i>Sen</i><i class="on">Sel</i><i>Rab</i><i>Kam</i><i>Jum</i></div>
+          <div class="ps-slots"><i>17:00</i><i class="x">18:00</i><i class="on">19:00</i><i>20:00</i><i class="x">21:00</i><i>22:00</i></div>
+          <div class="ps-btn">Bayar dengan QRIS</div>
+        </div>
+      </div>
+      <div class="float f1"><svg class="ic"><use href="#i-check"/></svg><div><b>Terkonfirmasi</b><small>Sel &middot; 19:00</small></div></div>
+      <div class="float f2"><svg class="ic"><use href="#i-qr"/></svg><div><b>E-ticket QR</b><small>Siap di-scan</small></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<section class="marquee" aria-label="Venue mitra">
+  <div class="marquee__track" id="marquee"></div>
+</section>
+
+<!-- STATS -->
+<section class="wrap stats" aria-label="Statistik platform">
+  <div class="stat" data-k="venues"><b class="count" data-to="0">0</b><span>Venue mitra</span></div>
+  <div class="stat" data-k="courts"><b class="count" data-to="0">0</b><span>Lapangan</span></div>
+  <div class="stat" data-k="players"><b class="count" data-to="0">0</b><span>Pemain</span></div>
+  <div class="stat" data-k="cities"><b class="count" data-to="0">0</b><span>Kota</span></div>
+  <div class="stat" data-k="bookings"><b class="count" data-to="0">0</b><span>Booking</span></div>
+</section>
+
+<!-- FITUR -->
+<section class="sec wrap" id="fitur">
+  <header class="sec__h reveal"><span class="eyebrow">Fitur</span><h2>SEMUA YANG KAMU BUTUH<br>DI SATU LAPANGAN.</h2></header>
+  <div class="bento">
+    <article class="bc bc--wide spot reveal">
+      <svg class="ic ic--lg"><use href="#i-cal"/></svg>
+      <h3>Booking real-time, 7 hari ke depan</h3>
+      <p>Lihat slot kosong langsung. Satu slot hanya bisa dipesan satu orang &mdash; server menolak bentrok, jadi tidak ada lagi dobel jadwal.</p>
+      <div class="mini-slots" aria-hidden="true"><i>08</i><i class="x">09</i><i>10</i><i class="on">11</i><i class="x">12</i><i>13</i><i>14</i><i class="x">15</i><i>16</i><i>17</i></div>
+    </article>
+    <article class="bc spot reveal"><svg class="ic ic--lg"><use href="#i-card"/></svg><h3>QRIS &amp; Virtual Account</h3><p>QRIS Instant, BCA atau Mandiri VA. Tidak dibayar dalam 15 menit, slot otomatis dilepas.</p></article>
+    <article class="bc spot reveal"><svg class="ic ic--lg"><use href="#i-qr"/></svg><h3>E-ticket QR</h3><p>Tunjukkan QR di lokasi, kasir scan, selesai. Tanpa antre, tanpa bukti transfer.</p></article>
+    <article class="bc spot reveal"><svg class="ic ic--lg"><use href="#i-users"/></svg><h3>Mabar &mdash; cari lawan</h3><p>Gabung match terbuka sesuai level, atau buka sendiri dan tunggu pemain lain bergabung.</p></article>
+    <article class="bc spot reveal"><svg class="ic ic--lg"><use href="#i-whistle"/></svg><h3>Coaching</h3><p>Pelatih bersertifikat dengan rating dan tarif jelas. Pesan sesi tanpa tanya-tanya.</p></article>
+    <article class="bc bc--wide bc--accent spot reveal">
+      <svg class="ic ic--lg"><use href="#i-trophy"/></svg>
+      <h3>Leaderboard &amp; pencapaian</h3>
+      <p>Setiap kemenangan menambah poin. Bandingkan dengan teman, kumpulkan achievement, dan kejar peringkat satu.</p>
+    </article>
+  </div>
+</section>
+
+<!-- CARA KERJA -->
+<section class="sec sec--alt" id="cara-kerja">
+  <div class="wrap">
+    <header class="sec__h reveal"><span class="eyebrow">Cara kerja</span><h2>3 LANGKAH, LANGSUNG MAIN.</h2></header>
+    <ol class="steps">
+      <li class="step reveal"><span class="step__n">01</span><h3>Pilih lapangan &amp; jam</h3><p>Cari venue di kotamu, pilih tanggal dan slot yang masih kosong.</p></li>
+      <li class="step reveal"><span class="step__n">02</span><h3>Bayar &amp; dapat e-ticket</h3><p>Bayar via QRIS atau VA, pakai voucher bila ada. E-ticket QR langsung terbit.</p></li>
+      <li class="step reveal"><span class="step__n">03</span><h3>Check-in &amp; main</h3><p>Scan QR di lokasi, masuk lapangan, dan catat hasil match untuk poin leaderboard.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- LAPANGAN -->
+<section class="sec" id="lapangan">
+  <div class="wrap">
+    <header class="sec__h sec__h--row reveal">
+      <div><span class="eyebrow">Lapangan</span><h2>LAPANGAN DENGAN RATING TERTINGGI.</h2></div>
+      <a class="link" href="/app/#/login">Lihat semua <svg class="ic"><use href="#i-arrow"/></svg></a>
+    </header>
+  </div>
+  <div class="rail" id="courts" tabindex="0" aria-label="Daftar lapangan, geser untuk melihat lebih banyak">
+    <div class="skel card"></div><div class="skel card"></div><div class="skel card"></div><div class="skel card"></div>
+  </div>
+</section>
+
+<!-- PEMILIK -->
+<section class="sec sec--dark" id="pemilik">
+  <div class="wrap owner">
+    <div class="owner__copy reveal">
+      <span class="eyebrow">Untuk Pemilik Lapangan</span>
+      <h2>ISI JADWAL LAPANGANMU.<br><span class="hl">OTOMATIS.</span></h2>
+      <p class="lead">Daftarkan venue, atur harga, dan biarkan pemain memesan sendiri. Semua booking, pembayaran, dan check-in terpantau dari satu dashboard.</p>
+      <ul class="ticks">
+        <li><svg class="ic"><use href="#i-cal"/></svg><div><b>Jadwal &amp; blokir slot</b><span>Tutup jam untuk maintenance atau acara pribadi.</span></div></li>
+        <li><svg class="ic"><use href="#i-qr"/></svg><div><b>Scan QR check-in</b><span>Validasi e-ticket pemain di lokasi dalam sekali scan.</span></div></li>
+        <li><svg class="ic"><use href="#i-chart"/></svg><div><b>Laporan pendapatan</b><span>Pantau omzet dan okupansi per lapangan.</span></div></li>
+        <li><svg class="ic"><use href="#i-tag"/></svg><div><b>Voucher promo</b><span>Buat diskon untuk mengisi jam sepi.</span></div></li>
+      </ul>
+      <a class="btn btn--lime btn--lg" href="/app/#/register?role=owner">Daftarkan Lapangan <svg class="ic"><use href="#i-arrow"/></svg></a>
+    </div>
+    <div class="dash reveal" aria-hidden="true">
+      <div class="dash__bar"><i></i><i></i><i></i><span>Dashboard Pemilik</span></div>
+      <div class="dash__kpis"><div><small>Pendapatan</small><b>Rp 18,4jt</b></div><div><small>Okupansi</small><b>76%</b></div><div><small>Check-in</small><b>42</b></div></div>
+      <div class="dash__chart"><i style="--h:38%"></i><i style="--h:55%"></i><i style="--h:44%"></i><i style="--h:70%"></i><i style="--h:62%"></i><i style="--h:90%"></i><i style="--h:78%"></i></div>
+      <div class="dash__grid"><span>07</span><span>08</span><span>09</span><span>10</span>
+        <i class="b">Budi</i><i class="b">Sari</i><i class="m">Maint.</i><i></i></div>
+    </div>
+  </div>
+</section>
+
+<!-- COACHES -->
+<section class="sec" id="coaches">
+  <div class="wrap">
+    <header class="sec__h reveal"><span class="eyebrow">Coaching</span><h2>BELAJAR DARI PELATIH TERBAIK.</h2></header>
+    <div class="coaches" id="coachList"><div class="skel coach"></div><div class="skel coach"></div><div class="skel coach"></div><div class="skel coach"></div></div>
+  </div>
+</section>
+
+<!-- LEADERBOARD + VOUCHER -->
+<section class="sec sec--alt" id="peringkat">
+  <div class="wrap duo">
+    <div class="reveal">
+      <span class="eyebrow">Leaderboard</span><h2>SIAPA RAJA<br>LAPANGAN?</h2>
+      <ol class="lb" id="lb"><li class="skel lb__s"></li><li class="skel lb__s"></li><li class="skel lb__s"></li></ol>
+    </div>
+    <div class="reveal">
+      <span class="eyebrow">Voucher</span><h2>MAIN LEBIH HEMAT.</h2>
+      <div class="vouchers" id="vouchers"><div class="skel vch"></div><div class="skel vch"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONI -->
+<section class="sec" id="testimoni">
+  <div class="wrap">
+    <header class="sec__h reveal"><span class="eyebrow">Kata mereka</span><h2>DIPAKAI PEMAIN &amp; PENGELOLA.</h2></header>
+    <div class="tests">
+      <figure class="test reveal"><blockquote>Dulu tanya slot lewat WhatsApp bisa setengah jam. Sekarang tinggal buka app, pilih jam, bayar QRIS. Beres.</blockquote><figcaption><span class="av">R</span><div><b>Rizky P.</b><small>Pemain, Jakarta</small></div></figcaption></figure>
+      <figure class="test reveal"><blockquote>Fitur mabar bikin kami nggak pernah kekurangan pemain lagi. Level-nya juga cocok.</blockquote><figcaption><span class="av">D</span><div><b>Dewi A.</b><small>Pemain, Tangerang</small></div></figcaption></figure>
+      <figure class="test reveal"><blockquote>Jam sepi kami isi pakai voucher, dan check-in QR bikin kasir tidak perlu catat manual.</blockquote><figcaption><span class="av">B</span><div><b>Pengelola venue</b><small>Mitra Ace Padel</small></div></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec sec--alt" id="faq">
+  <div class="wrap faq-wrap">
+    <header class="sec__h reveal"><span class="eyebrow">FAQ</span><h2>PERTANYAAN UMUM.</h2></header>
+    <div class="faq reveal">
+      <details><summary>Apakah Ace Padel gratis?</summary><p>Mendaftar dan memakai aplikasi sebagai pemain gratis. Kamu hanya membayar sewa lapangan atau sesi coaching.</p></details>
+      <details><summary>Bagaimana jika slot yang sama dipesan dua orang?</summary><p>Tidak bisa. Server memeriksa ketersediaan saat booking; slot yang sudah terisi otomatis ditolak.</p></details>
+      <details><summary>Metode pembayaran apa saja yang didukung?</summary><p>QRIS Instant, BCA Virtual Account, Mandiri Virtual Account, atau bayar di tempat (tergantung venue). Pembayaran online berlaku 15 menit sebelum slot dilepas kembali.</p></details>
+      <details><summary>Bagaimana cara check-in?</summary><p>Setelah booking terkonfirmasi, kamu mendapat e-ticket QR. Tunjukkan ke pengelola venue untuk di-scan.</p></details>
+      <details><summary>Bisa batalkan booking?</summary><p>Bisa, dari menu Booking di aplikasi. Ketentuan pengembalian dana mengikuti status pembayaran booking tersebut.</p></details>
+      <details><summary>Bagaimana cara mendaftarkan lapangan saya?</summary><p>Buat akun sebagai pemilik lapangan, isi data venue dan harga, lalu tunggu persetujuan admin. Setelah disetujui, lapangan tampil di aplikasi.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="sec" id="unduh">
+  <div class="wrap">
+    <div class="cta reveal">
+      <i class="cta__beam" aria-hidden="true"></i>
+      <div class="cta__in">
+        <h2>SIAP SMASH?</h2>
+        <p>Buka versi web sekarang. Aplikasi Android &amp; iOS (Flutter) segera hadir di toko aplikasi.</p>
+        <div class="hero__cta cta__btns">
+          <a class="btn btn--lime btn--lg beam" href="/app/#/login">Buka Web App <svg class="ic"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn--outline btn--lg" href="/app/#/register?role=owner">Daftar sebagai Pemilik</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <div class="foot__brand"><a class="brand" href="/"><img src="/img/logo.png" alt="" width="36" height="36"><span>ACE PADEL</span></a><p>Booking lapangan padel yang cepat dan transparan.</p></div>
+    <nav aria-label="Produk"><h3>Produk</h3><a href="#fitur">Fitur</a><a href="#lapangan">Lapangan</a><a href="#coaches">Coaching</a><a href="#peringkat">Leaderboard</a></nav>
+    <nav aria-label="Masuk"><h3>Masuk</h3><a href="/app/#/login">Login Pemain</a><a href="/app/#/login">Login Pemilik</a><a href="/app/#/login">Login Admin</a><a href="/app/#/register?role=owner">Daftar Pemilik</a></nav>
+    <nav aria-label="Legal"><h3>Info</h3><a href="/privacy.html">Kebijakan Privasi</a><a href="#faq">FAQ</a></nav>
+  </div>
+  <div class="wrap foot__copy">&copy; <span id="yr">2026</span> Ace Padel. Dibuat untuk komunitas padel Indonesia.</div>
+</footer>
+
+<script src="/js/landing.js" defer></script>
+</body>
+</html>

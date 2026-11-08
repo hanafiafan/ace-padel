@@ -1,0 +1,25 @@
+/* Design tokens bersama (landing + panel) — selaras dengan DESIGN.md aplikasi */
+@font-face { font-family: 'Display'; src: url('/fonts/BarlowCondensed-SemiBold.ttf'); font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Display'; src: url('/fonts/BarlowCondensed-Bold.ttf'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Display'; src: url('/fonts/BarlowCondensed-ExtraBold.ttf'); font-weight: 800; font-display: swap; }
+
+:root {
+  --blue: #2334DB; --blue-dark: #151C4E; --blue-soft: #4756F0; --lime: #C7F23C; --lime-ink: #1a2300;
+  --bg: #F2F4FB; --surface: #FFFFFF; --surface-2: #F7F8FD; --ink: #12152B; --muted: #5A6180; --line: #E7EAF3;
+  --ok: #12A150; --warn: #D98A00; --danger: #D92D4A;
+  --radius: 16px; --radius-lg: 24px; --shadow: 0 1px 2px rgba(18,21,43,.06), 0 8px 24px rgba(18,21,43,.06);
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; --display: 'Display', 'Barlow Condensed', Impact, sans-serif;
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  --bg: #070A16; --surface: #0E1226; --surface-2: #131833; --ink: #EEF0FA; --muted: #98A0C4; --line: #1E2548;
+  --blue: #4C5CFF; --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35); color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) {
+  --bg: #070A16; --surface: #0E1226; --surface-2: #131833; --ink: #EEF0FA; --muted: #98A0C4; --line: #1E2548;
+  --blue: #4C5CFF; --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35); color-scheme: dark; } }
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; display: block; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
