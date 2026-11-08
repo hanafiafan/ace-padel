@@ -1,277 +1,123 @@
 const fs = require('fs');
 const path = require('path');
+const { DatabaseSync } = require('node:sqlite');
 
-const DB_PATH = path.join(__dirname, '../data/db.json');
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, '../data/acepadel.sqlite');
+if (DB_PATH !== ':memory:') fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
 
-const INITIAL_COURTS = [
-  {
-    id: 'c1',
-    name: 'Center Court',
-    venue: 'Ace Arena Senayan',
-    area: 'Senayan, Jakarta',
-    rating: 4.9,
-    pricePerHour: 180,
-    indoor: true,
-    facilities: [
-      'Sewa Raket & Bola',
-      'Shower Air Panas',
-      'Locker Room',
-      'WiFi Cepat',
-      'Parkir Luas',
-      'Padel Cafe'
-    ],
-    description:
-      'Lapangan padel standar internasional dengan karpet Mondo Supercourt generasi terbaru dan kaca tempered panoramic view untuk kenyamanan bermain maksimal.'
-  },
-  {
-    id: 'c2',
-    name: 'Glass Court 2',
-    venue: 'Padel Point BSD',
-    area: 'BSD, Tangerang',
-    rating: 4.7,
-    pricePerHour: 150,
-    indoor: true,
-    facilities: [
-      'Sewa Raket & Bola',
-      'Shower Air Panas',
-      'Locker Room',
-      'Parkir Luas'
-    ],
-    description:
-      'Lapangan indoor ber-AC dengan pencahayaan LED profesional yang anti-silau.'
-  },
-  {
-    id: 'c3',
-    name: 'Sky Court',
-    venue: 'Rooftop Padel Kemang',
-    area: 'Kemang, Jakarta',
-    rating: 4.8,
-    pricePerHour: 165,
-    indoor: false,
-    facilities: [
-      'Sewa Raket & Bola',
-      'Padel Cafe',
-      'Locker Room',
-      'WiFi Cepat'
-    ],
-    description:
-      'Lapangan outdoor di atas rooftop dengan pemandangan kota dan suasana sunset spektakuler.'
-  },
-  {
-    id: 'c4',
-    name: 'Sunset Court',
-    venue: 'Bali Padel Canggu',
-    area: 'Canggu, Badung',
-    rating: 4.9,
-    pricePerHour: 200,
-    indoor: false,
-    facilities: [
-      'Sewa Raket & Bola',
-      'Shower Air Panas',
-      'Padel Cafe',
-      'Locker Room',
-      'Parkir Luas'
-    ],
-    description:
-      'Venue tropis favorit pemain ekspatriat dan lokal dengan vibe santai di Canggu.'
-  },
-  {
-    id: 'c5',
-    name: 'Match Point Padel Court',
-    venue: 'Nusantara Padel Pekanbaru',
-    area: 'Sudirman, Pekanbaru',
-    rating: 4.3,
-    pricePerHour: 240,
-    indoor: true,
-    facilities: ['Sewa Raket & Bola', 'Locker Room', 'Parkir Luas'],
-    description: 'Lapangan padel modern pertama dan terlengkap di Pekanbaru.'
-  },
-  {
-    id: 'c6',
-    name: 'Fusion Padel',
-    venue: 'Victory Padel Samarinda',
-    area: 'Air Hitam, Samarinda',
-    rating: 4.5,
-    pricePerHour: 120,
-    indoor: false,
-    facilities: ['Sewa Raket & Bola', 'Parkir Luas'],
-    description: 'Venue outdoor ramah pemula dengan harga sewa terjangkau.'
-  },
-  {
-    id: 'c7',
-    name: 'Rally Padel Center',
-    venue: 'Ace Padel Denpasar',
-    area: 'Sanur, Denpasar',
-    rating: 4.7,
-    pricePerHour: 115,
-    indoor: true,
-    facilities: ['Sewa Raket & Bola', 'Shower Air Panas', 'WiFi Cepat'],
-    description: 'Lapangan indoor sejuk di kawasan Sanur dengan komunitas aktif.'
-  },
-  {
-    id: 'c8',
-    name: 'Fusion Padel',
-    venue: 'Victory Padel Semarang',
-    area: 'Simpang Lima, Semarang',
-    rating: 4.7,
-    pricePerHour: 115,
-    indoor: true,
-    facilities: ['Sewa Raket & Bola', 'Locker Room', 'Parkir Luas'],
-    description: 'Lokasi strategis di pusat kota Semarang dekat Simpang Lima.'
-  }
-];
+const db = new DatabaseSync(DB_PATH);
+db.exec('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;');
 
-const INITIAL_VOUCHERS = [
-  {
-    code: 'ACEWEEKEND',
-    title: 'Diskon Akhir Pekan',
-    description: 'Potongan Rp25.000 untuk sewa lapangan akhir pekan',
-    discountAmount: 25,
-    minSpend: 100
-  },
-  {
-    code: 'PADELNEW',
-    title: 'Member Baru 20%',
-    description: 'Diskon 20% (maks Rp35.000) untuk member baru',
-    discountAmount: 35,
-    percentage: 0.2,
-    maxDiscount: 35,
-    minSpend: 120
-  },
-  {
-    code: 'SMASH10',
-    title: 'Smash Hemat Rp10k',
-    description: 'Potongan langsung Rp10.000 tanpa syarat minimal',
-    discountAmount: 10,
-    minSpend: 0
-  }
-];
+db.exec(`
+CREATE TABLE IF NOT EXISTS users (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  username TEXT UNIQUE,
+  email TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  password_hash TEXT,
+  role TEXT NOT NULL DEFAULT 'player' CHECK (role IN ('player','owner','admin')),
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','suspended')),
+  phone TEXT, skill_level TEXT DEFAULT 'Menengah (Intermediate)',
+  preferred_hand TEXT DEFAULT 'Tangan Kanan (Right-handed)',
+  photo_url TEXT, auth_provider TEXT DEFAULT 'email', google_id TEXT,
+  points INTEGER NOT NULL DEFAULT 0, wins INTEGER NOT NULL DEFAULT 0, matches INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS courts (
+  id TEXT PRIMARY KEY,
+  owner_id TEXT REFERENCES users(id),
+  name TEXT NOT NULL, venue TEXT NOT NULL, area TEXT NOT NULL,
+  price_per_hour INTEGER NOT NULL CHECK (price_per_hour > 0), -- ribuan Rupiah
+  indoor INTEGER NOT NULL DEFAULT 1,
+  rating REAL NOT NULL DEFAULT 0,
+  image TEXT, facilities TEXT NOT NULL DEFAULT '[]', description TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','approved','rejected','suspended')),
+  created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS bookings (
+  id TEXT PRIMARY KEY,
+  court_id TEXT NOT NULL REFERENCES courts(id),
+  user_id TEXT REFERENCES users(id),
+  date TEXT NOT NULL, slot TEXT NOT NULL,
+  price INTEGER NOT NULL DEFAULT 0, discount INTEGER NOT NULL DEFAULT 0,
+  add_ons TEXT NOT NULL DEFAULT '[]', add_ons_total INTEGER NOT NULL DEFAULT 0,
+  final_price INTEGER NOT NULL DEFAULT 0,
+  payment_method TEXT NOT NULL DEFAULT 'Bayar di tempat',
+  payment_status TEXT NOT NULL DEFAULT 'Belum Bayar', -- Belum Bayar | Menunggu | Lunas | Dikembalikan
+  payment_ref TEXT, payment_expires_at TEXT,
+  voucher_code TEXT, note TEXT,
+  status TEXT NOT NULL DEFAULT 'Terkonfirmasi', -- Terkonfirmasi | Check-in Selesai | Dibatalkan | Maintenance
+  created_at TEXT NOT NULL, checked_in_at TEXT, cancelled_at TEXT
+);
+-- Anti double-booking dijamin DB, bukan hanya kode aplikasi
+CREATE UNIQUE INDEX IF NOT EXISTS uq_slot ON bookings(court_id, date, slot)
+  WHERE status IN ('Terkonfirmasi','Check-in Selesai','Maintenance');
+CREATE INDEX IF NOT EXISTS ix_bookings_user ON bookings(user_id);
+CREATE INDEX IF NOT EXISTS ix_bookings_court_date ON bookings(court_id, date);
+CREATE TABLE IF NOT EXISTS vouchers (
+  code TEXT PRIMARY KEY, title TEXT NOT NULL, description TEXT DEFAULT '',
+  discount_amount INTEGER NOT NULL DEFAULT 0, percentage REAL, max_discount INTEGER,
+  min_spend INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1,
+  usage_limit INTEGER, used_count INTEGER NOT NULL DEFAULT 0, expires_at TEXT
+);
+CREATE TABLE IF NOT EXISTS matches (
+  id TEXT PRIMARY KEY, court_id TEXT NOT NULL REFERENCES courts(id),
+  host_id TEXT NOT NULL REFERENCES users(id),
+  date_label TEXT NOT NULL, time TEXT NOT NULL, title TEXT NOT NULL,
+  skill_level TEXT NOT NULL, max_players INTEGER NOT NULL DEFAULT 4,
+  price_per_player INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS match_players (
+  match_id TEXT NOT NULL REFERENCES matches(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users(id), PRIMARY KEY (match_id, user_id)
+);
+CREATE TABLE IF NOT EXISTS reviews (
+  id TEXT PRIMARY KEY, court_id TEXT NOT NULL REFERENCES courts(id),
+  user_id TEXT NOT NULL REFERENCES users(id),
+  rating REAL NOT NULL CHECK (rating BETWEEN 1 AND 5), comment TEXT DEFAULT '', created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS friends (
+  user_id TEXT NOT NULL REFERENCES users(id), friend_id TEXT NOT NULL REFERENCES users(id),
+  PRIMARY KEY (user_id, friend_id)
+);
+CREATE TABLE IF NOT EXISTS favorites (
+  user_id TEXT NOT NULL REFERENCES users(id), court_id TEXT NOT NULL REFERENCES courts(id),
+  PRIMARY KEY (user_id, court_id)
+);
+CREATE TABLE IF NOT EXISTS notifications (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL REFERENCES users(id),
+  title TEXT NOT NULL, body TEXT NOT NULL DEFAULT '', type TEXT NOT NULL DEFAULT 'info',
+  read INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS coaches (
+  id TEXT PRIMARY KEY, name TEXT NOT NULL, title TEXT, rating REAL DEFAULT 0, reviews_count INTEGER DEFAULT 0,
+  rate_per_hour INTEGER NOT NULL, experience TEXT, image TEXT, specialties TEXT DEFAULT '[]',
+  venues TEXT DEFAULT '[]', bio TEXT DEFAULT '', active INTEGER NOT NULL DEFAULT 1
+);
+CREATE TABLE IF NOT EXISTS coach_sessions (
+  id TEXT PRIMARY KEY, coach_id TEXT NOT NULL REFERENCES coaches(id), user_id TEXT NOT NULL REFERENCES users(id),
+  venue TEXT, date TEXT NOT NULL, slot TEXT NOT NULL, focus TEXT, price INTEGER NOT NULL,
+  status TEXT NOT NULL DEFAULT 'Terkonfirmasi', created_at TEXT NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_coach_slot ON coach_sessions(coach_id, date, slot) WHERE status = 'Terkonfirmasi';
+CREATE TABLE IF NOT EXISTS payment_methods (
+  id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL REFERENCES users(id),
+  method TEXT NOT NULL, is_default INTEGER NOT NULL DEFAULT 0
+);
+`);
 
-const INITIAL_MATCHES = [
-  {
-    id: 'm1',
-    courtId: 'c1',
-    dateString: 'Sabtu, 18 Okt',
-    time: '19:00 – 21:00 (2 jam)',
-    title: 'Mabar Santai Sabtu Malam (Ganda)',
-    hostName: 'Rizky Pratama',
-    skillLevel: 'Menengah (Intermediate)',
-    currentPlayers: 3,
-    maxPlayers: 4,
-    pricePerPlayer: 65,
-    players: ['Rizky Pratama', 'Kevin Sanjaya', 'Dewi Anggraini']
-  },
-  {
-    id: 'm2',
-    courtId: 'c3',
-    dateString: 'Minggu, 19 Okt',
-    time: '16:00 – 18:00 (2 jam)',
-    title: 'Padel Sunset Friendly Match',
-    hostName: 'Dewi Anggraini',
-    skillLevel: 'Semua Level (Casual)',
-    currentPlayers: 2,
-    maxPlayers: 4,
-    pricePerPlayer: 55,
-    players: ['Dewi Anggraini', 'Bagas Wicaksono']
-  }
-];
-
-const INITIAL_REVIEWS = [
-  {
-    id: 'r1',
-    courtId: 'c1',
-    userName: 'Budi Santoso',
-    rating: 5.0,
-    comment:
-      'Kaca sangat jernih dan karpet Mondo Supercourt sangat empuk di lutut. Pencahayaan malam hari sangat terang!',
-    date: '3 hari lalu',
-    skillLevel: 'Menengah'
-  },
-  {
-    id: 'r2',
-    courtId: 'c1',
-    userName: 'Nadya Putri',
-    rating: 4.8,
-    comment:
-      'Fasilitas shower dan locker room bersih banget. Ada cafe enak buat ngopi setelah game.',
-    date: '1 minggu lalu',
-    skillLevel: 'Pemula'
-  }
-];
-
-const INITIAL_USERS = [
-  {
-    id: 'u1',
-    name: 'Afan',
-    email: 'hanafiafan20@gmail.com',
-    phone: '+62 812-3456-7890',
-    skillLevel: 'Menengah (Intermediate)',
-    role: 'player'
-  }
-];
-
-let dbMemory = null;
-
-function initDb() {
-  const dir = path.dirname(DB_PATH);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-
-  if (!fs.existsSync(DB_PATH)) {
-    const defaultData = {
-      courts: INITIAL_COURTS,
-      bookings: [],
-      history: [],
-      matches: INITIAL_MATCHES,
-      vouchers: INITIAL_VOUCHERS,
-      reviews: INITIAL_REVIEWS,
-      users: INITIAL_USERS
-    };
-    fs.writeFileSync(DB_PATH, JSON.stringify(defaultData, null, 2), 'utf-8');
-    dbMemory = defaultData;
-  } else {
-    try {
-      const raw = fs.readFileSync(DB_PATH, 'utf-8');
-      dbMemory = JSON.parse(raw);
-    } catch (err) {
-      console.error('Error reading DB, re-initializing', err);
-      dbMemory = {
-        courts: INITIAL_COURTS,
-        bookings: [],
-        history: [],
-        matches: INITIAL_MATCHES,
-        vouchers: INITIAL_VOUCHERS,
-        reviews: INITIAL_REVIEWS,
-        users: INITIAL_USERS,
-        friends: ['p1', 'p5']
-      };
-      fs.writeFileSync(DB_PATH, JSON.stringify(dbMemory, null, 2), 'utf-8');
-    }
-  }
-  if (!dbMemory.friends) {
-    dbMemory.friends = ['p1', 'p5'];
-  }
-  return dbMemory;
-}
-
-function getDb() {
-  if (!dbMemory) {
-    initDb();
-  }
-  return dbMemory;
-}
-
-function saveDb() {
+const tx = (fn) => {
+  db.exec('BEGIN IMMEDIATE');
   try {
-    fs.writeFileSync(DB_PATH, JSON.stringify(dbMemory, null, 2), 'utf-8');
-  } catch (err) {
-    console.error('Failed to persist DB to file:', err);
+    const r = fn();
+    db.exec('COMMIT');
+    return r;
+  } catch (e) {
+    db.exec('ROLLBACK');
+    throw e;
   }
-}
-
-module.exports = {
-  getDb,
-  saveDb
 };
 
+require('./seed')(db);
+
+module.exports = { db, tx };

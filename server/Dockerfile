@@ -1,26 +1,13 @@
-# Multi-stage lightweight Node.js container for Ace Padel API
-FROM node:20-alpine AS base
-
+FROM node:22-alpine
 WORKDIR /app
-
-# Install dependencies first for optimal Docker layer caching
 COPY package*.json ./
-RUN npm ci --only=production
-
-# Copy application source
+RUN npm ci --omit=dev
 COPY src ./src
-
-# Non-root user for security compliance
+COPY public ./public
+RUN mkdir -p /data && chown node:node /data
 USER node
-
-# Default port
+ENV NODE_ENV=production PORT=3001 DB_PATH=/data/acepadel.sqlite NODE_NO_WARNINGS=1
+VOLUME /data
 EXPOSE 3001
-
-ENV NODE_ENV=production
-ENV PORT=3001
-
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3001/api/health || exit 1
-
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s CMD wget -qO- http://localhost:3001/api/health || exit 1
 CMD ["node", "src/index.js"]
-

@@ -1,320 +1,100 @@
-const test = require('node:test');
+process.env.DB_PATH = ':memory:';
+process.env.NODE_ENV = 'test';
+const { test, before, after } = require('node:test');
 const assert = require('node:assert');
 const app = require('../src/index');
 
-let server;
-const PORT = 3001;
-const BASE_URL = `http://localhost:${PORT}`;
+let base, server;
+before(() => new Promise((r) => { server = app.listen(0, () => { base = `http://localhost:${server.address().port}`; r(); }); }));
+after(() => server.close());
 
-test.before(async () => {
-  await new Promise((resolve) => {
-    server = app.listen(PORT, 'localhost', resolve);
-  });
+const call = async (method, path, body, token) => {
+  const res = await fetch(base + path, { method, headers: { 'content-type': 'application/json', ...(token && { authorization: `Bearer ${token}` }) }, body: body && JSON.stringify(body) });
+  return { status: res.status, ...(await res.json()) };
+};
+const login = async (email, password) => (await call('POST', '/api/auth/login', { email, password })).token;
+const tomorrow = new Date(Date.now() + 7 * 3600e3 + 86400e3).toISOString().slice(0, 10);
+
+test('katalog publik & slot', async () => {
+  const c = await call('GET', '/api/courts');
+  assert.ok(c.count >= 16);
+  const s = await call('GET', `/api/courts/c1/slots?date=${tomorrow}`);
+  assert.equal(s.slots.length, 14);
+  assert.equal((await call('GET', '/api/public/stats')).data.courts >= 16, true);
 });
 
-test.after(async () => {
-  await new Promise((resolve) => {
-    server.close(resolve);
-  });
+test('auth: register, login, role guard', async () => {
+  const reg = await call('POST', '/api/auth/register', { name: 'Tester', email: 't@x.id', password: 'secret123' });
+  assert.equal(reg.status, 201);
+  assert.equal((await call('POST', '/api/auth/register', { name: 'Tt', email: 't@x.id', password: 'secret123' })).status, 409);
+  assert.equal((await call('POST', '/api/auth/login', { email: 't@x.id', password: 'salah' })).status, 401);
+  assert.equal((await call('GET', '/api/bookings')).status, 401);
+  assert.equal((await call('GET', '/api/admin/overview', null, reg.token)).status, 403);
+  assert.equal((await call('GET', '/api/owner/courts', null, reg.token)).status, 403);
+  assert.equal((await call('POST', '/api/auth/register', { name: 'Hacker', email: 'h@x.id', password: 'secret123', role: 'admin' })).data.role, 'player');
 });
 
-test('GET /api/health returns healthy status', async () => {
-  const res = await fetch(`${BASE_URL}/api/health`);
-  assert.strictEqual(res.status, 200);
-  const data = await res.json();
-  assert.strictEqual(data.status, 'healthy');
-  assert.strictEqual(data.service, 'ace-padel-backend');
+test('booking: anti double-booking, voucher, add-on server-side, cancel membuka slot', async () => {
+  const a = await login('player@acepadel.id', 'player12345');
+  const b = (await call('POST', '/api/auth/register', { name: 'Bb', email: 'b@x.id', password: 'secret123' })).token;
+  const body = { courtId: 'c1', date: tomorrow, slot: '10:00', voucherCode: 'smash10', addOns: ['racket'], addOnsTotal: 1 };
+  const r1 = await call('POST', '/api/bookings', body, a);
+  assert.equal(r1.status, 201);
+  assert.equal(r1.data.finalPrice, 220 + 30 - 10);
+  assert.equal((await call('POST', '/api/bookings', body, b)).status, 409);
+  assert.equal((await call('DELETE', `/api/bookings/${r1.data.id}`, null, b)).status, 403);
+  assert.equal((await call('POST', '/api/bookings', { ...body, voucherCode: 'NOPE' }, b)).status, 400);
+  assert.equal((await call('POST', '/api/bookings', { ...body, date: '2020-01-01' }, b)).status, 400);
+  assert.equal((await call('DELETE', `/api/bookings/${r1.data.id}`, null, a)).status, 200);
+  assert.equal((await call('POST', '/api/bookings', body, b)).status, 201);
 });
 
-test('GET /api/courts returns courts list', async () => {
-  const res = await fetch(`${BASE_URL}/api/courts`);
-  assert.strictEqual(res.status, 200);
-  const json = await res.json();
-  assert.strictEqual(json.success, true);
-  assert.ok(json.count > 0);
-  assert.ok(Array.isArray(json.data));
-  assert.strictEqual(json.data[0].id, 'c1');
+test('pembayaran online → kedaluwarsa otomatis & bayar', async () => {
+  const a = await login('player@acepadel.id', 'player12345');
+  const r = await call('POST', '/api/bookings', { courtId: 'c2', date: tomorrow, slot: '12:00', paymentMethod: 'QRIS Instant' }, a);
+  assert.equal(r.data.paymentStatus, 'Menunggu');
+  const p = await call('POST', `/api/bookings/${r.data.id}/pay`, null, a);
+  assert.equal(p.data.paymentStatus, 'Lunas');
 });
 
-test('GET /api/courts/:id/slots returns availability', async () => {
-  const res = await fetch(`${BASE_URL}/api/courts/c1/slots?date=2026-10-25`);
-  assert.strictEqual(res.status, 200);
-  const json = await res.json();
-  assert.strictEqual(json.success, true);
-  assert.strictEqual(json.slots.length, 14);
-  assert.strictEqual(json.slots[0].slot, '08:00');
-  assert.strictEqual(json.slots[0].available, true);
+test('owner: hanya lapangan miliknya; check-in + poin; blokir slot', async () => {
+  const o = await login('owner@acepadel.id', 'owner12345');
+  const a = await login('player@acepadel.id', 'player12345');
+  const mine = await call('GET', '/api/owner/courts', null, o);
+  assert.equal(mine.data.length, 5);
+  assert.equal((await call('POST', '/api/owner/toggle-slot', { courtId: 'c9', date: tomorrow, slot: '09:00' }, o)).status, 403);
+  assert.equal((await call('POST', '/api/owner/toggle-slot', { courtId: 'c1', date: tomorrow, slot: '09:00' }, o)).status, 200);
+  assert.equal((await call('POST', '/api/bookings', { courtId: 'c1', date: tomorrow, slot: '09:00' }, a)).status, 409);
+  assert.equal((await call('POST', '/api/owner/toggle-slot', { courtId: 'c1', date: tomorrow, slot: '09:00', action: 'unblock' }, o)).status, 200);
+  const bk = (await call('POST', '/api/bookings', { courtId: 'c1', date: tomorrow, slot: '09:00' }, a)).data;
+  const v = await call('POST', '/api/owner/verify-ticket', { bookingId: bk.id }, o);
+  assert.equal(v.valid, false); // bukan hari ini
+  const st = await call('GET', '/api/owner/stats', null, o);
+  assert.ok(st.data.daily.length === 14);
 });
 
-test('POST /api/bookings creates booking and prevents double-booking', async () => {
-  // 1. Create booking
-  const createRes = await fetch(`${BASE_URL}/api/bookings`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      courtId: 'c1',
-      date: '2026-10-25',
-      slot: '18:00',
-      voucherCode: 'ACEWEEKEND',
-      paymentMethod: 'QRIS Instant'
-    })
-  });
-
-  assert.strictEqual(createRes.status, 201);
-  const createJson = await createRes.json();
-  assert.strictEqual(createJson.success, true);
-  assert.strictEqual(createJson.data.discount, 25);
-  assert.strictEqual(createJson.data.finalPrice, 155);
-  const bookingId = createJson.data.id;
-
-  // 2. Anti double-booking check for same court, date, slot
-  const duplicateRes = await fetch(`${BASE_URL}/api/bookings`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      courtId: 'c1',
-      date: '2026-10-25',
-      slot: '18:00'
-    })
-  });
-
-  assert.strictEqual(duplicateRes.status, 409); // Conflict
-
-  // 3. Verify slot availability endpoint reports taken: true
-  const slotsRes = await fetch(`${BASE_URL}/api/courts/c1/slots?date=2026-10-25`);
-  const slotsJson = await slotsRes.json();
-  const slot18 = slotsJson.slots.find((s) => s.slot === '18:00');
-  assert.strictEqual(slot18.taken, true);
-
-  // 4. Cancel booking
-  const cancelRes = await fetch(`${BASE_URL}/api/bookings/${bookingId}`, {
-    method: 'DELETE'
-  });
-  assert.strictEqual(cancelRes.status, 200);
-
-  // 5. Verify slot is freed up
-  const slotsAfterCancel = await fetch(`${BASE_URL}/api/courts/c1/slots?date=2026-10-25`);
-  const slotsAfterJson = await slotsAfterCancel.json();
-  const slot18After = slotsAfterJson.slots.find((s) => s.slot === '18:00');
-  assert.strictEqual(slot18After.taken, false);
+test('owner ajukan lapangan → admin setujui → tampil publik', async () => {
+  const o = await login('owner@acepadel.id', 'owner12345');
+  const ad = await login('admin@acepadel.id', 'admin12345');
+  const c = await call('POST', '/api/owner/courts', { name: 'Court Baru', venue: 'Venue Baru', area: 'Bandung, Jawa Barat', pricePerHour: 150 }, o);
+  assert.equal(c.data.status, 'pending');
+  assert.equal((await call('GET', `/api/courts/${c.data.id}`)).status, 404);
+  assert.equal((await call('PATCH', `/api/admin/courts/${c.data.id}/status`, { status: 'approved' }, o)).status, 403);
+  assert.equal((await call('PATCH', `/api/admin/courts/${c.data.id}/status`, { status: 'approved' }, ad)).status, 200);
+  assert.equal((await call('GET', `/api/courts/${c.data.id}`)).status, 200);
 });
 
-test('POST /api/bookings supports equipment add-ons and updates finalPrice', async () => {
-  const res = await fetch(`${BASE_URL}/api/bookings`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      courtId: 'c2',
-      date: '2026-10-26',
-      slot: '16:00',
-      addOns: ['2x Sewa Raket Bullpadel Pro', '1x 1 Can Bola Baru (3 Pcs)'],
-      addOnsTotal: 135,
-      paymentMethod: 'Bayar di tempat'
-    })
-  });
-
-  assert.strictEqual(res.status, 201);
-  const json = await res.json();
-  assert.strictEqual(json.success, true);
-  assert.strictEqual(json.data.addOns.length, 2);
-  assert.strictEqual(json.data.addOnsTotal, 135);
-  // c2 price is 150 + 135 = 285
-  assert.strictEqual(json.data.finalPrice, 285);
-
-  // Clean up
-  await fetch(`${BASE_URL}/api/bookings/${json.data.id}`, { method: 'DELETE' });
+test('mabar, teman, favorit, notifikasi, achievements', async () => {
+  const a = await login('player@acepadel.id', 'player12345');
+  const ms = await call('GET', '/api/matches', null, a);
+  const m = ms.data.find((x) => x.currentPlayers < x.maxPlayers);
+  const j = await call('POST', `/api/matches/${m.id}/join`, null, a);
+  assert.equal(j.joined, true);
+  assert.equal((await call('POST', '/api/friends/add', { playerId: 'daniel_lim' }, a)).status, 200);
+  assert.equal((await call('POST', '/api/favorites/c1', null, a)).data.favorite, true);
+  const n = await call('GET', '/api/notifications', null, a);
+  assert.ok(n.data.length > 0);
+  assert.equal((await call('GET', '/api/achievements', null, a)).data.length, 8);
+  assert.equal((await call('POST', '/api/coach-sessions', { coachId: 'coach1', date: tomorrow, slot: '15:00' }, a)).status, 201);
+  assert.equal((await call('POST', '/api/coach-sessions', { coachId: 'coach1', date: tomorrow, slot: '15:00' }, a)).status, 409);
 });
-
-test('POST /api/vouchers/validate checks promo voucher', async () => {
-  const res = await fetch(`${BASE_URL}/api/vouchers/validate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      code: 'ACEWEEKEND',
-      amount: 180
-    })
-  });
-
-  assert.strictEqual(res.status, 200);
-  const json = await res.json();
-  assert.strictEqual(json.valid, true);
-  assert.strictEqual(json.data.discountAmount, 25);
-  assert.strictEqual(json.data.finalAmount, 155);
-});
-
-test('Venue Owner endpoints: verify ticket, check-in, and toggle maintenance', async () => {
-  // 1. Create a test booking
-  const createRes = await fetch(`${BASE_URL}/api/bookings`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      courtId: 'c1',
-      date: '2026-10-30',
-      slot: '14:00',
-      paymentMethod: 'Bayar di tempat'
-    })
-  });
-  const createJson = await createRes.json();
-  const bookingId = createJson.data.id;
-
-  // 2. Verify ticket
-  const verifyRes = await fetch(`${BASE_URL}/api/venue/verify-ticket`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ bookingId })
-  });
-  assert.strictEqual(verifyRes.status, 200);
-  const verifyJson = await verifyRes.json();
-  assert.strictEqual(verifyJson.valid, true);
-  assert.strictEqual(verifyJson.data.slot, '14:00');
-
-  // 3. Check-in
-  const checkInRes = await fetch(`${BASE_URL}/api/venue/check-in`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ bookingId })
-  });
-  assert.strictEqual(checkInRes.status, 200);
-  const checkInJson = await checkInRes.json();
-  assert.strictEqual(checkInJson.data.status, 'Check-in Selesai');
-
-  // 4. Toggle maintenance on another slot
-  const blockRes = await fetch(`${BASE_URL}/api/venue/toggle-slot`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      courtId: 'c1',
-      date: '2026-10-30',
-      slot: '10:00',
-      action: 'block',
-      reason: 'Pembersihan Kaca Rutin'
-    })
-  });
-  assert.strictEqual(blockRes.status, 200);
-
-  // 5. Unblock maintenance slot
-  const unblockRes = await fetch(`${BASE_URL}/api/venue/toggle-slot`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      courtId: 'c1',
-      date: '2026-10-30',
-      slot: '10:00',
-      action: 'unblock'
-    })
-  });
-  assert.strictEqual(unblockRes.status, 200);
-
-  // Cleanup test booking
-  await fetch(`${BASE_URL}/api/bookings/${bookingId}`, { method: 'DELETE' });
-});
-
-test('Friends & Leaderboard endpoints: list, add, remove and leaderboard filtering', async () => {
-  // 1. Get friends
-  const listRes = await fetch(`${BASE_URL}/api/friends`);
-  assert.strictEqual(listRes.status, 200);
-  const listJson = await listRes.json();
-  assert.strictEqual(listJson.success, true);
-  assert.ok(Array.isArray(listJson.data));
-
-  // 2. Add friend 'p2' (Dewi Anggraini)
-  const addRes = await fetch(`${BASE_URL}/api/friends/add`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ playerId: 'p2' })
-  });
-  assert.strictEqual(addRes.status, 200);
-  const addJson = await addRes.json();
-  assert.ok(addJson.data.includes('p2'));
-
-  // 3. Get friends leaderboard
-  const lbRes = await fetch(`${BASE_URL}/api/friends/leaderboard?type=friends`);
-  assert.strictEqual(lbRes.status, 200);
-  const lbJson = await lbRes.json();
-  assert.strictEqual(lbJson.success, true);
-  assert.ok(lbJson.data.some((p) => p.id === 'p2'));
-  assert.ok(lbJson.data.some((p) => p.isMe));
-
-  // 4. Remove friend 'p2'
-  const remRes = await fetch(`${BASE_URL}/api/friends/remove`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ playerId: 'p2' })
-  });
-  assert.strictEqual(remRes.status, 200);
-  const remJson = await remRes.json();
-  assert.strictEqual(remJson.data.includes('p2'), false);
-});
-
-test('POST /api/auth/google handles Google OAuth login and updates profile', async () => {
-  const res = await fetch(`${BASE_URL}/api/auth/google`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      email: 'test.google@padel.id',
-      name: 'Google Padel User',
-      photoUrl: 'https://lh3.googleusercontent.com/test',
-      googleId: 'g_123456789'
-    })
-  });
-  assert.strictEqual(res.status, 200);
-  const json = await res.json();
-  assert.strictEqual(json.success, true);
-  assert.strictEqual(json.data.email, 'test.google@padel.id');
-  assert.strictEqual(json.data.name, 'Google Padel User');
-  assert.strictEqual(json.data.authProvider, 'google');
-  assert.ok(json.token);
-});
-
-test('Super Admin endpoints: overview, courts, vouchers, and web portal HTML', async () => {
-  // 1. Overview metrics
-  const ovRes = await fetch(`${BASE_URL}/api/admin/overview`);
-  assert.strictEqual(ovRes.status, 200);
-  const ovJson = await ovRes.json();
-  assert.strictEqual(ovJson.success, true);
-  assert.ok(ovJson.data.metrics.totalCourts > 0);
-  assert.ok(ovJson.data.metrics.totalRevenueFormatted);
-
-  // 2. Add court
-  const addCourtRes = await fetch(`${BASE_URL}/api/admin/courts`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name: 'Super Court Test',
-      venue: 'Hellens Arena',
-      area: 'Jakarta Pusat',
-      pricePerHour: 220,
-      indoor: true
-    })
-  });
-  assert.strictEqual(addCourtRes.status, 201);
-  const addCourtJson = await addCourtRes.json();
-  assert.strictEqual(addCourtJson.success, true);
-  assert.strictEqual(addCourtJson.data.name, 'Super Court Test');
-
-  // 3. Add & delete voucher
-  const addVoucherRes = await fetch(`${BASE_URL}/api/admin/vouchers`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      code: 'TESTSUPER50',
-      discount: 50,
-      description: 'Diskon 50k uji coba'
-    })
-  });
-  assert.strictEqual(addVoucherRes.status, 201);
-
-  const delVoucherRes = await fetch(`${BASE_URL}/api/admin/vouchers/TESTSUPER50`, {
-    method: 'DELETE'
-  });
-  assert.strictEqual(delVoucherRes.status, 200);
-
-  // 4. Web portal serves HTML
-  const webRes = await fetch(`${BASE_URL}/admin`);
-  assert.strictEqual(webRes.status, 200);
-  const html = await webRes.text();
-  assert.ok(html.includes('Ace Padel'));
-  assert.ok(html.includes('Super Admin'));
-});
-
-

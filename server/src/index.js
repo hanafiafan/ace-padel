@@ -1,88 +1,61 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-
-const courtsRouter = require('./routes/courts');
-const bookingsRouter = require('./routes/bookings');
-const matchesRouter = require('./routes/matches');
-const vouchersRouter = require('./routes/vouchers');
-const reviewsRouter = require('./routes/reviews');
-const authRouter = require('./routes/auth');
-const venueRouter = require('./routes/venue');
-const friendsRouter = require('./routes/friends');
-const adminRouter = require('./routes/admin');
+const { db } = require('./db');
+const { HttpError } = require('./lib/util');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Request logger
+app.set('trust proxy', 1);
+app.disable('x-powered-by');
+app.use(cors({ origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : true }));
+app.use(express.json({ limit: '5mb' }));
 app.use((req, res, next) => {
-  const start = Date.now();
-  res.on('finish', () => {
-    const duration = Date.now() - start;
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} ${res.statusCode} (${duration}ms)`);
-  });
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   next();
 });
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'healthy',
-    service: 'ace-padel-backend',
-    version: '1.0.0',
-    timestamp: new Date().toISOString()
-  });
-});
-
-// Web Admin Dashboard Routes
-app.get(['/', '/admin'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/admin.html'));
-});
-
-// Routes
-app.use('/api/courts', courtsRouter);
-app.use('/api/bookings', bookingsRouter);
-app.use('/api/matches', matchesRouter);
-app.use('/api/vouchers', vouchersRouter);
-app.use('/api/reviews', reviewsRouter);
-app.use('/api/auth', authRouter);
-app.use('/api/venue', venueRouter);
-app.use('/api/friends', friendsRouter);
-app.use('/api/admin', adminRouter);
-
-// 404 Handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: `Endpoint ${req.method} ${req.originalUrl} tidak ditemukan`
-  });
-});
-
-// Global Error Handler
-app.use((err, req, res, next) => {
-  console.error('Unhandled server error:', err);
-  res.status(500).json({
-    success: false,
-    message: 'Internal server error',
-    error: err.message
-  });
-});
-
-// Start server if executed directly
-if (require.main === module) {
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🎾 Ace Padel Backend Server is running at http://localhost:${PORT}`);
-    console.log(`📋 Health Check: http://localhost:${PORT}/api/health`);
-    console.log(`🏟️ Courts API:  http://localhost:${PORT}/api/courts`);
-    console.log(`📅 Bookings API: http://localhost:${PORT}/api/bookings`);
+if (process.env.NODE_ENV !== 'test') {
+  app.use((req, res, next) => {
+    const t = Date.now();
+    res.on('finish', () => req.originalUrl.startsWith('/api') && console.log(`${req.method} ${req.originalUrl} ${res.statusCode} ${Date.now() - t}ms`));
+    next();
   });
 }
 
-module.exports = app;
+// Booking online yang tidak dibayar dalam 15 menit dibatalkan otomatis → slot terbuka lagi
+app.use('/api', (req, res, next) => {
+  db.prepare("UPDATE bookings SET status = 'Dibatalkan', cancelled_at = ?, payment_status = 'Kedaluwarsa' WHERE status = 'Terkonfirmasi' AND payment_status = 'Menunggu' AND payment_expires_at < ?")
+    .run(new Date().toISOString(), new Date().toISOString());
+  next();
+});
 
+app.get('/api/health', (req, res) => res.json({ status: 'healthy', service: 'ace-padel-backend', version: '2.0.0', timestamp: new Date().toISOString() }));
+
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/owner', require('./routes/owner'));
+app.use('/api/admin', require('./routes/admin'));
+app.use('/api', require('./routes/catalog'));
+app.use('/api', require('./routes/player'));
+
+app.use('/api', (req, res) => res.status(404).json({ success: false, message: `Endpoint ${req.method} ${req.originalUrl} tidak ditemukan` }));
+
+// Web: landing + panel (statis, tanpa build step)
+const PUB = path.join(__dirname, '../public');
+app.use('/uploads', express.static(path.join(__dirname, '../data/uploads')));
+app.use(express.static(PUB, { extensions: ['html'] }));
+app.get(['/app', '/app/*'], (req, res) => res.sendFile(path.join(PUB, 'app/index.html')));
+
+app.use((err, req, res, next) => {
+  if (err instanceof HttpError) return res.status(err.status).json({ success: false, message: err.message });
+  if (err.type === 'entity.parse.failed') return res.status(400).json({ success: false, message: 'JSON tidak valid' });
+  console.error(err);
+  res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server' });
+});
+
+if (require.main === module) {
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, '0.0.0.0', () => console.log(`Ace Padel server → http://localhost:${PORT}  (web: / , panel: /app , API: /api)`));
+}
+module.exports = app;

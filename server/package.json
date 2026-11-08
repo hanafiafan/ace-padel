@@ -1,18 +1,20 @@
 {
   "name": "ace-padel-backend",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "REST API backend for Ace Padel reservation mobile app",
   "author": "hellens.dev",
   "homepage": "https://hellens.dev",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js",
-    "test": "node --test"
+    "start": "NODE_NO_WARNINGS=1 node src/index.js",
+    "dev": "NODE_NO_WARNINGS=1 node --watch src/index.js",
+    "test": "NODE_NO_WARNINGS=1 node --test"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.2"
+  },
+  "engines": {
+    "node": ">=22.13"
   }
 }
-
