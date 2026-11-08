@@ -31,8 +31,27 @@ class _HomeScreenState extends State<HomeScreen> {
   String _cat = 'Semua';
   bool? _indoorFilter;
 
+  void _rebuild() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    CatalogStore.instance.addListener(_rebuild);
+  }
+
+  Future<void> _refreshAll() async {
+    await Future.wait([
+      CatalogStore.instance.loadAll(),
+      MatchStore.instance.refresh(),
+      if (UserStore.instance.isLoggedIn) BookingStore.instance.refresh(),
+    ]);
+  }
+
   @override
   void dispose() {
+    CatalogStore.instance.removeListener(_rebuild);
     _controller.dispose();
     super.dispose();
   }
@@ -226,6 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return ResponsiveContainer(
       child: SafeArea(
         child: APList(
+          onRefresh: _refreshAll,
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
           children: [
             // Executive Brand & Action Header
@@ -314,7 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 final user = UserStore.instance.profile;
                 return APPhotoHero(
                   name: user.name.split(' ').first,
-                  line: '12 lapangan tersedia',
+                  line: '${courts.length} lapangan tersedia',
                   cta: 'Pesan lapangan',
                   onCta: () => tabIndex.value = 1,
                 );
@@ -385,8 +405,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(12),
-                            child: Image.asset(
-                              next.court.image,
+                            child: apImg(
+next.court.image, fallbackUrl: next.court.imageUrl,
                               width: 44,
                               height: 44,
                               fit: BoxFit.cover,
@@ -607,8 +627,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
-                          m.court.image,
+                        child: apImg(
+m.court.image, fallbackUrl: m.court.imageUrl,
                           width: 52,
                           height: 52,
                           fit: BoxFit.cover,

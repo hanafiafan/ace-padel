@@ -1,10 +1,39 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import '../../services/api_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/haptics.dart';
 
 const _kDisplay = 'Display';
+
+/// Bundled asset (`assets/...`) or a server path (`/img/..`, `/uploads/..`).
+ImageProvider apImageProvider(String src) => src.startsWith('assets/')
+    ? AssetImage(src) as ImageProvider
+    : NetworkImage(ApiService.instance.absUrl(src));
+
+/// Image from a bundled asset when present, else from the server (`fallbackUrl`).
+Widget apImg(
+  String src, {
+  String fallbackUrl = '',
+  double? width,
+  double? height,
+  BoxFit fit = BoxFit.cover,
+  Alignment alignment = Alignment.center,
+  ImageErrorWidgetBuilder? errorBuilder,
+}) {
+  final err = errorBuilder ?? (_, __, ___) => const ColoredBox(color: APColors.blueDark);
+  if (src.isEmpty && fallbackUrl.isEmpty) return Builder(builder: (c) => err(c, 'empty', null));
+  if (src.startsWith('assets/')) {
+    return Image.asset(src, width: width, height: height, fit: fit, alignment: alignment,
+        errorBuilder: fallbackUrl.isEmpty
+            ? err
+            : (c, e, s) => Image.network(ApiService.instance.absUrl(fallbackUrl),
+                width: width, height: height, fit: fit, alignment: alignment, errorBuilder: err));
+  }
+  return Image.network(ApiService.instance.absUrl(src.isEmpty ? fallbackUrl : src),
+      width: width, height: height, fit: fit, alignment: alignment, errorBuilder: err);
+}
 
 /// Photo with a bottom-weighted black scrim, so text on top stays legible.
 class APPhoto extends StatelessWidget {
@@ -12,11 +41,12 @@ class APPhoto extends StatelessWidget {
   final Alignment alignment;
   final double scrim; // 0..1 strength of the dark overlay
   final Widget? child;
-  const APPhoto({super.key, required this.asset, this.alignment = Alignment.center, this.scrim = .72, this.child});
+  final String fallbackUrl;
+  const APPhoto({super.key, required this.asset, this.fallbackUrl = '', this.alignment = Alignment.center, this.scrim = .72, this.child});
 
   @override
   Widget build(BuildContext context) => Stack(fit: StackFit.expand, children: [
-        Image.asset(asset, fit: BoxFit.cover, alignment: alignment, errorBuilder: (_, __, ___) => const ColoredBox(color: APColors.blueDark)),
+        apImg(asset, fallbackUrl: fallbackUrl, alignment: alignment),
         DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(

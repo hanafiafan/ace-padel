@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import '../core/utils/ui.dart';
+import '../data.dart' show relativeDate;
+import '../services/api_service.dart';
+import '../store.dart';
 import '../theme.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -10,54 +14,38 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  final List<Map<String, dynamic>> _items = [
-    {
-      'title': 'Pengingat Jadwal Main',
-      'body':
-          'Jadwal bermain Anda di Center Court Senayan akan dimulai dalam 2 jam. Jangan lupa membawa sepatu padel!',
-      'time': '30 menit lalu',
-      'icon': LucideIcons.clock,
-      'color': AP.blue,
-      'unread': true,
-    },
-    {
-      'title': 'Poin Leaderboard Bertambah!',
-      'body':
-          'Kemenangan match terakhir menambahkan +120 poin. Peringkat Anda kini berada di Top 4!',
-      'time': '3 jam lalu',
-      'icon': LucideIcons.trophy,
-      'color': const Color(0xFFF5B301),
-      'unread': true,
-    },
-    {
-      'title': 'Promo Weekend Smash',
-      'body':
-          'Gunakan kode ACEWEEKEND untuk potongan Rp25.000 pada seluruh lapangan outdoor akhir pekan ini.',
-      'time': 'Kemarin',
-      'icon': LucideIcons.tag,
-      'color': AP.lime,
-      'unread': false,
-    },
-    {
-      'title': 'Badge Baru Terbuka!',
-      'body':
-          'Selamat, Anda telah membuka badge "Rajin Main" setelah menyelesaikan 10 sesi booking.',
-      'time': '2 hari lalu',
-      'icon': LucideIcons.medal,
-      'color': AP.slate,
-      'unread': false,
-    },
-  ];
+  final _store = NotificationStore.instance;
 
-  void _markAllRead() {
-    setState(() {
-      for (final item in _items) {
-        item['unread'] = false;
-      }
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Semua notifikasi ditandai telah dibaca.')),
-    );
+  @override
+  void initState() {
+    super.initState();
+    if (UserStore.instance.isLoggedIn) _store.refresh();
+  }
+
+  Future<void> _markAllRead() async {
+    try {
+      await _store.markAllRead();
+      if (mounted) showInfo(context, 'Semua notifikasi ditandai telah dibaca.');
+    } on ApiException catch (e) {
+      if (mounted) showError(context, e);
+    }
+  }
+
+  static (IconData, Color) _style(String type) {
+    switch (type) {
+      case 'booking':
+        return (LucideIcons.clock, AP.blue);
+      case 'payment':
+        return (LucideIcons.badgeCheck, const Color(0xFF16A34A));
+      case 'match':
+        return (LucideIcons.users, AP.blue);
+      case 'friend':
+        return (LucideIcons.userPlus, AP.blue);
+      case 'coach':
+        return (LucideIcons.medal, const Color(0xFFF5B301));
+      default:
+        return (LucideIcons.bell, AP.slate);
+    }
   }
 
   @override
@@ -83,14 +71,42 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           const SizedBox(width: 8),
         ],
       ),
-      body: ListView.separated(
+      body: AnimatedBuilder(
+        animation: Listenable.merge([_store, UserStore.instance]),
+        builder: (context, _) {
+          if (!UserStore.instance.isLoggedIn) {
+            return _centerNote('Masuk untuk melihat notifikasi Anda.',
+                action: TextButton(onPressed: () => requireLogin(context, 'melihat notifikasi'), child: const Text('Masuk')));
+          }
+          if (_store.isLoading && _store.items.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (_store.error != null && _store.items.isEmpty) {
+            return _centerNote(_store.error!, action: TextButton(onPressed: _store.refresh, child: const Text('Coba lagi')));
+          }
+          if (_store.items.isEmpty) return _centerNote('Belum ada notifikasi.');
+          return RefreshIndicator(
+            onRefresh: _store.refresh,
+            child: ListView.separated(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
-        itemCount: _items.length,
+        itemCount: _store.items.length,
         separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (context, i) {
-          final n = _items[i];
+          final item = _store.items[i];
+          final (icon, color) = _style(item.type);
+          final n = {
+            'title': item.title,
+            'body': item.body,
+            'time': relativeDate(item.createdAt?.toIso8601String()),
+            'icon': icon,
+            'color': color,
+            'unread': !item.read,
+          };
           final unread = n['unread'] as bool;
-          return Container(
+          return GestureDetector(
+            onTap: unread ? () => _store.markRead(item) : null,
+            child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: AP.surface,
@@ -170,9 +186,28 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 ),
               ],
             ),
+            ),
+          );
+        },
+      ),
           );
         },
       ),
     );
   }
+
+  Widget _centerNote(String msg, {Widget? action}) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(LucideIcons.bellOff, size: 40, color: AP.slate),
+              const SizedBox(height: 12),
+              Text(msg, textAlign: TextAlign.center, style: TextStyle(color: AP.slate)),
+              if (action != null) action,
+            ],
+          ),
+        ),
+      );
 }

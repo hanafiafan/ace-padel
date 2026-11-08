@@ -86,6 +86,7 @@ class FavoritesScreen extends StatelessWidget {
           }
 
           return APList(
+            onRefresh: FavoriteStore.instance.refresh,
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
             children: [
               Text(

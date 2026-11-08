@@ -4,7 +4,8 @@ import '../core/widgets/ap_banners.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
 import '../core/widgets/responsive_container.dart';
-import '../data.dart';
+import '../core/utils/ui.dart';
+import '../services/api_service.dart';
 import '../store.dart';
 import '../theme.dart';
 import 'achievements_screen.dart';
@@ -18,6 +19,7 @@ class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   void _showEditProfile(BuildContext context) {
+    if (!requireLogin(context, 'mengubah profil')) return;
     final user = UserStore.instance.profile;
     final nameCtrl = TextEditingController(text: user.name);
     final phoneCtrl = TextEditingController(text: user.phone);
@@ -119,18 +121,18 @@ class ProfileScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: () {
-                    UserStore.instance.updateProfile(
-                      name: nameCtrl.text.trim().isEmpty ? null : nameCtrl.text.trim(),
-                      phone: phoneCtrl.text.trim().isEmpty ? null : phoneCtrl.text.trim(),
-                      skillLevel: selectedLevel,
-                    );
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Profil berhasil diperbarui.'),
-                      ),
-                    );
+                  onPressed: () async {
+                    try {
+                      await UserStore.instance.updateProfile(
+                        name: nameCtrl.text.trim().isEmpty ? null : nameCtrl.text.trim(),
+                        phone: phoneCtrl.text.trim().isEmpty ? null : phoneCtrl.text.trim(),
+                        skillLevel: selectedLevel,
+                      );
+                      if (ctx.mounted) Navigator.pop(ctx);
+                      if (context.mounted) showInfo(context, 'Profil berhasil diperbarui.');
+                    } on ApiException catch (e) {
+                      if (context.mounted) showError(context, e);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AP.lime,
@@ -226,7 +228,8 @@ class ProfileScreen extends StatelessWidget {
                      CircleAvatar(
                       radius: 32,
                       backgroundColor: AP.lime,
-                      child: Icon(LucideIcons.userRound, color: AP.onLime, size: 36),
+                      backgroundImage: (user.photoUrl ?? '').isNotEmpty ? NetworkImage(user.photoUrl!) : null,
+                      child: (user.photoUrl ?? '').isNotEmpty ? null : Icon(LucideIcons.userRound, color: AP.onLime, size: 36),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -243,7 +246,7 @@ class ProfileScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            user.email,
+                            user.isLoggedIn ? user.email : 'Mode tamu - masuk untuk fitur lengkap',
                             style: const TextStyle(
                               color: Colors.white70,
                               fontSize: 13,
@@ -355,18 +358,18 @@ class ProfileScreen extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // Stats row
+          // Stats row (GET /me/stats)
           AnimatedBuilder(
-            animation: BookingStore.instance,
+            animation: Listenable.merge([StatsStore.instance, BookingStore.instance]),
             builder: (_, __) {
-              final total = BookingStore.instance.bookings.length;
+              final st = StatsStore.instance;
               return Row(
                 children: [
-                  _stat('$total', 'Booking Aktif'),
+                  _stat('${BookingStore.instance.bookings.length}', 'Booking Aktif'),
                   const SizedBox(width: 12),
-                  _stat('${total * 2 + 10}', 'Jam Main'),
+                  _stat('${st.hoursPlayed}', 'Jam Main'),
                   const SizedBox(width: 12),
-                  _stat('4.9', 'Rating Player'),
+                  _stat(st.rank > 0 ? '#${st.rank}' : '-', 'Peringkat'),
                 ],
               );
             },
@@ -395,20 +398,93 @@ class ProfileScreen extends StatelessWidget {
           const SizedBox(height: 12),
           SizedBox(
             height: 96,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: achievements.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 14),
-              itemBuilder: (_, i) => AchievementBadge(a: achievements[i]),
+            child: AnimatedBuilder(
+              animation: StatsStore.instance,
+              builder: (_, __) {
+                final list = StatsStore.instance.achievementList;
+                return ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: list.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 14),
+                  itemBuilder: (_, i) => AchievementBadge(a: list[i]),
+                );
+              },
             ),
           ),
 
           const SizedBox(height: 24),
 
-          // Mitra Lapangan Portal Card
-          GestureDetector(
+          // Mitra Lapangan Portal Card (only for server-confirmed owner/admin)
+          AnimatedBuilder(
+            animation: UserStore.instance,
+            builder: (context, _) => UserStore.instance.isVenueOwner
+                ? _partnerCard(context)
+                : const SizedBox.shrink(),
+          ),
+
+          // Navigation list
+          _tile(
+            LucideIcons.creditCard,
+            'Metode pembayaran',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const PaymentMethodsScreen(),
+              ),
+            ),
+          ),
+          _tile(
+            LucideIcons.heart,
+            'Venue favorit',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const FavoritesScreen(),
+              ),
+            ),
+          ),
+          _tile(
+            LucideIcons.bell,
+            'Notifikasi',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const NotificationsScreen(),
+              ),
+            ),
+          ),
+          _tile(
+            LucideIcons.settings,
+            'Pengaturan',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SettingsScreen()),
+            ),
+          ),
+          _tile(
+            LucideIcons.circleHelp,
+            'Bantuan & FAQ',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const HelpScreen(),
+              ),
+            ),
+          ),
+          AnimatedBuilder(
+            animation: UserStore.instance,
+            builder: (context, _) => UserStore.instance.isLoggedIn
+                ? _tile(LucideIcons.logOut, 'Keluar', danger: true, onTap: () => _showLogoutDialog(context))
+                : _tile(LucideIcons.logIn, 'Masuk / Daftar', onTap: () => requireLogin(context, 'mengakses akun Anda')),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+  Widget _partnerCard(BuildContext context) => GestureDetector(
             onTap: () {
-              UserStore.instance.switchRole('venue_owner');
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -495,7 +571,6 @@ class ProfileScreen extends StatelessWidget {
                   const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: () {
-                      UserStore.instance.switchRole('venue_owner');
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -521,68 +596,7 @@ class ProfileScreen extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-
-          // Navigation list
-          _tile(
-            LucideIcons.creditCard,
-            'Metode pembayaran',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const PaymentMethodsScreen(),
-              ),
-            ),
-          ),
-          _tile(
-            LucideIcons.heart,
-            'Venue favorit',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const FavoritesScreen(),
-              ),
-            ),
-          ),
-          _tile(
-            LucideIcons.bell,
-            'Notifikasi',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const NotificationsScreen(),
-              ),
-            ),
-          ),
-          _tile(
-            LucideIcons.settings,
-            'Pengaturan',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const SettingsScreen()),
-            ),
-          ),
-          _tile(
-            LucideIcons.circleHelp,
-            'Bantuan & FAQ',
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const HelpScreen(),
-              ),
-            ),
-          ),
-          _tile(
-            LucideIcons.logOut,
-            'Keluar',
-            danger: true,
-            onTap: () => _showLogoutDialog(context),
-          ),
-        ],
-      ),
-    ),
-  );
-}
+          );
 
   Widget _stat(String value, String label) => Expanded(
         child: Container(

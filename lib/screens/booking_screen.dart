@@ -1,9 +1,12 @@
+import '../core/widgets/ap_banners.dart';
 import 'package:flutter/material.dart';
 import '../core/widgets/ap_decor.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../core/utils/haptics.dart';
+import '../core/utils/ui.dart';
+import '../services/api_service.dart';
 import '../core/widgets/responsive_container.dart';
 import '../data.dart';
 import '../store.dart';
@@ -36,11 +39,25 @@ class _BookingScreenState extends State<BookingScreen> {
     final today = DateTime(now.year, now.month, now.day);
     _days = List.generate(7, (i) => today.add(Duration(days: i)));
     _selectedDay = _days.first;
+    BookingStore.instance.addListener(_rebuild);
+    BookingStore.instance.loadSlots(widget.court, _selectedDay);
+    ReviewStore.instance.load(widget.court.id);
+  }
+
+  void _rebuild() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    BookingStore.instance.removeListener(_rebuild);
+    super.dispose();
   }
 
   void _confirm() {
     final slot = _slot;
     if (slot == null) return;
+    if (!requireLogin(context, 'memesan lapangan')) return;
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -51,10 +68,11 @@ class _BookingScreenState extends State<BookingScreen> {
           durationMinutes: _selectedDurationMinutes,
         ),
       ),
-    ).then((_) => setState(() {})); // refresh slot jika status berubah
+    ).then((_) => BookingStore.instance.loadSlots(widget.court, _selectedDay)); // refresh slot
   }
 
   void _showWriteReviewDialog() {
+    if (!requireLogin(context, 'menulis ulasan')) return;
     double selectedRating = 5.0;
     final commentCtrl = TextEditingController();
 
@@ -124,28 +142,16 @@ class _BookingScreenState extends State<BookingScreen> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     final comment = commentCtrl.text.trim();
                     if (comment.isEmpty) return;
-                    final user = UserStore.instance.profile;
-                    ReviewStore.instance.addReview(
-                      CourtReview(
-                        id: 'r_${DateTime.now().millisecondsSinceEpoch}',
-                        courtId: widget.court.id,
-                        userName: user.name,
-                        rating: selectedRating,
-                        comment: comment,
-                        date: 'Hari ini',
-                        skillLevel: user.skillLevel.split(' ').first,
-                      ),
-                    );
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content:
-                            Text('Terima kasih! Ulasan Anda berhasil diterbitkan.'),
-                      ),
-                    );
+                    try {
+                      await ReviewStore.instance.submit(widget.court.id, selectedRating, comment);
+                      if (ctx.mounted) Navigator.pop(ctx);
+                      if (mounted) showInfo(context, 'Terima kasih! Ulasan Anda berhasil diterbitkan.');
+                    } on ApiException catch (e) {
+                      if (mounted) showError(context, e);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AP.lime,
@@ -202,8 +208,15 @@ class _BookingScreenState extends State<BookingScreen> {
                       isFav ? LucideIcons.heart : LucideIcons.heart,
                       color: isFav ? Colors.redAccent : Colors.white,
                     ),
-                    onPressed: () {
-                      FavoriteStore.instance.toggle(c.id);
+                    onPressed: () async {
+                      if (!requireLogin(context, 'menyimpan venue favorit')) return;
+                      try {
+                        await FavoriteStore.instance.toggle(c.id);
+                      } on ApiException catch (e) {
+                        if (context.mounted) showError(context, e);
+                        return;
+                      }
+                      if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(isFav
@@ -239,8 +252,8 @@ class _BookingScreenState extends State<BookingScreen> {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.asset(
-                    c.image,
+                  apImg(
+c.image, fallbackUrl: c.imageUrl,
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => Container(
                       decoration: BoxDecoration(
@@ -626,6 +639,7 @@ class _BookingScreenState extends State<BookingScreen> {
           _selectedDay = d;
           _slot = null; // reset karena ketersediaan beda per hari
         });
+        BookingStore.instance.loadSlots(widget.court, d);
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
@@ -764,7 +778,7 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   Widget _durationPicker() {
-    final durations = [60, 90, 120];
+    final durations = [60]; // server books one hourly slot per reservation
     return Row(
       children: durations.map((d) {
         final selected = _selectedDurationMinutes == d;

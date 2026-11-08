@@ -1,3 +1,4 @@
+import '../core/widgets/ap_banners.dart';
 import 'package:flutter/material.dart';
 import '../core/utils/launch.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -307,7 +308,7 @@ class TicketScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage(c.image),
+                      image: apImageProvider(c.image),
                       fit: BoxFit.cover,
                       colorFilter: ColorFilter.mode(
                           Colors.black.withValues(alpha: isCancelled ? .75 : .6), BlendMode.darken),

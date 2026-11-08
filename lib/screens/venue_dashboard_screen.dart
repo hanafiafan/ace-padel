@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
 import '../data.dart';
+import '../core/utils/ui.dart';
 import '../services/api_service.dart';
 import '../store.dart';
 import '../theme.dart';
@@ -18,8 +19,9 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
   late TabController _tabController;
   final TextEditingController _codeController = TextEditingController();
 
-  late Court _selectedCourt;
-  DateTime _selectedDate = DateTime.now();
+  OwnerStore get _o => OwnerStore.instance;
+  Court get _selectedCourt => _o.selected!;
+  DateTime get _selectedDate => _o.date;
 
   // Ticket verification state
   bool _isVerifying = false;
@@ -31,11 +33,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    final user = UserStore.instance.profile;
-    _selectedCourt = courts.firstWhere(
-      (c) => c.id == user.managedCourtId,
-      orElse: () => courts.first,
-    );
+    _o.init(); // /owner/courts, /owner/stats, /owner/schedule, /owner/bookings
   }
 
   @override
@@ -60,50 +58,23 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
       _verificationMessage = null;
     });
 
-    // 1. Try local store
-    final localBooking = BookingStore.instance.findBookingById(clean);
-
-    // 2. Try backend API asynchronously
-    final apiResult = await ApiService.instance.verifyTicket(clean);
-
+    final r = await _o.verify(clean);
+    if (!mounted) return;
     setState(() {
       _isVerifying = false;
-      if (localBooking != null) {
-        _verifiedBooking = localBooking;
-        _verificationSuccess = true;
-        _verificationMessage = localBooking.isCheckedIn
-            ? 'Tiket ini SUDAH PERNAH Check-in sebelumnya.'
-            : (localBooking.status == 'Dibatalkan'
-                ? 'Tiket ini telah DIBATALKAN.'
-                : 'Tiket VALID dan terverifikasi!');
-      } else if (apiResult != null && apiResult['success'] == true) {
-        final bData = apiResult['data'] as Map<String, dynamic>;
-        final courtId = bData['courtId'] as String;
-        final c = courts.firstWhere((x) => x.id == courtId, orElse: () => courts.first);
-        _verifiedBooking = Booking(
-          id: bData['id'] as String?,
-          court: c,
-          date: DateTime.tryParse(bData['date'] ?? '') ?? DateTime.now(),
-          slot: bData['slot'] ?? '18:00',
-          paymentMethod: bData['paymentMethod'] ?? 'Bayar di tempat',
-          status: bData['status'] ?? 'Terkonfirmasi',
-        );
-        _verificationSuccess = true;
-        _verificationMessage = apiResult['message'] ?? 'Tiket valid!';
-      } else {
-        _verificationSuccess = false;
-        _verificationMessage = apiResult?['message'] ??
-            'Kode booking tidak ditemukan dalam sistem reservasi.';
-      }
+      _verifiedBooking = r.booking;
+      _verificationSuccess = r.valid;
+      _verificationMessage = r.message;
     });
   }
 
-  void _confirmCheckIn(Booking booking) {
-    final success = BookingStore.instance.checkIn(booking.id);
-    if (success) {
+  Future<void> _confirmCheckIn(Booking booking) async {
+    try {
+      final msg = await _o.checkIn(booking.id);
+      if (!mounted) return;
       setState(() {
         _verifiedBooking = booking.copyWith(status: 'Check-in Selesai');
-        _verificationMessage = 'Pemain berhasil CHECK-IN! Selamat bermain.';
+        _verificationMessage = msg;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -119,6 +90,8 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
           ),
         ),
       );
+    } on ApiException catch (e) {
+      if (mounted) showError(context, e);
     }
   }
 
@@ -192,20 +165,14 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
               child:  Text('Batal', style: TextStyle(color: AP.slate)),
             ),
             ElevatedButton(
-              onPressed: () {
-                BookingStore.instance.toggleMaintenance(
-                  _selectedCourt,
-                  _selectedDate,
-                  slot,
-                  block: true,
-                  reason: selectedReason,
-                );
+              onPressed: () async {
                 Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Slot $slot berhasil ditutup untuk $selectedReason.'),
-                  ),
-                );
+                try {
+                  await _o.toggleSlot(slot, block: true, reason: selectedReason);
+                  if (mounted) showInfo(context, 'Slot $slot berhasil ditutup untuk $selectedReason.');
+                } on ApiException catch (e) {
+                  if (mounted) showError(context, e);
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange.shade800,
@@ -223,16 +190,50 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
     );
   }
 
-  void _unblockSlot(String slot) {
-    BookingStore.instance.toggleMaintenance(
-      _selectedCourt,
-      _selectedDate,
-      slot,
-      block: false,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Slot $slot dibuka kembali untuk umum.'),
+  Future<void> _unblockSlot(String slot) async {
+    try {
+      await _o.toggleSlot(slot, block: false);
+      if (mounted) showInfo(context, 'Slot $slot dibuka kembali untuk umum.');
+    } on ApiException catch (e) {
+      if (mounted) showError(context, e);
+    }
+  }
+
+  /// Walk-in / manual booking by the cashier.
+  void _showWalkInDialog(String slot) {
+    final ctrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AP.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text('Booking Walk-in $slot',
+            style: const TextStyle(fontFamily: 'Display', fontWeight: FontWeight.w800, fontSize: 20.7)),
+        content: TextField(
+          controller: ctrl,
+          decoration: InputDecoration(
+            hintText: 'Nama pelanggan',
+            filled: true,
+            fillColor: AP.cloud,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Batal', style: TextStyle(color: AP.slate))),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await _o.manualBooking(slot, ctrl.text.trim().isEmpty ? 'Tamu' : ctrl.text.trim());
+                if (mounted) showInfo(context, 'Booking walk-in $slot dibuat.');
+              } on ApiException catch (e) {
+                if (mounted) showError(context, e);
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AP.blue, foregroundColor: Colors.white, elevation: 0),
+            child: const Text('Simpan', style: TextStyle(fontWeight: FontWeight.w700)),
+          ),
+        ],
       ),
     );
   }
@@ -262,7 +263,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
               ),
             ),
             Text(
-              _selectedCourt.venue,
+              _o.selected?.venue ?? 'Pemilik Lapangan',
               style: const TextStyle(
                 color: AP.lime,
                 fontSize: 11,
@@ -277,10 +278,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
           Container(
             margin: const EdgeInsets.only(right: 12),
             child: TextButton.icon(
-              onPressed: () {
-                UserStore.instance.switchRole('player');
-                Navigator.pop(context);
-              },
+              onPressed: () => Navigator.pop(context),
               icon: const Icon(LucideIcons.arrowLeftRight, color: AP.lime, size: 16),
               label: const Text(
                 'Mode Pemain',
@@ -321,8 +319,31 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
         ),
       ),
       body: AnimatedBuilder(
-        animation: BookingStore.instance,
+        animation: _o,
         builder: (context, _) {
+          if (_o.selected == null) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: _o.isLoading
+                    ? const CircularProgressIndicator()
+                    : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(LucideIcons.store, size: 40, color: AP.slate),
+                          const SizedBox(height: 12),
+                          Text(
+                            _o.error ?? 'Belum ada lapangan yang terdaftar atas akun Anda.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: AP.slate),
+                          ),
+                          const SizedBox(height: 12),
+                          OutlinedButton(onPressed: _o.init, child: const Text('Muat ulang')),
+                        ],
+                      ),
+              ),
+            );
+          }
           return TabBarView(
             controller: _tabController,
             children: [
@@ -339,6 +360,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
   // ================= TAB 1: VALIDASI TIKET QR ================= //
   Widget _buildValidationTab() {
     return APList(
+      onRefresh: _o.refresh,
       padding: const EdgeInsets.all(16),
       children: [
         // Venue Selector Banner
@@ -526,7 +548,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                     'Coba cepat:',
                     style: TextStyle(color: AP.slate, fontSize: 12),
                   ),
-                  ...BookingStore.instance.bookings.take(2).map((b) => GestureDetector(
+                  ..._o.courtBookings.where((b) => b.status == 'Terkonfirmasi').take(2).map((b) => GestureDetector(
                         onTap: () {
                           _codeController.text = b.id;
                           _verifyTicket(b.id);
@@ -651,7 +673,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
             _infoRow('Total Biaya', 'Rp${b.finalPrice}.000'),
             _infoRow('Status Saat Ini', b.status),
 
-            if (!isCheckedIn && !isCancelled) ...[
+            if (!isCheckedIn && !isCancelled && _verificationSuccess) ...[
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
@@ -706,9 +728,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
   }
 
   Widget _buildCheckedInLog() {
-    final checkedInBookings = BookingStore.instance.bookings
-        .where((b) => b.court.id == _selectedCourt.id && b.isCheckedIn)
-        .toList();
+    final checkedInBookings = _o.courtBookings.where((b) => b.isCheckedIn).toList();
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -834,12 +854,8 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
 
   // ================= TAB 2: MANAJEMEN JADWAL & SLOT ================= //
   Widget _buildScheduleTab() {
-    final dailyBookings = BookingStore.instance.getBookingsForCourtAndDate(
-      _selectedCourt.id,
-      _selectedDate,
-    );
-
     return APList(
+      onRefresh: _o.refresh,
       padding: const EdgeInsets.all(16),
       children: [
         // Venue Selector Banner
@@ -863,11 +879,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
         const SizedBox(height: 14),
 
         // 14 Time Slots (08:00 - 22:00)
-        ...allSlots.map((slot) {
-          final booking =
-              dailyBookings.where((b) => b.slot == slot).firstOrNull;
-          return _buildSlotCard(slot, booking);
-        }),
+        ...allSlots.map((slot) => _buildSlotCard(slot, _o.schedule[slot])),
       ],
     );
   }
@@ -994,6 +1006,12 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
 
           // Action Buttons
           if (isAvailable)
+            IconButton(
+              tooltip: 'Booking walk-in',
+              onPressed: () => _showWalkInDialog(slot),
+              icon: Icon(LucideIcons.userPlus, size: 18, color: AP.blue),
+            ),
+          if (isAvailable)
             TextButton.icon(
               onPressed: () => _showMaintenanceDialog(slot),
               icon: const Icon(LucideIcons.wrench, size: 14),
@@ -1061,7 +1079,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
               _selectedDate.day == date.day;
 
           return GestureDetector(
-            onTap: () => setState(() => _selectedDate = date),
+            onTap: () => _o.setDate(date),
             child: Container(
               width: 76,
               padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
@@ -1109,7 +1127,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
 
   // ================= TAB 3: LAPORAN & KEUANGAN ================= //
   Widget _buildReportTab() {
-    final stats = BookingStore.instance.getVenueStats(_selectedCourt.id);
+    final stats = _o.courtStats();
     final totalBookings = stats['totalBookings'] as int? ?? 0;
     final checkedIn = stats['checkedInCount'] as int? ?? 0;
     final revenue = stats['estimatedRevenue'] as int? ?? 0;
@@ -1118,6 +1136,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
     final payRows = pay.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
 
     return APList(
+      onRefresh: _o.refresh,
       padding: const EdgeInsets.all(16),
       children: [
         _buildVenueSelectorBanner(),
@@ -1355,9 +1374,9 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
           Expanded(
             child: DropdownButtonHideUnderline(
               child: DropdownButton<Court>(
-                value: _selectedCourt,
+                value: _o.ownCourts.where((c) => c.id == _selectedCourt.id).firstOrNull,
                 isExpanded: true,
-                items: courts.map((c) {
+                items: _o.ownCourts.map((c) {
                   return DropdownMenuItem<Court>(
                     value: c,
                     child: Column(
@@ -1385,10 +1404,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                   );
                 }).toList(),
                 onChanged: (newCourt) {
-                  if (newCourt != null) {
-                    setState(() => _selectedCourt = newCourt);
-                    UserStore.instance.setManagedCourt(newCourt.id);
-                  }
+                  if (newCourt != null) _o.select(newCourt);
                 },
               ),
             ),
@@ -1399,7 +1415,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
   }
 
   Widget _buildStatsRow() {
-    final stats = BookingStore.instance.getVenueStats(_selectedCourt.id);
+    final stats = _o.courtStats();
     final total = stats['totalBookings'] as int? ?? 0;
     final checkedIn = stats['checkedInCount'] as int? ?? 0;
     final revenue = stats['estimatedRevenue'] as int? ?? 0;

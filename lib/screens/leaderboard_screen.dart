@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
 import '../core/widgets/responsive_container.dart';
+import 'dart:async';
+import '../core/utils/ui.dart';
 import '../data.dart';
+import '../services/api_service.dart';
 import '../store.dart';
 import '../theme.dart';
 
@@ -18,7 +21,14 @@ class LeaderboardScreen extends StatefulWidget {
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
   LeaderboardScope _scope = LeaderboardScope.global;
 
+  @override
+  void initState() {
+    super.initState();
+    FriendStore.instance.refresh(); // GET /leaderboard (+ friends when logged in)
+  }
+
   void _showAddFriendsSheet(BuildContext context) {
+    if (!requireLogin(context, 'menambah teman')) return;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -39,12 +49,13 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
         builder: (context, _) {
           final friendStore = FriendStore.instance;
           final List<Player> displayed = _scope == LeaderboardScope.global
-              ? players
-              : friendStore.friendsLeaderboard;
+              ? friendStore.globalBoard
+              : friendStore.friendsBoard;
 
           final meIndex = displayed.indexWhere((p) => p.isMe);
 
           return APList(
+            onRefresh: friendStore.refresh,
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
             children: [
               // Header with Title and Tambah Teman button
@@ -110,7 +121,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       child: _scopeTab(
                         title: 'Global',
                         icon: LucideIcons.globe,
-                        count: players.length,
+                        count: friendStore.globalBoard.length,
                         selected: _scope == LeaderboardScope.global,
                         onTap: () =>
                             setState(() => _scope = LeaderboardScope.global),
@@ -190,16 +201,17 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   );
 }
 
-  void _toggleFriendWithSnack(Player p) {
-    final willAdd = FriendStore.instance.toggleFriend(p.id);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(willAdd
-            ? '${p.name} berhasil ditambahkan ke daftar teman!'
-            : '${p.name} dihapus dari daftar teman.'),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+  Future<void> _toggleFriendWithSnack(Player p) async {
+    if (!requireLogin(context, 'menambah teman')) return;
+    try {
+      final willAdd = await FriendStore.instance.toggleFriend(p);
+      if (!mounted) return;
+      showInfo(context, willAdd
+          ? '${p.name} berhasil ditambahkan ke daftar teman!'
+          : '${p.name} dihapus dari daftar teman.');
+    } on ApiException catch (e) {
+      if (mounted) showError(context, e);
+    }
   }
 
   Widget _scopeTab({
@@ -364,24 +376,42 @@ class _AddFriendsModal extends StatefulWidget {
 class _AddFriendsModalState extends State<_AddFriendsModal> {
   final TextEditingController _searchCtrl = TextEditingController();
   String _query = '';
+  Timer? _debounce;
+  List<Player>? _results; // null = show top players from the leaderboard
+  bool _searching = false;
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _searchCtrl.dispose();
     super.dispose();
+  }
+
+  /// GET /players/search?q= (debounced).
+  void _onQuery(String val) {
+    setState(() => _query = val);
+    _debounce?.cancel();
+    if (val.trim().isEmpty) {
+      setState(() => _results = null);
+      return;
+    }
+    _debounce = Timer(const Duration(milliseconds: 300), () async {
+      setState(() => _searching = true);
+      try {
+        final r = await FriendStore.instance.search(val.trim());
+        if (mounted && _query == val) setState(() => _results = r);
+      } on ApiException catch (e) {
+        if (mounted) showError(context, e);
+      } finally {
+        if (mounted) setState(() => _searching = false);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final friendStore = FriendStore.instance;
-    final otherPlayers = players.where((p) => !p.isMe).toList();
-
-    final filtered = otherPlayers.where((p) {
-      final q = _query.trim().toLowerCase();
-      if (q.isEmpty) return true;
-      return p.name.toLowerCase().contains(q) ||
-          p.handle.toLowerCase().contains(q);
-    }).toList();
+    final filtered = _results ?? friendStore.globalBoard.where((p) => !p.isMe).toList();
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -433,7 +463,7 @@ class _AddFriendsModalState extends State<_AddFriendsModal> {
           // Search Field
           TextField(
             controller: _searchCtrl,
-            onChanged: (val) => setState(() => _query = val),
+            onChanged: _onQuery,
             decoration: InputDecoration(
               hintText: 'Cari nama atau @username pemain...',
               hintStyle:  TextStyle(fontSize: 13, color: AP.slate),
@@ -443,7 +473,7 @@ class _AddFriendsModalState extends State<_AddFriendsModal> {
                       icon: const Icon(LucideIcons.x, size: 18),
                       onPressed: () {
                         _searchCtrl.clear();
-                        setState(() => _query = '');
+                        _onQuery('');
                       },
                     )
                   : null,
@@ -468,7 +498,11 @@ class _AddFriendsModalState extends State<_AddFriendsModal> {
           // Players List
           ConstrainedBox(
             constraints: const BoxConstraints(maxHeight: 320),
-            child: filtered.isEmpty
+            child: _searching
+                ? const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(child: CircularProgressIndicator()))
+                : filtered.isEmpty
                 ?  Padding(
                     padding: EdgeInsets.symmetric(vertical: 24),
                     child: Center(
@@ -530,17 +564,17 @@ class _AddFriendsModalState extends State<_AddFriendsModal> {
                           ),
                           const SizedBox(width: 8),
                           ElevatedButton(
-                            onPressed: () {
-                              final added = friendStore.toggleFriend(p.id);
-                              setState(() {});
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(added
-                                      ? '${p.name} ditambahkan ke teman!'
-                                      : '${p.name} dihapus dari teman.'),
-                                  duration: const Duration(seconds: 1),
-                                ),
-                              );
+                            onPressed: () async {
+                              try {
+                                final added = await friendStore.toggleFriend(p);
+                                if (!mounted) return;
+                                setState(() {});
+                                showInfo(context, added
+                                    ? '${p.name} ditambahkan ke teman!'
+                                    : '${p.name} dihapus dari teman.');
+                              } on ApiException catch (e) {
+                                if (mounted) showError(context, e);
+                              }
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor:

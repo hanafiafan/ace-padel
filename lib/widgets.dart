@@ -1,3 +1,5 @@
+import 'core/widgets/ap_banners.dart';
+import 'core/utils/ui.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'core/widgets/ap_decor.dart';
@@ -33,8 +35,8 @@ class FeaturedCard extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.asset(
-                court.image,
+              apImg(
+court.image, fallbackUrl: court.imageUrl,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Container(
                   decoration: BoxDecoration(
@@ -74,7 +76,7 @@ class FeaturedCard extends StatelessWidget {
                             return GestureDetector(
                               onTap: () {
                                 APHaptics.medium();
-                                FavoriteStore.instance.toggle(court.id);
+                                toggleFavorite(context, court.id);
                               },
                               child: AnimatedScale(
                                 scale: isFav ? 1.2 : 1.0,
@@ -308,8 +310,8 @@ class CourtRow extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
-                  child: Image.asset(
-                    court.image,
+                  child: apImg(
+court.image, fallbackUrl: court.imageUrl,
                     width: 72,
                     height: 72,
                     fit: BoxFit.cover,
@@ -350,7 +352,7 @@ class CourtRow extends StatelessWidget {
                               return GestureDetector(
                                 onTap: () {
                                   APHaptics.light();
-                                  FavoriteStore.instance.toggle(court.id);
+                                  toggleFavorite(context, court.id);
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 6),

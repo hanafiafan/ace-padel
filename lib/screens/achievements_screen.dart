@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
 import '../data.dart';
+import '../store.dart';
 import '../theme.dart';
 
 void showAchievementDetailModal(BuildContext context, Achievement a) {
@@ -206,6 +207,13 @@ class AchievementsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: StatsStore.instance,
+      builder: (context, _) => _page(context, StatsStore.instance.achievementList),
+    );
+  }
+
+  Widget _page(BuildContext context, List<Achievement> achievements) {
     final unlocked = achievements.where((a) => a.unlocked).length;
     return Scaffold(
       backgroundColor: AP.cloud,
@@ -219,6 +227,7 @@ class AchievementsScreen extends StatelessWidget {
         ),
       ),
       body: APList(
+        onRefresh: StatsStore.instance.refresh,
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         children: [
           Container(

@@ -104,12 +104,20 @@ cd server
 npm test
 ```
 
-### 2. Menjalankan Aplikasi di Android Emulator
-Pastikan emulator Android (`AcePadel_Pixel` atau device terhubung lainnya) aktif:
+### 2. Menjalankan Aplikasi (terhubung ke backend nyata)
+Aplikasi memakai API server (`server/API.md`): login email/password atau Google, booking, mabar, teman, notifikasi, dan portal pemilik lapangan semuanya lewat server. Katalog lapangan/pelatih jatuh kembali ke data bawaan bila server tidak terjangkau (muncul snackbar "offline").
+
+Alamat API: `--dart-define=API_URL=...`; default debug `http://localhost:3001` (web/desktop) atau `http://10.0.2.2:3001` (Android emulator); release `https://api.hellens.dev`.
 ```bash
+# terminal 1: backend
+cd server && npm install && npm start            # http://localhost:3001
+
+# terminal 2: aplikasi
 flutter pub get
-flutter run
+flutter run                                       # Android emulator
+flutter run -d chrome --dart-define=API_URL=http://localhost:3001   # web
 ```
+Akun dev (hanya non-production): `player@acepadel.id / player12345`, `owner@acepadel.id / owner12345` (membuka Portal Mitra), `admin@acepadel.id / admin12345`. Untuk Google Sign-In di server dev tanpa kredensial: jalankan server dengan `ALLOW_UNVERIFIED_GOOGLE=1`.
 
 Atau pasang APK langsung via ADB:
 ```bash
@@ -159,6 +167,6 @@ Aplikasi **Ace Padel** dikembangkan oleh **[hellens.dev](https://hellens.dev)**.
 ## 🧪 Hasil Pengujian & Kualitas Kode
 
 - **Flutter Analyze**: `flutter analyze` -> **0 issues found** (100% clean).
-- **Flutter Automated Tests**: `flutter test` -> **16/16 tests passed** (unit test store, booking kalkulasi add-ons, coaching flow, widget test 5 tab, Google auth).
+- **Flutter Automated Tests**: `flutter test` -> unit test ApiService/store (mock HTTP: login, role, booking-pay-cancel, 409, 401, fallback offline) + widget test navigasi.
 - **Backend Node.js Tests**: `cd server && npm test` -> **9/9 test suites passed** (100% clean).
-- **Offline-First Resilience**: Jika server tidak aktif atau koneksi terputus, aplikasi mobile secara transparan beralih ke state memory lokal tanpa mengalami crash.
+- **Mode offline**: katalog lapangan & pelatih memakai data bawaan bila server tidak terjangkau; booking, mabar, teman, dan portal pemilik memerlukan server (pesan error ditampilkan).

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
+import '../core/utils/ui.dart';
+import '../services/api_service.dart';
+import '../store.dart';
 import '../theme.dart';
 
 class PaymentMethodsScreen extends StatefulWidget {
@@ -11,7 +14,24 @@ class PaymentMethodsScreen extends StatefulWidget {
 }
 
 class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
-  String _selectedMethod = 'Bayar di tempat';
+  String get _selectedMethod => PaymentPrefStore.instance.method;
+
+  @override
+  void initState() {
+    super.initState();
+    PaymentPrefStore.instance.addListener(_rebuild);
+    PaymentPrefStore.instance.refresh(); // GET /payment-method
+  }
+
+  void _rebuild() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    PaymentPrefStore.instance.removeListener(_rebuild);
+    super.dispose();
+  }
 
   final List<Map<String, dynamic>> _methods = [
     {
@@ -121,14 +141,14 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           ..._methods.map((m) {
             final isSelected = _selectedMethod == m['id'];
             return GestureDetector(
-              onTap: () {
-                setState(() => _selectedMethod = m['id'] as String);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Metode utama diubah ke "${m['title']}"'),
-                    duration: const Duration(seconds: 1),
-                  ),
-                );
+              onTap: () async {
+                if (!requireLogin(context, 'menyimpan metode pembayaran')) return;
+                try {
+                  await PaymentPrefStore.instance.save(m['id'] as String); // PUT /payment-method
+                  if (mounted) showInfo(context, 'Metode utama diubah ke "${m['title']}"');
+                } on ApiException catch (e) {
+                  if (mounted) showError(context, e);
+                }
               },
               child: Container(
                 margin: const EdgeInsets.only(bottom: 12),

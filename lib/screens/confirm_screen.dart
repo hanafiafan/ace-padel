@@ -4,7 +4,9 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import '../core/utils/ui.dart';
 import '../data.dart';
+import '../services/api_service.dart';
 import '../store.dart';
 import '../theme.dart';
 import '../main.dart' show tabIndex;
@@ -29,7 +31,7 @@ class ConfirmScreen extends StatefulWidget {
 
 class _ConfirmScreenState extends State<ConfirmScreen> {
   bool _done = false;
-  String _selectedPayment = 'Bayar di tempat';
+  String _selectedPayment = PaymentPrefStore.instance.method;
   Voucher? _appliedVoucher;
   Booking? _createdBooking;
   final Map<String, int> _selectedAddOns = {};
@@ -46,20 +48,6 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
       }
     }
     return total;
-  }
-
-  List<String> get _selectedAddOnsSummary {
-    final list = <String>[];
-    for (final entry in _selectedAddOns.entries) {
-      if (entry.value > 0) {
-        final item = equipmentAddOns.firstWhere(
-          (e) => e.id == entry.key,
-          orElse: () => equipmentAddOns.first,
-        );
-        list.add('${entry.value}x ${item.name}');
-      }
-    }
-    return list;
   }
 
   int get _baseCourtPrice =>
@@ -98,38 +86,84 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
     },
   ];
 
-  void _confirm() {
-    final ok = BookingStore.instance.book(
-      widget.court,
-      widget.date,
-      widget.slot,
-      durationMinutes: widget.durationMinutes,
-      paymentMethod: _selectedPayment,
-      voucherCode: _appliedVoucher?.code,
-      discount: _discountAmount,
-      addOns: _selectedAddOnsSummary,
-      addOnsTotal: _addOnsTotal,
-    );
-    if (!ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Slot itu sudah dipesan. Silakan pilih slot lain.')),
+  bool _submitting = false;
+
+  /// Server-side add-on ids, repeated by quantity (server prices them).
+  List<String> get _addOnIds => [
+        for (final e in _selectedAddOns.entries)
+          for (var i = 0; i < e.value; i++) e.key,
+      ];
+
+  /// POST /bookings. Returns null on failure (message already shown).
+  Future<Booking?> _createBooking() async {
+    if (_submitting) return null;
+    if (!requireLogin(context, 'memesan lapangan')) return null;
+    setState(() => _submitting = true);
+    try {
+      return await BookingStore.instance.book(
+        widget.court,
+        widget.date,
+        widget.slot,
+        paymentMethod: _selectedPayment,
+        voucherCode: _appliedVoucher?.code,
+        addOnIds: _addOnIds,
       );
-      Navigator.pop(context); // kembali ke pilih jam
-      return;
+    } on ApiException catch (e) {
+      if (!mounted) return null;
+      if (e.isConflict) {
+        showInfo(context, 'Slot itu baru saja dipesan pemain lain. Silakan pilih jam lain.');
+        Navigator.pop(context); // kembali ke pilih jam (slot sudah di-refresh)
+      } else {
+        showError(context, e);
+      }
+      return null;
+    } finally {
+      if (mounted) setState(() => _submitting = false);
     }
+  }
 
-    final newBooking = BookingStore.instance.bookings.firstWhere((b) =>
-        b.court.id == widget.court.id &&
-        b.slot == widget.slot &&
-        b.date.year == widget.date.year &&
-        b.date.month == widget.date.month &&
-        b.date.day == widget.date.day);
-
+  void _finish(Booking b) {
     setState(() {
-      _createdBooking = newBooking;
+      _createdBooking = b;
       _done = true;
     });
+  }
+
+  /// Pay-at-venue: create the booking directly.
+  Future<void> _confirm() async {
+    final b = await _createBooking();
+    if (b != null && mounted) _finish(b);
+  }
+
+  /// Simulated gateway callback for online methods.
+  Future<void> _payNow(Booking b) async {
+    try {
+      final paid = await BookingStore.instance.pay(b);
+      if (mounted) _finish(paid);
+    } on ApiException catch (e) {
+      if (mounted) showError(context, e);
+    }
+  }
+
+  /// Dismissing the payment sheet cancels the unpaid booking so the slot reopens.
+  Future<void> _abandon(Booking b) async {
+    try {
+      await BookingStore.instance.cancel(b);
+    } on ApiException catch (_) {}
+  }
+
+  /// POST /vouchers/validate (server is authoritative). Returns true if applied.
+  Future<bool> _applyVoucher(String code) async {
+    try {
+      final (v, _) = await CatalogStore.instance.validateVoucher(code, _baseCourtPrice);
+      if (!mounted) return false;
+      setState(() => _appliedVoucher = v);
+      showInfo(context, 'Voucher ${v.code} berhasil dipasang!');
+      return true;
+    } on ApiException catch (e) {
+      if (mounted) showError(context, e);
+      return false;
+    }
   }
 
   void _showVoucherPicker() {
@@ -190,24 +224,10 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     final typed = codeCtrl.text.trim().toUpperCase();
-                    final match =
-                        vouchers.where((v) => v.code == typed).firstOrNull;
-                    if (match != null) {
-                      setState(() => _appliedVoucher = match);
-                      Navigator.pop(ctx);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Text(
-                                'Voucher ${match.code} berhasil dipasang!')),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Kode voucher tidak ditemukan.')),
-                      );
-                    }
+                    if (typed.isEmpty) return;
+                    if (await _applyVoucher(typed) && ctx.mounted) Navigator.pop(ctx);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AP.blue,
@@ -233,7 +253,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
             ),
             const SizedBox(height: 10),
 
-            ...vouchers.map((v) {
+            ...CatalogStore.instance.vouchers.map((v) {
               final isApplied = _appliedVoucher?.code == v.code;
               final disc = v.calculateDiscount(_baseCourtPrice);
 
@@ -305,17 +325,12 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                       ),
                     ),
                     TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _appliedVoucher = isApplied ? null : v;
-                        });
-                        Navigator.pop(ctx);
-                        if (!isApplied) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content: Text(
-                                    'Voucher ${v.code} berhasil diterapkan!')),
-                          );
+                      onPressed: () async {
+                        if (isApplied) {
+                          setState(() => _appliedVoucher = null);
+                          Navigator.pop(ctx);
+                        } else if (await _applyVoucher(v.code) && ctx.mounted) {
+                          Navigator.pop(ctx);
                         }
                       },
                       child: Text(
@@ -405,20 +420,27 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
     );
   }
 
-  void _handlePaymentFlow() {
+  Future<void> _handlePaymentFlow() async {
+    if (_selectedPayment == 'Bayar di tempat') {
+      await _confirm();
+      return;
+    }
+    // Online: reserve the slot first (status Menunggu) to get the VA / QRIS reference.
+    final b = await _createBooking();
+    if (b == null || !mounted) return;
     if (_selectedPayment == 'QRIS Instant') {
-      _showQrisSheet();
-    } else if (_selectedPayment.contains('Virtual Account')) {
-      _showVaSheet();
+      _showQrisSheet(b);
     } else {
-      _confirm();
+      _showVaSheet(b);
     }
   }
 
-  void _showQrisSheet() {
+  void _showQrisSheet(Booking b) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      isDismissible: false,
+      enableDrag: false,
       backgroundColor: AP.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
@@ -476,7 +498,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Rp$_finalTotal.000',
+              'Rp${b.finalPrice}.000',
               style:  TextStyle(fontFamily: 'Display', 
                 fontSize: 29.12,
                 fontWeight: FontWeight.w800,
@@ -538,7 +560,9 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                   Icon(LucideIcons.timer, size: 14, color: AP.ink),
                   SizedBox(width: 6),
                   Text(
-                    'Selesaikan pembayaran dalam 14:59',
+                    b.paymentExpiresAt != null
+                        ? 'Selesaikan pembayaran sebelum ${DateFormat('HH:mm').format(b.paymentExpiresAt!)}'
+                        : 'Selesaikan pembayaran dalam 15 menit',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -548,6 +572,9 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                 ],
               ),
             ),
+            const SizedBox(height: 8),
+            SelectableText(b.paymentRef ?? '',
+                style: const TextStyle(fontFamily: 'monospace', fontSize: 11, fontWeight: FontWeight.w700)),
             const SizedBox(height: 10),
              Text(
               'Scan menggunakan BCA Mobile, GoPay, OVO, ShopeePay, Dana, atau LinkAja',
@@ -561,7 +588,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
               child: ElevatedButton.icon(
                 onPressed: () {
                   Navigator.pop(ctx);
-                  _confirm();
+                  _payNow(b);
                 },
                 icon:  Icon(LucideIcons.badgeCheck, color: AP.ink),
                 label:  Text(
@@ -583,7 +610,10 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
             ),
             const SizedBox(height: 8),
             TextButton(
-              onPressed: () => Navigator.pop(ctx),
+              onPressed: () {
+                Navigator.pop(ctx);
+                _abandon(b);
+              },
               child:  Text(
                 'Batalkan Pembayaran',
                 style: TextStyle(color: AP.slate, fontWeight: FontWeight.w600),
@@ -595,14 +625,17 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
     );
   }
 
-  void _showVaSheet() {
+  void _showVaSheet(Booking b) {
     final isBca = _selectedPayment.contains('BCA');
-    final vaNumber = isBca ? '8214 0812 3456 7890' : '8801 0812 3456 7890';
+    final rawRef = b.paymentRef ?? '';
+    final vaNumber = RegExp(r'.{1,4}').allMatches(rawRef).map((m) => m.group(0)).join(' ');
     final bankName = isBca ? 'BCA Virtual Account' : 'Mandiri Virtual Account';
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      isDismissible: false,
+      enableDrag: false,
       backgroundColor: AP.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
@@ -724,7 +757,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                        Text('Total Tagihan',
                           style: TextStyle(color: AP.slate, fontSize: 12)),
                       Text(
-                        'Rp$_finalTotal.000',
+                        'Rp${b.finalPrice}.000',
                         style:  TextStyle(fontFamily: 'Display', 
                           fontSize: 18.4,
                           fontWeight: FontWeight.w800,
@@ -753,7 +786,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
               child: ElevatedButton.icon(
                 onPressed: () {
                   Navigator.pop(ctx);
-                  _confirm();
+                  _payNow(b);
                 },
                 icon:  Icon(LucideIcons.circleCheck, color: AP.ink),
                 label:  Text(
@@ -776,7 +809,10 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
             const SizedBox(height: 8),
             Center(
               child: TextButton(
-                onPressed: () => Navigator.pop(ctx),
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  _abandon(b);
+                },
                 child:  Text(
                   'Batalkan',
                   style: TextStyle(color: AP.slate, fontWeight: FontWeight.w600),
@@ -810,7 +846,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
               label: _selectedPayment == 'Bayar di tempat'
                   ? 'Konfirmasi Booking Sekarang'
                   : 'Lanjut ke Pembayaran ($_selectedPayment)',
-              onTap: _handlePaymentFlow,
+              onTap: _submitting ? () {} : _handlePaymentFlow,
             ),
     );
   }
@@ -826,7 +862,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
           child: SizedBox(
             height: 132,
             child: APPhoto(
-              asset: c.image,
+              asset: c.image, fallbackUrl: c.imageUrl,
               scrim: .82,
               child: Padding(
                 padding: const EdgeInsets.all(18),
@@ -1194,7 +1230,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
         ),
         const SizedBox(height: 6),
          Text(
-          'Reservasi Anda telah dikonfirmasi oleh sistem.',
+          (b?.isPaid ?? false) ? 'Reservasi dikonfirmasi dan pembayaran lunas.' : 'Reservasi Anda telah dikonfirmasi oleh sistem.',
           textAlign: TextAlign.center,
           style: TextStyle(color: AP.slate, fontSize: 14),
         ),
@@ -1222,8 +1258,8 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      c.image,
+                    child: apImg(
+c.image, fallbackUrl: c.imageUrl,
                       width: 50,
                       height: 50,
                       fit: BoxFit.cover,
@@ -1287,7 +1323,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                     ),
                   ),
                   Text(
-                    'Rp${_finalTotal}k',
+                    'Rp${b?.finalPrice ?? _finalTotal}k',
                     style:  TextStyle(fontFamily: 'Display', 
                       fontSize: 22.4,
                       fontWeight: FontWeight.w800,

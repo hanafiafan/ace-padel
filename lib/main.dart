@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,6 +10,7 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/theme_controller.dart';
 import 'core/utils/haptics.dart';
 import 'core/widgets/responsive_container.dart';
+import 'core/utils/ui.dart';
 import 'store.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
@@ -28,7 +30,9 @@ Future<void> main() async {
   } catch (_) {}
   await initializeDateFormatting('id_ID');
   Intl.defaultLocale = 'id_ID';
+  UserStore.instance.restoring = true;
   runApp(const AcePadelApp());
+  unawaited(UserStore.instance.restore()); // GET /auth/me, then load data
 }
 
 class AcePadelApp extends StatefulWidget {
@@ -44,12 +48,28 @@ class _AcePadelAppState extends State<AcePadelApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     ThemeController.instance.addListener(_onTheme);
+    CatalogStore.instance.addListener(_onCatalog);
+  }
+
+  bool _offlineShown = false;
+  void _onCatalog() {
+    final off = CatalogStore.instance.isOffline;
+    if (off && !_offlineShown) {
+      messengerKey.currentState?.showSnackBar(SnackBar(
+        content: const Text('Server tidak terjangkau. Menampilkan data lokal (offline).'),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 6),
+        action: SnackBarAction(label: 'Coba lagi', onPressed: () => CatalogStore.instance.loadAll()),
+      ));
+    }
+    _offlineShown = off;
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     ThemeController.instance.removeListener(_onTheme);
+    CatalogStore.instance.removeListener(_onCatalog);
     super.dispose();
   }
 
@@ -73,6 +93,7 @@ class _AcePadelAppState extends State<AcePadelApp> with WidgetsBindingObserver {
     return MaterialApp(
       title: 'Ace Padel',
       debugShowCheckedModeBanner: false,
+      scaffoldMessengerKey: messengerKey,
       theme: theme,
       darkTheme: theme,
       themeMode: dark ? ThemeMode.dark : ThemeMode.light,
@@ -89,7 +110,10 @@ class _AcePadelAppState extends State<AcePadelApp> with WidgetsBindingObserver {
       home: AnimatedBuilder(
         animation: UserStore.instance,
         builder: (context, _) {
-          if (!UserStore.instance.isLoggedIn) {
+          if (UserStore.instance.restoring) {
+            return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          }
+          if (!UserStore.instance.canBrowse) {
             return const LoginScreen();
           }
           return const RootNav();

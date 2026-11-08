@@ -3,8 +3,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
 import '../core/utils/haptics.dart';
 import '../core/widgets/responsive_container.dart';
-import '../data/repositories/court_repository.dart';
 import '../data.dart';
+import '../store.dart';
 import '../theme.dart';
 import '../widgets.dart';
 import 'booking_screen.dart';
@@ -25,8 +25,19 @@ class _CourtsScreenState extends State<CourtsScreen> {
   String _query = '';
   bool _isGridView = false;
 
+  void _rebuild() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    CatalogStore.instance.addListener(_rebuild);
+  }
+
   @override
   void dispose() {
+    CatalogStore.instance.removeListener(_rebuild);
     _controller.dispose();
     super.dispose();
   }
@@ -381,12 +392,13 @@ class _CourtsScreenState extends State<CourtsScreen> {
             const SizedBox(height: 10),
             Expanded(
               child: list.isEmpty
-                  ? _empty()
+                  ? (CatalogStore.instance.isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : _empty())
                   : RefreshIndicator(
                       onRefresh: () async {
                         APHaptics.medium();
-                        await CourtRepository.instance.fetchCourts();
-                        setState(() {});
+                        await CatalogStore.instance.refreshCourts();
                       },
                       color: AP.blue,
                       child: LayoutBuilder(

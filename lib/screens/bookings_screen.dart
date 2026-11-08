@@ -1,9 +1,12 @@
+import '../core/widgets/ap_banners.dart';
 import 'package:flutter/material.dart';
 import '../core/widgets/app_empty_state.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
 import 'package:intl/intl.dart';
+import '../core/utils/ui.dart';
 import '../data.dart';
+import '../services/api_service.dart';
 import '../store.dart';
 import '../theme.dart';
 import '../main.dart' show tabIndex;
@@ -24,6 +27,7 @@ class _BookingsScreenState extends State<BookingsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    if (UserStore.instance.isLoggedIn) BookingStore.instance.refresh();
   }
 
   @override
@@ -81,10 +85,32 @@ class _BookingsScreenState extends State<BookingsScreen>
             // Tab view
             Expanded(
               child: AnimatedBuilder(
-                animation: BookingStore.instance,
+                animation: Listenable.merge([BookingStore.instance, UserStore.instance]),
                 builder: (context, _) {
-                  final active = BookingStore.instance.bookings;
-                  final history = BookingStore.instance.history;
+                  final store = BookingStore.instance;
+                  final active = store.bookings;
+                  final history = store.history;
+                  if (!UserStore.instance.isLoggedIn) {
+                    return AppEmptyState(
+                      icon: LucideIcons.logIn,
+                      title: 'Masuk untuk melihat booking',
+                      message: 'Booking, tiket QR, dan riwayat Anda tersimpan di akun.',
+                      actionLabel: 'Masuk / Daftar',
+                      onAction: () => requireLogin(context, 'melihat booking Anda'),
+                    );
+                  }
+                  if (store.isLoading && active.isEmpty && history.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (store.error != null && active.isEmpty && history.isEmpty) {
+                    return AppEmptyState(
+                      icon: LucideIcons.wifiOff,
+                      title: 'Gagal memuat booking',
+                      message: store.error!,
+                      actionLabel: 'Coba lagi',
+                      onAction: store.refresh,
+                    );
+                  }
 
                   return TabBarView(
                     controller: _tabController,
@@ -92,7 +118,10 @@ class _BookingsScreenState extends State<BookingsScreen>
                       // Active Tab
                       active.isEmpty
                           ? _emptyActive(context)
-                          : ListView.separated(
+                          : RefreshIndicator(
+                              onRefresh: store.refresh,
+                              child: ListView.separated(
+                              physics: const AlwaysScrollableScrollPhysics(),
                               itemCount: active.length,
                               separatorBuilder: (_, __) =>
                                   const SizedBox(height: 12),
@@ -100,12 +129,15 @@ class _BookingsScreenState extends State<BookingsScreen>
                                 booking: active[i],
                                 isActive: true,
                               ).reveal(i < 6 ? i : 6),
-                            ),
+                            )),
 
                       // History Tab
                       history.isEmpty
                           ? _emptyHistory()
-                          : ListView.separated(
+                          : RefreshIndicator(
+                              onRefresh: store.refresh,
+                              child: ListView.separated(
+                              physics: const AlwaysScrollableScrollPhysics(),
                               itemCount: history.length,
                               separatorBuilder: (_, __) =>
                                   const SizedBox(height: 12),
@@ -113,7 +145,7 @@ class _BookingsScreenState extends State<BookingsScreen>
                                 booking: history[i],
                                 isActive: false,
                               ),
-                            ),
+                            )),
                     ],
                   );
                 },
@@ -167,14 +199,14 @@ class _BookingCard extends StatelessWidget {
                 style: TextStyle(color: AP.slate, fontWeight: FontWeight.w600)),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(ctx);
-              BookingStore.instance.cancel(booking);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Reservasi berhasil dibatalkan.'),
-                ),
-              );
+              try {
+                await BookingStore.instance.cancel(booking);
+                if (context.mounted) showInfo(context, 'Reservasi berhasil dibatalkan.');
+              } on ApiException catch (e) {
+                if (context.mounted) showError(context, e);
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red.shade600,
@@ -196,6 +228,8 @@ class _BookingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = booking.court;
     final isCancelled = booking.status == 'Dibatalkan';
+    final pending = booking.isPendingPayment;
+    final statusLabel = pending ? 'Menunggu Pembayaran' : booking.status;
 
     return GestureDetector(
       onTap: () {
@@ -246,11 +280,11 @@ class _BookingCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        booking.status,
+                        statusLabel,
                         style: TextStyle(
                           color: isCancelled
                               ? Colors.red.shade700
-                              : Colors.green.shade800,
+                              : (pending ? Colors.orange.shade800 : Colors.green.shade800),
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
                         ),
@@ -276,8 +310,8 @@ class _BookingCard extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(14),
-                  child: Image.asset(
-                    c.image,
+                  child: apImg(
+c.image, fallbackUrl: c.imageUrl,
                     width: 60,
                     height: 60,
                     fit: BoxFit.cover,
@@ -350,6 +384,17 @@ class _BookingCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                if (isActive && pending) ...[
+                  InkWell(
+                    onTap: () => showPendingPaymentDialog(context, booking),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                      child: Text('Bayar',
+                          style: TextStyle(color: AP.blue, fontSize: 12, fontWeight: FontWeight.w800)),
+                    ),
+                  ),
+                ],
                 if (isActive) ...[
                   InkWell(
                     onTap: () => _showCancelDialog(context),
@@ -405,4 +450,51 @@ class _BookingCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Shows the VA number / QRIS reference for an unpaid online booking and lets
+/// the (simulated) gateway confirm it via POST /bookings/:id/pay.
+void showPendingPaymentDialog(BuildContext context, Booking b) {
+  showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      backgroundColor: AP.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: Text(b.paymentMethod,
+          style: const TextStyle(fontFamily: 'Display', fontWeight: FontWeight.w800, fontSize: 20.7)),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Total tagihan: Rp${b.finalPrice}.000', style: const TextStyle(fontWeight: FontWeight.w800)),
+          const SizedBox(height: 10),
+          Text(b.paymentMethod.contains('QRIS') ? 'Kode QRIS' : 'Nomor Virtual Account',
+              style: TextStyle(color: AP.slate, fontSize: 12)),
+          SelectableText(b.paymentRef ?? '-',
+              style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.w900, fontSize: 16)),
+          if (b.paymentExpiresAt != null) ...[
+            const SizedBox(height: 10),
+            Text('Berlaku sampai ${DateFormat('HH:mm').format(b.paymentExpiresAt!)}',
+                style: TextStyle(color: AP.slate, fontSize: 12)),
+          ],
+        ],
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Tutup', style: TextStyle(color: AP.slate))),
+        ElevatedButton(
+          onPressed: () async {
+            Navigator.pop(ctx);
+            try {
+              await BookingStore.instance.pay(b);
+              if (context.mounted) showInfo(context, 'Pembayaran berhasil.');
+            } on ApiException catch (e) {
+              if (context.mounted) showError(context, e);
+            }
+          },
+          style: ElevatedButton.styleFrom(backgroundColor: AP.lime, foregroundColor: AP.onLime, elevation: 0),
+          child: const Text('Simulasikan Pembayaran', style: TextStyle(fontWeight: FontWeight.w800)),
+        ),
+      ],
+    ),
+  );
 }

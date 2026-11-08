@@ -1,233 +1,191 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'dart:convert';
 import 'package:ace_padel/data.dart';
+import 'package:ace_padel/services/api_service.dart';
 import 'package:ace_padel/store.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+const _court = {
+  'id': 'c1', 'name': 'Court A', 'venue': 'Venue A', 'area': 'Kemang, Jakarta',
+  'pricePerHour': 220, 'indoor': true, 'rating': 4.8, 'image': 'assets/images/court1.jpg',
+  'imageUrl': '/img/court1.jpg', 'facilities': ['WiFi'], 'description': 'x',
+};
+
+Map<String, dynamic> _booking({String status = 'Terkonfirmasi', String pay = 'Menunggu'}) => {
+      'id': 'ACE-C1-1800-1234', 'courtId': 'c1', 'date': '2030-01-02', 'slot': '18:00',
+      'paymentMethod': 'QRIS Instant', 'paymentStatus': pay, 'paymentRef': 'QRIS-ACE-C1-1800-1234',
+      'finalPrice': 250, 'discount': 0, 'addOns': ['Sewa Raket Bullpadel Pro'], 'addOnsTotal': 30,
+      'status': status, 'court': _court,
+    };
+
+http.Response _json(Object body, [int status = 200]) =>
+    http.Response(jsonEncode(body), status, headers: {'content-type': 'application/json; charset=utf-8'});
+
+/// Tiny fake backend. [log] records "METHOD path" and the auth header.
+MockClient _server(List<String> log, {String role = 'player', bool conflict = false}) {
+  return MockClient((req) async {
+    final path = req.url.path.replaceFirst('/api', '');
+    log.add('${req.method} $path auth=${req.headers['Authorization']}');
+    switch ('${req.method} $path') {
+      case 'POST /auth/login':
+        final b = jsonDecode(req.body) as Map;
+        if (b['password'] != 'secret123') return _json({'success': false, 'message': 'Email atau password salah'}, 401);
+        return _json({
+          'success': true, 'token': 'tok-1',
+          'data': {'id': 'u1', 'name': 'Budi', 'email': b['email'], 'role': role, 'authProvider': 'email'},
+        });
+      case 'POST /bookings':
+        if (conflict) return _json({'success': false, 'message': 'Slot jam tersebut sudah dipesan pemain lain.'}, 409);
+        return _json({'success': true, 'data': _booking()}, 201);
+      case 'POST /bookings/ACE-C1-1800-1234/pay':
+        return _json({'success': true, 'data': _booking(pay: 'Lunas')});
+      case 'DELETE /bookings/ACE-C1-1800-1234':
+        return _json({'success': true, 'data': _booking(status: 'Dibatalkan')});
+      case 'GET /courts/c1/slots':
+        return _json({'success': true, 'data': [
+          {'slot': '17:00', 'available': true}, {'slot': '18:00', 'available': false},
+        ]});
+      case 'GET /bookings':
+        return _json({'success': true, 'data': {'active': [], 'history': []}});
+      case 'GET /me/stats':
+      case 'GET /payment-method':
+        return _json({'success': true, 'data': {'method': 'QRIS Instant'}});
+      case 'GET /owner/courts':
+        return _json({'success': true, 'data': [_court]});
+      case 'GET /owner/stats':
+        return _json({'success': true, 'data': {'perCourt': []}});
+      case 'GET /owner/schedule':
+        return _json({'success': true, 'data': [{'slot': '18:00', 'booking': null}]});
+      case 'GET /courts':
+        return _json({'success': true, 'data': [_court]});
+    }
+    return _json({'success': true, 'data': []});
+  });
+}
 
 void main() {
-  final store = BookingStore.instance;
-  final court = courts.first;
-  final day = DateTime(2026, 10, 6);
+  final api = ApiService.instance;
+  final log = <String>[];
 
-  test('slot bisa dibooking lalu jadi taken', () {
-    expect(store.isTaken(court, day, '18:00'), false);
-    expect(store.book(court, day, '18:00'), true);
-    expect(store.isTaken(court, day, '18:00'), true);
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    log.clear();
+    await api.setToken(null);
+    api.client = _server(log);
   });
 
-  test('tidak boleh double-booking slot sama', () {
-    expect(store.book(court, day, '18:00'), false);
+  test('Booking.fromJson memakai harga dari server', () {
+    final b = Booking.fromJson(_booking());
+    expect(b.finalPrice, 250);
+    expect(b.isPendingPayment, true);
+    expect(b.paymentRef, startsWith('QRIS-'));
+    expect(b.court.pricePerHour, 220);
+    expect(b.date, DateTime(2030, 1, 2));
   });
 
-  test('cancel mengosongkan slot dan masuk ke history', () {
-    final activeBooking =
-        store.bookings.firstWhere((b) => b.slot == '18:00');
-    store.cancel(activeBooking);
-    expect(store.isTaken(court, day, '18:00'), false);
-    expect(store.history.isNotEmpty, true);
-    expect(store.history.first.status, 'Dibatalkan');
-  });
+  test('ApiService: envelope, token header, error bertipe', () async {
+    await api.setToken('abc');
+    final d = await api.get('/courts', auth: false);
+    expect(d, isA<List>());
+    expect(log.single, 'GET /courts auth=null');
 
-  test('booking dengan metode pembayaran spesifik tersimpan dengan benar', () {
-    expect(store.book(court, day, '20:00', paymentMethod: 'QRIS Instant'), true);
-    final b = store.bookings.firstWhere((x) => x.slot == '20:00');
-    expect(b.paymentMethod, 'QRIS Instant');
-    expect(b.status, 'Terkonfirmasi');
-    expect(b.id.startsWith('ACE-'), true);
-    store.cancel(b);
-  });
-
-  test('booking dengan voucher menghitung harga diskon dengan akurat', () {
-    final voucher = vouchers.firstWhere((v) => v.code == 'ACEWEEKEND');
-    final discount = voucher.calculateDiscount(court.pricePerHour);
-    expect(discount, 25);
-
+    api.client = _server(log, conflict: true);
     expect(
-      store.book(
-        court,
-        day,
-        '10:00',
-        voucherCode: voucher.code,
-        discount: discount,
-      ),
-      true,
+      () => BookingStore.instance.book(Court.fromJson(_court), DateTime(2030, 1, 2), '18:00'),
+      throwsA(isA<ApiException>().having((e) => e.isConflict, 'conflict', true)),
     );
-
-    final b = store.bookings.firstWhere((x) => x.slot == '10:00');
-    expect(b.voucherCode, 'ACEWEEKEND');
-    expect(b.discount, 25);
-    expect(b.finalPrice, court.pricePerHour - 25);
-    store.cancel(b);
+    api.client = MockClient((_) async => throw Exception('offline'));
+    await expectLater(api.get('/x'), throwsA(isA<ApiException>().having((e) => e.isNetwork, 'network', true)));
   });
 
-  test('booking dengan sewa alat dan perlengkapan menghitung total akurat', () {
-    expect(
-      store.book(
-        court,
-        day,
-        '12:00',
-        addOns: ['2x Sewa Raket Bullpadel Pro', '1x 1 Can Bola Baru (3 Pcs)'],
-        addOnsTotal: 135,
-      ),
-      true,
-    );
-    final b = store.bookings.firstWhere((x) => x.slot == '12:00');
-    expect(b.addOns.length, 2);
-    expect(b.addOnsTotal, 135);
-    expect(b.finalPrice, court.pricePerHour + 135);
-    store.cancel(b);
+  test('401 pada request terautentikasi menghapus token & memanggil onUnauthorized', () async {
+    await api.setToken('old');
+    var called = false;
+    api.onUnauthorized = () => called = true;
+    api.client = MockClient((_) async => _json({'success': false, 'message': 'Silakan login'}, 401));
+    await expectLater(api.get('/bookings'), throwsA(isA<ApiException>().having((e) => e.status, 'status', 401)));
+    expect(called, true);
+    expect(api.hasToken, false);
+    api.onUnauthorized = null;
   });
 
-  test('FavoriteStore toggle dan kueri favorit berfungsi', () {
-    final fav = FavoriteStore.instance;
-    const testCourtId = 'c3';
-    final initial = fav.isFavorite(testCourtId);
-    fav.toggle(testCourtId);
-    expect(fav.isFavorite(testCourtId), !initial);
-    fav.toggle(testCourtId);
-    expect(fav.isFavorite(testCourtId), initial);
-  });
-
-  test('UserStore update profile bekerja dengan baik', () {
+  test('UserStore.login: token tersimpan, role dari server, logout membersihkan', () async {
     final user = UserStore.instance;
-    user.updateProfile(name: 'Hanafi Afan', skillLevel: 'Mahir (Advanced / Pro)');
-    expect(user.profile.name, 'Hanafi Afan');
-    expect(user.profile.skillLevel, 'Mahir (Advanced / Pro)');
-  });
+    await expectLater(user.login('a@b.id', 'salah'), throwsA(isA<ApiException>()));
+    expect(user.isLoggedIn, false);
 
-  test('MatchStore toggle join dan leave mabar berfungsi', () {
-    final matchStore = MatchStore.instance;
-    final matchId = matchStore.matches.first.id;
-    final initialPlayers = matchStore.matches.first.currentPlayers;
-    final initialJoined = matchStore.matches.first.isJoined;
-
-    // Join
-    final joined = matchStore.toggleJoin(matchId);
-    expect(joined, !initialJoined);
-    expect(
-      matchStore.matches.first.currentPlayers,
-      initialJoined ? initialPlayers - 1 : initialPlayers + 1,
-    );
-
-    // Revert
-    matchStore.toggleJoin(matchId);
-    expect(matchStore.matches.first.currentPlayers, initialPlayers);
-  });
-
-  test('Venue Owner: verifikasi tiket dan check-in berfungsi', () {
-    expect(store.book(court, day, '14:00', paymentMethod: 'Transfer VA'), true);
-    final booking = store.bookings.firstWhere((b) => b.slot == '14:00');
-
-    // Find by booking code
-    final found = store.findBookingById(booking.id);
-    expect(found != null, true);
-    expect(found!.id, booking.id);
-    expect(found.isCheckedIn, false);
-
-    // Perform check-in
-    final checkInOk = store.checkIn(booking.id);
-    expect(checkInOk, true);
-
-    final updated = store.findBookingById(booking.id);
-    expect(updated!.status, 'Check-in Selesai');
-    expect(updated.isCheckedIn, true);
-
-    store.cancel(updated);
-  });
-
-  test('Venue Owner: blokir slot maintenance dan buka kembali berfungsi', () {
-    // Blokir slot 12:00 untuk maintenance
-    final blocked = store.toggleMaintenance(
-      court,
-      day,
-      '12:00',
-      block: true,
-      reason: 'Pembersihan Kaca & Net',
-    );
-    expect(blocked, true);
-    expect(store.isTaken(court, day, '12:00'), true);
-
-    final mBooking = store.bookings.firstWhere((b) => b.slot == '12:00');
-    expect(mBooking.isMaintenance, true);
-    expect(mBooking.status, 'Maintenance');
-
-    // Buka kembali slot
-    final unblocked = store.toggleMaintenance(
-      court,
-      day,
-      '12:00',
-      block: false,
-    );
-    expect(unblocked, true);
-    expect(store.isTaken(court, day, '12:00'), false);
-  });
-
-  test('Venue Owner: UserStore role switching dan stats perhitungan akurat', () {
-    final user = UserStore.instance;
-    user.switchRole('venue_owner');
-    expect(user.isVenueOwner, true);
-    expect(user.profile.role, 'venue_owner');
-
-    user.setManagedCourt('c2');
-    expect(user.profile.managedCourtId, 'c2');
-
-    final stats = store.getVenueStats('c1');
-    expect(stats.containsKey('totalBookings'), true);
-    expect(stats.containsKey('checkedInCount'), true);
-    expect(stats.containsKey('estimatedRevenue'), true);
-
-    user.switchRole('player');
+    await user.login('a@b.id', 'secret123');
+    expect(user.isLoggedIn, true);
+    expect(api.token, 'tok-1');
+    expect(user.profile.role, 'player');
     expect(user.isVenueOwner, false);
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    expect(log.any((l) => l == 'GET /bookings auth=Bearer tok-1'), true);
+
+    await user.logout();
+    expect(user.isLoggedIn, false);
+    expect(api.hasToken, false);
+    expect(BookingStore.instance.bookings, isEmpty);
   });
 
-  test('FriendStore: tambah/hapus teman dan leaderboard teman berfungsi', () {
-    final friendStore = FriendStore.instance;
-
-    // Initial friends are p1 (Rizky) and p5 (Putri)
-    expect(friendStore.isFriend('p1'), true);
-    expect(friendStore.isFriend('p5'), true);
-    expect(friendStore.isFriend('p2'), false);
-
-    // Toggle friend p2 (Dewi Anggraini)
-    final added = friendStore.toggleFriend('p2');
-    expect(added, true);
-    expect(friendStore.isFriend('p2'), true);
-
-    // Verify friendsLeaderboard includes friends + Afan (isMe)
-    final friendsLb = friendStore.friendsLeaderboard;
-    expect(friendsLb.any((p) => p.isMe), true);
-    expect(friendsLb.any((p) => p.id == 'p2'), true);
-
-    // Verify sorted high to low
-    for (int i = 0; i < friendsLb.length - 1; i++) {
-      expect(friendsLb[i].points >= friendsLb[i + 1].points, true);
-    }
-
-    // Toggle remove p2
-    final removed = friendStore.toggleFriend('p2');
-    expect(removed, false);
-    expect(friendStore.isFriend('p2'), false);
+  test('role owner dari server membuka /owner/*', () async {
+    api.client = _server(log, role: 'owner');
+    await UserStore.instance.login('o@b.id', 'secret123');
+    expect(UserStore.instance.isVenueOwner, true);
+    await Future<void>.delayed(const Duration(milliseconds: 80));
+    expect(log.any((l) => l.startsWith('GET /owner/courts')), true);
+    expect(OwnerStore.instance.selected?.id, 'c1');
+    await UserStore.instance.logout();
+    expect(UserStore.instance.isVenueOwner, false);
   });
 
-  test('UserStore: Google login dan logout mengelola status autentikasi', () async {
-    final userStore = UserStore.instance;
+  test('BookingStore: book -> slot taken -> pay -> cancel', () async {
+    await UserStore.instance.login('a@b.id', 'secret123');
+    final court = Court.fromJson(_court);
+    final day = DateTime(2030, 1, 2);
+    final store = BookingStore.instance;
+    await store.loadSlots(court, day);
+    expect(store.isTaken(court, day, '17:00'), false);
+    expect(store.isTaken(court, day, '18:00'), true);
 
-    await userStore.loginWithGoogleAccount(
-      name: 'Budi Santoso',
-      email: 'budi.santoso@gmail.com',
-      photoUrl: 'https://lh3.googleusercontent.com/avatar',
-      googleId: 'g_99887766',
-    );
+    final b = await store.book(court, day, '18:00', paymentMethod: 'QRIS Instant', addOnIds: ['racket']);
+    expect(b.finalPrice, 250);
+    expect(store.activeBookings.length, 1);
 
-    expect(userStore.isLoggedIn, true);
-    expect(userStore.profile.name, 'Budi Santoso');
-    expect(userStore.profile.email, 'budi.santoso@gmail.com');
-    expect(userStore.profile.authProvider, 'google');
-    expect(userStore.profile.photoUrl, 'https://lh3.googleusercontent.com/avatar');
+    final paid = await store.pay(b);
+    expect(paid.isPaid, true);
 
-    userStore.logout();
-    expect(userStore.isLoggedIn, false);
+    await store.cancel(paid);
+    expect(store.activeBookings, isEmpty);
+    expect(store.history.first.status, 'Dibatalkan');
+    await UserStore.instance.logout();
+  });
 
-    userStore.loginAsGuest();
-    expect(userStore.isLoggedIn, true);
-    expect(userStore.profile.authProvider, 'guest');
+  test('CatalogStore: fallback offline memakai data lokal', () async {
+    api.client = MockClient((_) async => throw Exception('down'));
+    await CatalogStore.instance.refreshCourts();
+    expect(CatalogStore.instance.isOffline, true);
+    expect(courts, isNotEmpty);
+    expect(courts.first.id, 'c1');
+  });
+
+  test('CatalogStore: online mengganti katalog dengan data server', () async {
+    await CatalogStore.instance.refreshCourts();
+    expect(CatalogStore.instance.isOffline, false);
+    expect(courts.length, 1);
+    expect(courts.first.name, 'Court A');
+    courts = fallbackCourts;
+  });
+
+  test('Voucher.fromJson & hitung diskon persen dengan batas maksimum', () {
+    final v = Voucher.fromJson({
+      'code': 'PADELNEW', 'title': 't', 'description': 'd', 'discountAmount': 0,
+      'percentage': 0.2, 'maxDiscount': 35, 'minSpend': 120,
+    });
+    expect(v.calculateDiscount(100), 0);
+    expect(v.calculateDiscount(220), 35);
+    expect(v.calculateDiscount(150), 30);
   });
 }

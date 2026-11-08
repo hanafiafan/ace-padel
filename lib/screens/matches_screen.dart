@@ -1,9 +1,12 @@
+import '../core/widgets/ap_banners.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
 import '../core/utils/haptics.dart';
 import '../core/widgets/responsive_container.dart';
 import '../data.dart';
+import '../core/utils/ui.dart';
+import '../services/api_service.dart';
 import '../store.dart';
 import '../theme.dart';
 import 'booking_screen.dart';
@@ -18,7 +21,15 @@ class MatchesScreen extends StatefulWidget {
 class _MatchesScreenState extends State<MatchesScreen> {
   String _selectedFilter = 'Semua';
 
+  @override
+  void initState() {
+    super.initState();
+    MatchStore.instance.refresh();
+  }
+
   void _showCreateMatchDialog(BuildContext context) {
+    if (!requireLogin(context, 'membuat match mabar')) return;
+    if (courts.isEmpty) return;
     final titleCtrl = TextEditingController(text: 'Mabar Padel Doubles');
     Court selectedCourt = courts.first;
     String selectedLevel = 'Semua Level (Casual)';
@@ -80,7 +91,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                     borderSide: BorderSide.none,
                   ),
                 ),
-                items: courts.take(8).map((c) {
+                items: courts.map((c) {
                   return DropdownMenuItem(
                     value: c,
                     child: Text('${c.name} (${c.area})',
@@ -130,32 +141,25 @@ class _MatchesScreenState extends State<MatchesScreen> {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () {
-                    final userName = UserStore.instance.profile.name;
-                    final newMatch = OpenMatch(
-                      id: 'm_${DateTime.now().millisecondsSinceEpoch}',
-                      court: selectedCourt,
-                      dateString: 'Besok',
-                      time: selectedTime,
-                      title: titleCtrl.text.trim().isEmpty
-                          ? 'Mabar Padel'
-                          : titleCtrl.text.trim(),
-                      hostName: userName,
-                      skillLevel: selectedLevel,
-                      currentPlayers: 1,
-                      maxPlayers: 4,
-                      pricePerPlayer:
-                          (selectedCourt.pricePerHour / 2).round(),
-                      isJoined: true,
-                    );
-                    MatchStore.instance.addMatch(newMatch);
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                            'Match mabar di ${selectedCourt.name} berhasil dibuat! Menunggu pemain lain bergabung.'),
-                      ),
-                    );
+                  onPressed: () async {
+                    try {
+                      await MatchStore.instance.create(
+                        court: selectedCourt,
+                        dateString: 'Besok',
+                        time: selectedTime,
+                        title: titleCtrl.text.trim().isEmpty ? 'Mabar Padel' : titleCtrl.text.trim(),
+                        skillLevel: selectedLevel,
+                        maxPlayers: 4,
+                        pricePerPlayer: (selectedCourt.pricePerHour / 2).round(),
+                      );
+                      if (ctx.mounted) Navigator.pop(ctx);
+                      if (context.mounted) {
+                        showInfo(context,
+                            'Match mabar di ${selectedCourt.name} berhasil dibuat! Menunggu pemain lain bergabung.');
+                      }
+                    } on ApiException catch (e) {
+                      if (context.mounted) showError(context, e);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AP.lime,
@@ -210,6 +214,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
           }).toList();
 
           return APList(
+            onRefresh: MatchStore.instance.refresh,
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 32),
             children: [
               // Hero Banner
@@ -394,8 +399,8 @@ class _MatchCard extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    c.image,
+                  child: apImg(
+c.image, fallbackUrl: c.imageUrl,
                     width: 48,
                     height: 48,
                     fit: BoxFit.cover,
@@ -572,15 +577,14 @@ class _MatchCard extends StatelessWidget {
                     child: joined
                         ? OutlinedButton.icon(
                             key: const ValueKey('joined_btn'),
-                            onPressed: () {
+                            onPressed: () async {
                               APHaptics.light();
-                              MatchStore.instance.toggleJoin(match.id);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Anda keluar dari slot match ini.'),
-                                  behavior: SnackBarBehavior.floating,
-                                ),
-                              );
+                              try {
+                                await MatchStore.instance.toggleJoin(match.id);
+                                if (context.mounted) showInfo(context, 'Anda keluar dari slot match ini.');
+                              } on ApiException catch (e) {
+                                if (context.mounted) showError(context, e);
+                              }
                             },
                             icon:  Icon(LucideIcons.circleCheck,
                                 color: AP.blue, size: 18),
@@ -597,18 +601,17 @@ class _MatchCard extends StatelessWidget {
                             key: const ValueKey('join_btn'),
                             onPressed: isFull
                                 ? null
-                                : () {
+                                : () async {
+                                    if (!requireLogin(context, 'bergabung ke match')) return;
                                     APHaptics.success();
-                                    final ok = MatchStore.instance
-                                        .toggleJoin(match.id);
-                                    if (ok) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                              'Berhasil bergabung dengan match ${match.title}! Sampai jumpa di lapangan.'),
-                                          behavior: SnackBarBehavior.floating,
-                                        ),
-                                      );
+                                    try {
+                                      final ok = await MatchStore.instance.toggleJoin(match.id);
+                                      if (ok && context.mounted) {
+                                        showInfo(context,
+                                            'Berhasil bergabung dengan match ${match.title}! Sampai jumpa di lapangan.');
+                                      }
+                                    } on ApiException catch (e) {
+                                      if (context.mounted) showError(context, e);
                                     }
                                   },
                             style: ElevatedButton.styleFrom(

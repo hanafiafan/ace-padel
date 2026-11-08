@@ -12,7 +12,8 @@ class Court {
   final bool indoor;
   // Seragam untuk semua venue (tint foto): hitam → biru brand.
   List<Color> get gradient => const [Color(0xFF070A16), Color(0xFF1F3BFF)];
-  final String image; // asset path
+  final String image; // bundled asset path, or server path (/img/.. /uploads/..)
+  final String imageUrl; // server path used when the bundled asset is missing
   final List<String> facilities;
   final String description;
 
@@ -26,6 +27,7 @@ class Court {
     required this.indoor,
     List<Color>? gradient, // ignored: lihat getter di atas
     required this.image,
+    this.imageUrl = '',
     this.facilities = const [
       'Sewa Raket & Bola',
       'Shower Air Panas',
@@ -40,6 +42,24 @@ class Court {
 
   /// City part of "District, City".
   String get city => area.contains(',') ? area.split(',').last.trim() : area;
+
+  factory Court.fromJson(Map<String, dynamic> m) {
+    final img = (m['image'] as String?) ?? '';
+    final url = (m['imageUrl'] as String?) ?? '';
+    return Court(
+      id: '${m['id']}',
+      name: (m['name'] as String?) ?? '',
+      venue: (m['venue'] as String?) ?? '',
+      area: (m['area'] as String?) ?? '',
+      rating: (m['rating'] as num?)?.toDouble() ?? 0,
+      pricePerHour: (m['pricePerHour'] as num?)?.toInt() ?? 0,
+      indoor: m['indoor'] == true || m['indoor'] == 1,
+      image: img.startsWith('assets/') ? img : (url.isNotEmpty ? url : img),
+      imageUrl: url,
+      facilities: (m['facilities'] as List?)?.map((e) => '$e').toList() ?? const [],
+      description: (m['description'] as String?) ?? '',
+    );
+  }
 }
 
 /// Unique cities, sorted — for the city filter.
@@ -60,8 +80,15 @@ class Booking {
   final int discount;
   final List<String> addOns;
   final int addOnsTotal;
-  final String status; // 'Terkonfirmasi', 'Dibatalkan', 'Selesai'
+  final String status; // 'Terkonfirmasi', 'Check-in Selesai', 'Dibatalkan', 'Maintenance'
   final DateTime createdAt;
+  // Server-owned fields
+  final String paymentStatus; // 'Belum Bayar' | 'Menunggu' | 'Lunas' | ...
+  final String? paymentRef; // VA number / QRIS payload
+  final DateTime? paymentExpiresAt;
+  final int? serverFinalPrice; // thousands of Rupiah, computed by the server
+  final String? userName;
+  final String? note;
 
   Booking({
     String? id,
@@ -76,49 +103,79 @@ class Booking {
     this.addOnsTotal = 0,
     this.status = 'Terkonfirmasi',
     DateTime? createdAt,
+    this.paymentStatus = 'Belum Bayar',
+    this.paymentRef,
+    this.paymentExpiresAt,
+    this.serverFinalPrice,
+    this.userName,
+    this.note,
   })  : id = id ?? 'ACE-${court.id.toUpperCase()}-${slot.replaceAll(':', '').replaceAll(' ', '')}',
         createdAt = createdAt ?? DateTime.now();
 
+  factory Booking.fromJson(Map<String, dynamic> m) {
+    final cj = m['court'];
+    final court = cj is Map<String, dynamic>
+        ? Court.fromJson(cj)
+        : (courts.where((c) => c.id == m['courtId']).firstOrNull ??
+            Court(id: '${m['courtId']}', name: 'Lapangan', venue: '', area: '', rating: 0, pricePerHour: (m['pricePerHour'] as num?)?.toInt() ?? 0, indoor: true, image: ''));
+    final d = DateTime.parse('${m['date']}'.split('T').first);
+    return Booking(
+      id: '${m['id']}',
+      court: court,
+      date: DateTime(d.year, d.month, d.day),
+      slot: '${m['slot']}',
+      paymentMethod: (m['paymentMethod'] as String?) ?? 'Bayar di tempat',
+      voucherCode: m['voucherCode'] as String?,
+      discount: (m['discount'] as num?)?.toInt() ?? 0,
+      addOns: (m['addOns'] as List?)?.map((e) => '$e').toList() ?? const [],
+      addOnsTotal: (m['addOnsTotal'] as num?)?.toInt() ?? 0,
+      status: (m['status'] as String?) ?? 'Terkonfirmasi',
+      createdAt: DateTime.tryParse('${m['createdAt']}')?.toLocal(),
+      paymentStatus: (m['paymentStatus'] as String?) ?? 'Belum Bayar',
+      paymentRef: m['paymentRef'] as String?,
+      paymentExpiresAt: DateTime.tryParse('${m['paymentExpiresAt']}')?.toLocal(),
+      serverFinalPrice: (m['finalPrice'] as num?)?.toInt(),
+      userName: m['userName'] as String?,
+      note: m['note'] as String?,
+    );
+  }
+
   int get baseCourtPrice => (court.pricePerHour * durationMinutes / 60).round();
-  int get finalPrice => (baseCourtPrice + addOnsTotal - discount).clamp(0, 999999);
+  int get finalPrice =>
+      serverFinalPrice ?? (baseCourtPrice + addOnsTotal - discount).clamp(0, 999999);
 
   String get key => '${court.id}|${date.year}-${date.month}-${date.day}|$slot';
 
   bool get isCheckedIn => status == 'Check-in Selesai';
   bool get isMaintenance => status == 'Maintenance';
+  bool get isCancelled => status == 'Dibatalkan';
+  bool get isPendingPayment => status == 'Terkonfirmasi' && paymentStatus == 'Menunggu';
+  bool get isPaid => paymentStatus == 'Lunas';
 
-  Booking copyWith({
-    String? id,
-    Court? court,
-    DateTime? date,
-    String? slot,
-    int? durationMinutes,
-    String? paymentMethod,
-    String? voucherCode,
-    int? discount,
-    List<String>? addOns,
-    int? addOnsTotal,
-    String? status,
-    DateTime? createdAt,
-  }) {
-    return Booking(
-      id: id ?? this.id,
-      court: court ?? this.court,
-      date: date ?? this.date,
-      slot: slot ?? this.slot,
-      durationMinutes: durationMinutes ?? this.durationMinutes,
-      paymentMethod: paymentMethod ?? this.paymentMethod,
-      voucherCode: voucherCode ?? this.voucherCode,
-      discount: discount ?? this.discount,
-      addOns: addOns ?? this.addOns,
-      addOnsTotal: addOnsTotal ?? this.addOnsTotal,
-      status: status ?? this.status,
-      createdAt: createdAt ?? this.createdAt,
-    );
-  }
+  Booking copyWith({String? status, String? paymentStatus}) => Booking(
+        id: id,
+        court: court,
+        date: date,
+        slot: slot,
+        durationMinutes: durationMinutes,
+        paymentMethod: paymentMethod,
+        voucherCode: voucherCode,
+        discount: discount,
+        addOns: addOns,
+        addOnsTotal: addOnsTotal,
+        status: status ?? this.status,
+        createdAt: createdAt,
+        paymentStatus: paymentStatus ?? this.paymentStatus,
+        paymentRef: paymentRef,
+        paymentExpiresAt: paymentExpiresAt,
+        serverFinalPrice: serverFinalPrice,
+        userName: userName,
+        note: note,
+      );
 }
 
-const courts = <Court>[
+/// Offline fallback catalog (used only when the server is unreachable).
+const fallbackCourts = <Court>[
   Court(
     id: 'c1',
     name: 'Signature Pink Indoor Court',
@@ -1421,6 +1478,9 @@ const courts = <Court>[
   ),
 ];
 
+/// Live catalog: starts as the offline fallback, replaced by CatalogStore.
+List<Court> courts = fallbackCourts;
+
 /// 08:00 - 22:00 hourly slots.
 final List<String> allSlots = List.generate(
   14,
@@ -1436,7 +1496,8 @@ class Player {
   final int wins;
   final int matches;
   final bool isMe;
-
+  final int rank;
+  final String? photoUrl;
   const Player({
     required this.id,
     required this.name,
@@ -1445,7 +1506,21 @@ class Player {
     required this.wins,
     required this.matches,
     this.isMe = false,
+    this.rank = 0,
+    this.photoUrl,
   });
+
+  factory Player.fromJson(Map<String, dynamic> m) => Player(
+        id: '${m['id']}',
+        name: (m['name'] as String?) ?? '',
+        username: (m['username'] as String?) ?? '',
+        points: (m['points'] as num?)?.toInt() ?? 0,
+        wins: (m['wins'] as num?)?.toInt() ?? 0,
+        matches: (m['matches'] as num?)?.toInt() ?? 0,
+        isMe: m['isMe'] == true,
+        rank: (m['rank'] as num?)?.toInt() ?? 0,
+        photoUrl: m['photoUrl'] as String?,
+      );
 
   String get handle => username.isNotEmpty
       ? '@$username'
@@ -1453,6 +1528,7 @@ class Player {
 
   String get initials {
     final parts = name.trim().split(' ');
+    if (parts.first.isEmpty) return '?';
     if (parts.length == 1) {
       return (parts.first.length >= 2 ? parts.first.substring(0, 2) : parts.first)
           .toUpperCase();
@@ -1461,30 +1537,16 @@ class Player {
   }
 }
 
-/// Sorted high → low by points.
-const players = <Player>[
-  Player(id: 'p1', name: 'Rizky Pratama', username: 'rizky_p', points: 2480, wins: 42, matches: 51),
-  Player(id: 'p2', name: 'Dewi Anggraini', username: 'dewi_ang', points: 2310, wins: 38, matches: 49),
-  Player(id: 'p3', name: 'Kevin Sanjaya', username: 'kevin_s', points: 2155, wins: 35, matches: 47),
-  Player(id: 'p4', name: 'Afan', username: 'afan_ace', points: 1980, wins: 31, matches: 44, isMe: true),
-  Player(id: 'p5', name: 'Putri Maharani', username: 'putri_m', points: 1870, wins: 29, matches: 43),
-  Player(id: 'p6', name: 'Bagas Wicaksono', username: 'bagas_w', points: 1720, wins: 26, matches: 40),
-  Player(id: 'p7', name: 'Siti Nurhaliza', username: 'siti_n', points: 1610, wins: 24, matches: 39),
-  Player(id: 'p8', name: 'Doni Saputra', username: 'doni_s', points: 1495, wins: 21, matches: 37),
-  Player(id: 'p9', name: 'Maya Lestari', username: 'maya_l', points: 1380, wins: 19, matches: 35),
-  Player(id: 'p10', name: 'Fajar Nugroho', username: 'fajar_n', points: 1240, wins: 16, matches: 33),
-  Player(id: 'p11', name: 'Sarah Wijaya', username: 'sarah_w', points: 1150, wins: 14, matches: 28),
-  Player(id: 'p12', name: 'Daniel Lim', username: 'daniel_lim', points: 980, wins: 11, matches: 22),
-];
-
 // ---------- Achievements ----------
 class Achievement {
+  final String key;
   final String title;
   final String desc;
   final IconData icon;
   final int progress; // current
   final int target;
   const Achievement({
+    this.key = '',
     required this.title,
     required this.desc,
     required this.icon,
@@ -1494,17 +1556,39 @@ class Achievement {
 
   bool get unlocked => progress >= target;
   double get ratio => (progress / target).clamp(0.0, 1.0);
+
+  /// Maps a server achievement (`key`) to the app's icon set.
+  factory Achievement.fromJson(Map<String, dynamic> m) => Achievement(
+        key: '${m['key']}',
+        title: (m['title'] as String?) ?? '',
+        desc: (m['desc'] as String?) ?? '',
+        icon: achievementIcons['${m['key']}'] ?? LucideIcons.award,
+        progress: (m['progress'] as num?)?.toInt() ?? 0,
+        target: ((m['target'] as num?)?.toInt() ?? 1).clamp(1, 1 << 30),
+      );
 }
 
+const achievementIcons = <String, IconData>{
+  'first_serve': kBallIcon,
+  'rajin_main': LucideIcons.flame,
+  'early_bird': LucideIcons.sun,
+  'globetrotter': LucideIcons.globe,
+  'win_streak': LucideIcons.zap,
+  'centurion': LucideIcons.timer,
+  'top3': LucideIcons.trophy,
+  'ace_master': LucideIcons.medal,
+};
+
+/// Zero-progress placeholders shown until /achievements loads (or logged out).
 const achievements = <Achievement>[
-  Achievement(title: 'First Serve', desc: 'Selesaikan booking pertama', icon: kBallIcon, progress: 1, target: 1),
-  Achievement(title: 'Rajin Main', desc: 'Main 10 kali', icon: LucideIcons.flame, progress: 10, target: 10),
-  Achievement(title: 'Early Bird', desc: 'Booking slot pagi 5x', icon: LucideIcons.sun, progress: 3, target: 5),
-  Achievement(title: 'Globetrotter', desc: 'Main di 4 venue berbeda', icon: LucideIcons.globe, progress: 2, target: 4),
-  Achievement(title: 'Win Streak', desc: 'Menang 5 kali beruntun', icon: LucideIcons.zap, progress: 4, target: 5),
-  Achievement(title: 'Centurion', desc: 'Capai 100 jam main', icon: LucideIcons.timer, progress: 44, target: 100),
-  Achievement(title: 'Top 3', desc: 'Masuk 3 besar leaderboard', icon: LucideIcons.trophy, progress: 0, target: 1),
-  Achievement(title: 'Ace Master', desc: 'Kumpulkan 3000 poin', icon: LucideIcons.medal, progress: 1980, target: 3000),
+  Achievement(key: 'first_serve', title: 'First Serve', desc: 'Selesaikan booking pertama', icon: kBallIcon, progress: 0, target: 1),
+  Achievement(key: 'rajin_main', title: 'Rajin Main', desc: 'Main 10 kali', icon: LucideIcons.flame, progress: 0, target: 10),
+  Achievement(key: 'early_bird', title: 'Early Bird', desc: 'Booking slot pagi 5x', icon: LucideIcons.sun, progress: 0, target: 5),
+  Achievement(key: 'globetrotter', title: 'Globetrotter', desc: 'Main di 4 venue berbeda', icon: LucideIcons.globe, progress: 0, target: 4),
+  Achievement(key: 'win_streak', title: 'Win Streak', desc: 'Menang 5 kali', icon: LucideIcons.zap, progress: 0, target: 5),
+  Achievement(key: 'centurion', title: 'Centurion', desc: 'Capai 100 jam main', icon: LucideIcons.timer, progress: 0, target: 100),
+  Achievement(key: 'top3', title: 'Top 3', desc: 'Masuk 3 besar leaderboard', icon: LucideIcons.trophy, progress: 0, target: 1),
+  Achievement(key: 'ace_master', title: 'Ace Master', desc: 'Kumpulkan 3000 poin', icon: LucideIcons.medal, progress: 0, target: 3000),
 ];
 
 // ---------- Vouchers & Promo ----------
@@ -1516,7 +1600,6 @@ class Voucher {
   final int minSpend; // in thousands IDR
   final double? percentage; // e.g. 0.20 for 20%
   final int? maxDiscount;
-
   const Voucher({
     required this.code,
     required this.title,
@@ -1527,11 +1610,22 @@ class Voucher {
     this.maxDiscount,
   });
 
+  factory Voucher.fromJson(Map<String, dynamic> m) => Voucher(
+        code: '${m['code']}',
+        title: (m['title'] as String?) ?? '',
+        description: (m['description'] as String?) ?? '',
+        discountAmount: (m['discountAmount'] as num?)?.toInt() ?? 0,
+        minSpend: (m['minSpend'] as num?)?.toInt() ?? 0,
+        percentage: (m['percentage'] as num?)?.toDouble(),
+        maxDiscount: (m['maxDiscount'] as num?)?.toInt(),
+      );
+
+  /// Display estimate; the server is authoritative (POST /vouchers/validate).
   int calculateDiscount(int priceInThousands) {
     if (priceInThousands < minSpend) return 0;
-    if (percentage != null) {
+    if (percentage != null && percentage! > 0) {
       final disc = (priceInThousands * percentage!).round();
-      if (maxDiscount != null && disc > maxDiscount!) {
+      if (maxDiscount != null && maxDiscount! > 0 && disc > maxDiscount!) {
         return maxDiscount!;
       }
       return disc;
@@ -1539,32 +1633,6 @@ class Voucher {
     return discountAmount.clamp(0, priceInThousands);
   }
 }
-
-const vouchers = <Voucher>[
-  Voucher(
-    code: 'ACEWEEKEND',
-    title: 'Diskon Akhir Pekan',
-    description: 'Potongan Rp25.000 untuk sewa lapangan akhir pekan',
-    discountAmount: 25,
-    minSpend: 100,
-  ),
-  Voucher(
-    code: 'PADELNEW',
-    title: 'Member Baru 20%',
-    description: 'Diskon 20% (maks Rp35.000) untuk member baru',
-    discountAmount: 35,
-    percentage: 0.20,
-    maxDiscount: 35,
-    minSpend: 120,
-  ),
-  Voucher(
-    code: 'SMASH10',
-    title: 'Smash Hemat Rp10k',
-    description: 'Potongan langsung Rp10.000 tanpa syarat minimal',
-    discountAmount: 10,
-    minSpend: 0,
-  ),
-];
 
 // ---------- Open Matches (Mabar Padel / Community) ----------
 class OpenMatch {
@@ -1574,12 +1642,13 @@ class OpenMatch {
   final String time; // e.g. "19:00 - 21:00"
   final String title;
   final String hostName;
+  final String hostId;
   final String skillLevel; // 'Semua Level', 'Menengah (Intermediate)', 'Mahir (Pro)'
   final int currentPlayers;
   final int maxPlayers;
   final int pricePerPlayer; // in thousands IDR
   final bool isJoined;
-
+  final List<String> players;
   const OpenMatch({
     required this.id,
     required this.court,
@@ -1587,12 +1656,36 @@ class OpenMatch {
     required this.time,
     required this.title,
     required this.hostName,
+    this.hostId = '',
     required this.skillLevel,
     required this.currentPlayers,
     this.maxPlayers = 4,
     required this.pricePerPlayer,
     this.isJoined = false,
+    this.players = const [],
   });
+
+  factory OpenMatch.fromJson(Map<String, dynamic> m) {
+    final cj = m['court'];
+    final court = cj is Map<String, dynamic>
+        ? Court.fromJson(cj)
+        : courts.firstWhere((c) => c.id == m['courtId'], orElse: () => courts.first);
+    return OpenMatch(
+      id: '${m['id']}',
+      court: court,
+      dateString: (m['dateString'] as String?) ?? '',
+      time: (m['time'] as String?) ?? '',
+      title: (m['title'] as String?) ?? '',
+      hostName: (m['hostName'] as String?) ?? '',
+      hostId: '${m['hostId'] ?? ''}',
+      skillLevel: (m['skillLevel'] as String?) ?? 'Semua Level',
+      currentPlayers: (m['currentPlayers'] as num?)?.toInt() ?? 0,
+      maxPlayers: (m['maxPlayers'] as num?)?.toInt() ?? 4,
+      pricePerPlayer: (m['pricePerPlayer'] as num?)?.toInt() ?? 0,
+      isJoined: m['isJoined'] == true,
+      players: (m['players'] as List?)?.map((e) => '$e').toList() ?? const [],
+    );
+  }
 
   OpenMatch copyWith({
     int? currentPlayers,
@@ -1605,77 +1698,16 @@ class OpenMatch {
       time: time,
       title: title,
       hostName: hostName,
+      hostId: hostId,
       skillLevel: skillLevel,
       currentPlayers: currentPlayers ?? this.currentPlayers,
       maxPlayers: maxPlayers,
       pricePerPlayer: pricePerPlayer,
       isJoined: isJoined ?? this.isJoined,
+      players: players,
     );
   }
 }
-
-final initialOpenMatches = <OpenMatch>[
-  OpenMatch(
-    id: 'm1',
-    court: courts[0], // Padel Pro Kemang
-    dateString: 'Malam Ini',
-    time: '19:00 – 21:00 (2 jam)',
-    title: 'Mabar Santai Sabtu Malam (Ganda)',
-    hostName: 'Rizky Pratama',
-    skillLevel: 'Menengah (Intermediate)',
-    currentPlayers: 3,
-    maxPlayers: 4,
-    pricePerPlayer: 65,
-  ),
-  OpenMatch(
-    id: 'm2',
-    court: courts[3], // HPC Atlas Beach Club
-    dateString: 'Besok Sore',
-    time: '16:30 – 18:30 (2 jam)',
-    title: 'Padel Sunset Beach Rally & Chill',
-    hostName: 'Dewi Anggraini',
-    skillLevel: 'Semua Level (Casual)',
-    currentPlayers: 2,
-    maxPlayers: 4,
-    pricePerPlayer: 95,
-  ),
-  OpenMatch(
-    id: 'm3',
-    court: courts[4], // Rekket Space Padel Hall BSD
-    dateString: 'Senin Malam',
-    time: '20:00 – 21:00 (1 jam)',
-    title: 'Drill & Sparring Double Competitive',
-    hostName: 'Kevin Sanjaya',
-    skillLevel: 'Mahir (Advanced)',
-    currentPlayers: 1,
-    maxPlayers: 4,
-    pricePerPlayer: 50,
-  ),
-  OpenMatch(
-    id: 'm4',
-    court: courts[1], // Social Padel House Menteng
-    dateString: 'Rabu Malam',
-    time: '19:00 – 20:30 (1.5 jam)',
-    title: 'Executive After-Office Social Hit',
-    hostName: 'Arif Wicaksono',
-    skillLevel: 'Menengah (Intermediate)',
-    currentPlayers: 2,
-    maxPlayers: 4,
-    pricePerPlayer: 75,
-  ),
-  OpenMatch(
-    id: 'm5',
-    court: courts[5], // Verde Sports Hub PIK 2
-    dateString: 'Jumat Malam',
-    time: '20:00 – 22:00 (2 jam)',
-    title: 'PIK 2 Night Rally & Masterclass',
-    hostName: 'Jessica Tan',
-    skillLevel: 'Pemula & Menengah',
-    currentPlayers: 3,
-    maxPlayers: 4,
-    pricePerPlayer: 70,
-  ),
-];
 
 // ---------- Reviews & Ratings ----------
 class CourtReview {
@@ -1686,7 +1718,6 @@ class CourtReview {
   final String comment;
   final String date;
   final String skillLevel;
-
   const CourtReview({
     required this.id,
     required this.courtId,
@@ -1696,50 +1727,34 @@ class CourtReview {
     required this.date,
     required this.skillLevel,
   });
+
+  factory CourtReview.fromJson(Map<String, dynamic> m) => CourtReview(
+        id: '${m['id']}',
+        courtId: '${m['courtId']}',
+        userName: (m['userName'] as String?) ?? 'Pemain',
+        rating: (m['rating'] as num?)?.toDouble() ?? 0,
+        comment: (m['comment'] as String?) ?? '',
+        date: relativeDate(m['createdAt'] as String?),
+        skillLevel: ((m['skillLevel'] as String?) ?? '').split(' ').first,
+      );
 }
 
-const initialReviews = <CourtReview>[
-  CourtReview(
-    id: 'r1',
-    courtId: 'c1',
-    userName: 'Budi Santoso',
-    rating: 5.0,
-    comment:
-        'Kaca sangat jernih dan karpet Mondo Supercourt sangat empuk di lutut. Pencahayaan malam hari sangat terang!',
-    date: '3 hari lalu',
-    skillLevel: 'Menengah',
-  ),
-  CourtReview(
-    id: 'r2',
-    courtId: 'c1',
-    userName: 'Nadya Putri',
-    rating: 4.8,
-    comment:
-        'Fasilitas shower dan locker room bersih banget. Ada cafe enak buat ngopi setelah game.',
-    date: '1 minggu lalu',
-    skillLevel: 'Pemula',
-  ),
-  CourtReview(
-    id: 'r3',
-    courtId: 'c2',
-    userName: 'Reza Rahardian',
-    rating: 4.7,
-    comment:
-        'Lokasi strategis di BSD, parkir mobil luas dan sewa raket Babolat tersedia.',
-    date: '5 hari lalu',
-    skillLevel: 'Mahir',
-  ),
-  CourtReview(
-    id: 'r4',
-    courtId: 'c3',
-    userName: 'Clara Shinta',
-    rating: 4.9,
-    comment:
-        'View rooftop Kemang saat sunset luar biasa indah! Wajib coba slot jam 17:00.',
-    date: 'Kemarin',
-    skillLevel: 'Menengah',
-  ),
-];
+List<String> _strList(dynamic v, String fallback) {
+  final l = (v as List?)?.map((e) => '$e').toList() ?? <String>[];
+  return l.isEmpty ? [fallback] : l;
+}
+
+/// "Hari ini", "3 hari lalu", ... from an ISO timestamp.
+String relativeDate(String? iso) {
+  final t = DateTime.tryParse(iso ?? '')?.toLocal();
+  if (t == null) return '';
+  final days = DateTime.now().difference(t).inDays;
+  if (days <= 0) return 'Hari ini';
+  if (days == 1) return 'Kemarin';
+  if (days < 7) return '$days hari lalu';
+  if (days < 30) return '${days ~/ 7} minggu lalu';
+  return '${days ~/ 30} bulan lalu';
+}
 
 // ---------- Perlengkapan & Add-Ons ----------
 class EquipmentAddOn {
@@ -1809,6 +1824,24 @@ class Coach {
     required this.availableVenues,
     required this.bio,
   });
+
+  factory Coach.fromJson(Map<String, dynamic> m) {
+    final img = (m['image'] as String?) ?? '';
+    final url = (m['imageUrl'] as String?) ?? '';
+    return Coach(
+      id: '${m['id']}',
+      name: (m['name'] as String?) ?? '',
+      title: (m['title'] as String?) ?? '',
+      rating: (m['rating'] as num?)?.toDouble() ?? 0,
+      reviewsCount: (m['reviewsCount'] as num?)?.toInt() ?? 0,
+      ratePerHour: (m['ratePerHour'] as num?)?.toInt() ?? 0,
+      experience: (m['experience'] as String?) ?? '',
+      image: img.startsWith('assets/') ? img : (url.isNotEmpty ? url : img),
+      specialties: _strList(m['specialties'], 'Umum'),
+      availableVenues: _strList(m['availableVenues'], 'Lapangan Ace Padel'),
+      bio: (m['bio'] as String?) ?? '',
+    );
+  }
 }
 
 const initialCoaches = <Coach>[

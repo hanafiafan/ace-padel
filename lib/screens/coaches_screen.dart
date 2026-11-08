@@ -1,9 +1,13 @@
+import '../core/widgets/ap_banners.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
 import 'package:intl/intl.dart';
 import '../core/widgets/responsive_container.dart';
+import '../core/utils/ui.dart';
 import '../data.dart';
+import '../services/api_service.dart';
+import '../store.dart';
 import '../theme.dart';
 
 class CoachesScreen extends StatefulWidget {
@@ -26,14 +30,26 @@ class _CoachesScreenState extends State<CoachesScreen> {
     'Taktik Double',
   ];
 
+  void _rebuild() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    CatalogStore.instance.addListener(_rebuild);
+    CatalogStore.instance.refreshCoaches();
+  }
+
   @override
   void dispose() {
+    CatalogStore.instance.removeListener(_rebuild);
     _searchCtrl.dispose();
     super.dispose();
   }
 
   List<Coach> get _filteredCoaches {
-    return initialCoaches.where((c) {
+    return CatalogStore.instance.coaches.where((c) {
       if (_query.isNotEmpty) {
         final q = _query.toLowerCase();
         final match = c.name.toLowerCase().contains(q) ||
@@ -59,6 +75,7 @@ class _CoachesScreenState extends State<CoachesScreen> {
   }
 
   void _bookCoachSession(Coach coach) {
+    if (!requireLogin(context, 'memesan sesi coaching')) return;
     String selectedVenue = coach.availableVenues.first;
     DateTime selectedDate = DateTime.now().add(const Duration(days: 1));
     String selectedSlot = '16:00';
@@ -97,7 +114,7 @@ class _CoachesScreenState extends State<CoachesScreen> {
                   CircleAvatar(
                     radius: 26,
                     backgroundColor: AP.blue,
-                    backgroundImage: coach.image.isNotEmpty ? AssetImage(coach.image) : null,
+                    backgroundImage: coach.image.isNotEmpty ? apImageProvider(coach.image) : null,
                     child: coach.image.isEmpty
                         ? Text(
                             coach.name.split(' ').map((e) => e[0]).take(2).join(),
@@ -270,17 +287,23 @@ class _CoachesScreenState extends State<CoachesScreen> {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Sesi coaching bersama ${coach.name} pada ${DateFormat('EEE, d MMM').format(selectedDate)} pukul $selectedSlot WIB berhasil dijadwalkan!',
-                        ),
-                        backgroundColor: AP.blueDark,
-                        duration: const Duration(seconds: 4),
-                      ),
-                    );
+                  onPressed: () async {
+                    try {
+                      await CoachSessionStore.book(
+                        coach: coach,
+                        venue: selectedVenue,
+                        date: selectedDate,
+                        slot: selectedSlot,
+                        focus: selectedFocus,
+                      );
+                      if (ctx.mounted) Navigator.pop(ctx);
+                      if (!mounted) return;
+                      NotificationStore.instance.refresh();
+                      showInfo(this.context,
+                          'Sesi coaching bersama ${coach.name} pada ${DateFormat('EEE, d MMM').format(selectedDate)} pukul $selectedSlot WIB berhasil dijadwalkan!');
+                    } on ApiException catch (e) {
+                      if (mounted) showError(this.context, e);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AP.lime,
@@ -525,7 +548,7 @@ class _CoachCard extends StatelessWidget {
               CircleAvatar(
                 radius: 28,
                 backgroundColor: AP.blue,
-                backgroundImage: coach.image.isNotEmpty ? AssetImage(coach.image) : null,
+                backgroundImage: coach.image.isNotEmpty ? apImageProvider(coach.image) : null,
                 child: coach.image.isEmpty
                     ? Text(
                         coach.name.split(' ').map((e) => e[0]).take(2).join(),

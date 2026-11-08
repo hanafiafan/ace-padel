@@ -1,137 +1,72 @@
+import 'dart:convert';
+import 'package:ace_padel/main.dart';
+import 'package:ace_padel/screens/coaches_screen.dart';
+import 'package:ace_padel/services/api_service.dart';
+import 'package:ace_padel/store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ace_padel/main.dart';
-import 'package:ace_padel/widgets.dart';
-import 'package:ace_padel/screens/coaches_screen.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  testWidgets('App renders successfully with RootNav and 5 tabs',
-      (WidgetTester tester) async {
-    // Set surface size to realistic modern mobile viewport
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+    // Server unreachable: the app must still render with the offline fallback catalog.
+    ApiService.instance.client = MockClient((_) async => http.Response(jsonEncode({'success': false}), 503));
+  });
+
+  void bigScreen(WidgetTester tester) {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 2.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
+  }
 
+  testWidgets('Login screen -> mode tamu -> navigasi 5 tab', (tester) async {
+    bigScreen(tester);
     await tester.pumpWidget(const AcePadelApp());
     await tester.pumpAndSettle();
 
-    // Verify LoginScreen renders on fresh start
-    expect(find.text('Selamat Datang di Ace Padel'), findsOneWidget);
+    expect(find.text('Selamat Datang'), findsOneWidget);
     expect(find.text('Masuk dengan Google'), findsOneWidget);
-    expect(find.text('Lanjutkan sebagai Tamu (Guest)'), findsOneWidget);
+    expect(find.text('Masuk'), findsWidgets);
 
-    // Tap Lanjutkan sebagai Tamu to enter the main app
-    await tester.tap(find.text('Lanjutkan sebagai Tamu (Guest)'));
+    // Register form toggles
+    await tester.tap(find.text('Belum punya akun? Daftar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Buat Akun Baru'), findsOneWidget);
+
+    await tester.tap(find.text('Lihat-lihat dulu sebagai Tamu'));
     await tester.pumpAndSettle();
 
-    // Verify Brand Logo lockup and greeting
-    expect(find.byType(AceLogo), findsOneWidget);
-    expect(find.textContaining('Ayo main padel'), findsOneWidget);
-
-    // Verify Navigation Destination labels
-    expect(find.text('Home'), findsOneWidget);
-    expect(find.text('Courts'), findsOneWidget);
-    expect(find.text('Ranking'), findsOneWidget);
-    expect(find.text('Bookings'), findsOneWidget);
-    expect(find.text('Profile'), findsOneWidget);
-
-    // Switch to Courts tab
+    for (final tab in ['Home', 'Courts', 'Ranking', 'Bookings', 'Profile']) {
+      expect(find.text(tab), findsOneWidget);
+    }
     await tester.tap(find.text('Courts'));
     await tester.pumpAndSettle();
     expect(find.text('Cari Lapangan'), findsOneWidget);
 
-    // Switch to Ranking tab
-    await tester.tap(find.text('Ranking'));
-    await tester.pumpAndSettle();
-    expect(find.text('Leaderboard'), findsOneWidget);
-    expect(find.textContaining('Global'), findsWidgets);
-    expect(find.textContaining('Teman'), findsWidgets);
-    expect(find.text('Tambah Teman'), findsOneWidget);
-
-    // Switch scope to Teman
-    await tester.tap(find.textContaining('Teman ('));
-    await tester.pumpAndSettle();
-
-    // Open Tambah Teman modal
-    await tester.tap(find.text('Tambah Teman'));
-    await tester.pumpAndSettle();
-    expect(find.text('Tambah Teman Pemain'), findsOneWidget);
-    expect(find.text('Daftar Pemain:'), findsOneWidget);
-
-    // Close modal
-    await tester.tap(find.byIcon(Icons.close));
-    await tester.pumpAndSettle();
-
-    // Switch to Bookings tab
+    // Guests must log in to see bookings
     await tester.tap(find.text('Bookings'));
     await tester.pumpAndSettle();
-    expect(find.text('Booking Saya'), findsOneWidget);
-    expect(find.text('Mendatang'), findsOneWidget);
-    expect(find.text('Riwayat'), findsOneWidget);
+    expect(find.text('Masuk untuk melihat booking'), findsOneWidget);
 
-    // Switch to Profile tab
     await tester.tap(find.text('Profile'));
     await tester.pumpAndSettle();
     expect(find.text('Profil Saya'), findsOneWidget);
-    expect(find.text('Venue favorit'), findsOneWidget);
-    expect(find.text('Metode pembayaran'), findsOneWidget);
-
-    // Open Portal Mitra Lapangan
-    expect(find.text('Portal Mitra Lapangan'), findsOneWidget);
-    await tester.tap(find.text('Buka'));
-    await tester.pumpAndSettle();
-
-    // Verify Venue Dashboard
-    expect(find.text('Portal Pengelola'), findsOneWidget);
-    expect(find.text('Validasi QR'), findsOneWidget);
-    expect(find.text('Jadwal Slot'), findsOneWidget);
-    expect(find.text('Laporan'), findsOneWidget);
-    expect(find.text('Pemindai Tiket Masuk'), findsOneWidget);
-
-    // Switch to Jadwal Slot tab in Venue Dashboard
-    await tester.tap(find.text('Jadwal Slot'));
-    await tester.pumpAndSettle();
-    expect(find.text('Tersedia'), findsOneWidget);
-    expect(find.text('Maintenance'), findsOneWidget);
-
-    // Return to Player Mode
-    await tester.tap(find.text('Mode Pemain'));
-    await tester.pumpAndSettle();
-    expect(find.text('Profil Saya'), findsOneWidget);
+    expect(find.text('Masuk / Daftar'), findsOneWidget);
+    // Owner portal is only offered to server-confirmed owners
+    expect(find.text('Portal Mitra'), findsNothing);
+    UserStore.instance.isGuest = false;
   });
 
-  testWidgets('CoachesScreen renders coach roster and opens booking sheet',
-      (WidgetTester tester) async {
-    tester.view.physicalSize = const Size(1080, 2400);
-    tester.view.devicePixelRatio = 2.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: CoachesScreen(),
-      ),
-    );
+  testWidgets('CoachesScreen menampilkan pelatih (fallback offline)', (tester) async {
+    bigScreen(tester);
+    await tester.pumpWidget(const MaterialApp(home: CoachesScreen()));
     await tester.pumpAndSettle();
 
     expect(find.text('Pelatih & Coaching Padel'), findsOneWidget);
     expect(find.text('Edu Altimires Ros'), findsOneWidget);
-    expect(find.text('Adrià Mercadal'), findsOneWidget);
-    expect(find.text('Adi Sila Pratama'), findsOneWidget);
-
-    // Tap Book Sesi for first coach
-    await tester.tap(find.text('Book Sesi').first);
-    await tester.pumpAndSettle();
-
-    expect(find.textContaining('Private Coaching: Edu Altimires Ros'),
-        findsOneWidget);
-    expect(find.text('Konfirmasi Jadwal Coaching'), findsOneWidget);
-
-    // Confirm booking session
-    await tester.tap(find.text('Konfirmasi Jadwal Coaching'));
-    await tester.pumpAndSettle();
-
-    expect(find.textContaining('berhasil dijadwalkan'), findsOneWidget);
   });
 }

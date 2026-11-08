@@ -187,16 +187,21 @@ class APList extends StatelessWidget {
   final bool shrinkWrap;
   final ScrollPhysics? physics;
   final ScrollController? controller;
-  const APList({super.key, this.padding, required this.children, this.shrinkWrap = false, this.physics, this.controller});
+  /// Adds pull-to-refresh.
+  final Future<void> Function()? onRefresh;
+  const APList({super.key, this.padding, required this.children, this.shrinkWrap = false, this.physics, this.controller, this.onRefresh});
 
   @override
-  Widget build(BuildContext context) => ListView(
-        padding: padding,
-        shrinkWrap: shrinkWrap,
-        physics: physics,
-        controller: controller,
-        children: [for (var i = 0; i < children.length; i++) children[i].reveal(math.min(i, 8))],
-      );
+  Widget build(BuildContext context) {
+    final list = ListView(
+      padding: padding,
+      shrinkWrap: shrinkWrap,
+      physics: onRefresh != null ? const AlwaysScrollableScrollPhysics() : physics,
+      controller: controller,
+      children: [for (var i = 0; i < children.length; i++) children[i].reveal(math.min(i, 8))],
+    );
+    return onRefresh == null ? list : RefreshIndicator(onRefresh: onRefresh!, child: list);
+  }
 }
 
 /// Slanted speed stripes — the "sporty" signature motif.
