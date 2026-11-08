@@ -1,0 +1,13 @@
+# Contoh konfigurasi signing key release untuk Android Google Play Store
+# Buat keystore dengan perintah:
+# keytool -genkey -v -keystore release-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias acepadel
+#
+# Lalu salin file ini menjadi `key.properties` di dalam folder android/:
+# cp android/key.properties.example android/key.properties
+# Dan isi nilai-nilainya sesuai password yang Anda masukkan saat membuat keystore.
+
+storePassword=password_keystore_anda
+keyPassword=password_key_anda
+keyAlias=acepadel
+storeFile=release-keystore.jks
+

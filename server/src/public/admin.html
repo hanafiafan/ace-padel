@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ace Padel - Portal Web Super Admin & Mitra Lapangan</title>
+  <!-- Tailwind CSS & Plus Jakarta Sans -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            apBlue: '#2334DB',
+            apDark: '#151C4E',
+            apLime: '#C7F23C',
+            apSlate: '#6B7291',
+            apCloud: '#F4F6FB',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; }
+    .glass-card { background: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03); }
+    .badge-lime { background-color: #EBFBD5; color: #3A6900; }
+    .badge-blue { background-color: #EEF0FD; color: #2334DB; }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col antialiased">
+
+  <!-- TOPBAR -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Brand Logo -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-apDark flex items-center justify-center p-1.5 shadow-sm">
+          <div class="w-7 h-7 rounded-lg bg-apLime flex items-center justify-center font-extrabold text-apDark text-xs">
+            AP
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xl font-extrabold tracking-tight text-apDark">Ace Padel</span>
+            <span class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-apDark text-white">PORTAL</span>
+          </div>
+          <span class="text-xs text-slate-500 font-medium">by hellens.dev</span>
+        </div>
+      </div>
+
+      <!-- Role Switcher & User Profile -->
+      <div class="flex items-center space-x-3 sm:space-x-4">
+        <!-- Live Status Pill -->
+        <div class="hidden sm:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>API Connected (Port 3001)</span>
+        </div>
+
+        <!-- Role Toggle Dropdown / Buttons -->
+        <div class="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200">
+          <button id="btnRoleSuperadmin" onclick="switchRole('superadmin')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 bg-white text-apBlue shadow-xs">
+            <span>👑 Super Admin</span>
+          </button>
+          <button id="btnRoleVenue" onclick="switchRole('venue_owner')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 text-slate-600 hover:text-slate-900">
+            <span>🏟️ Mitra Lapangan</span>
+          </button>
+        </div>
+
+        <!-- User Chip -->
+        <div class="flex items-center space-x-2 pl-2 border-l border-slate-200">
+          <div id="userAvatar" class="w-8 h-8 rounded-full bg-apLime text-apDark font-bold flex items-center justify-center text-xs">
+            AF
+          </div>
+          <div class="hidden md:block text-left">
+            <div id="userName" class="text-xs font-bold text-slate-800">Afan (Superadmin)</div>
+            <div id="userRoleBadge" class="text-[10px] font-semibold text-apBlue">hellens.dev HQ</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1 flex flex-col md:flex-row gap-6">
+
+    <!-- SIDEBAR NAV -->
+    <aside class="w-full md:w-64 shrink-0">
+      <div class="glass-card rounded-2xl p-4 sticky top-24">
+        
+        <!-- Role Specific Section Header -->
+        <div class="px-3 py-2 text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
+          <span id="sidebarRoleLabel">Super Admin Menu</span>
+        </div>
+
+        <nav id="navSuperadmin" class="space-y-1 mt-1">
+          <button onclick="showTab('tabOverview')" class="nav-btn active w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-bold transition text-white bg-apBlue">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Overview & KPI</span>
+          </button>
+          <button onclick="showTab('tabCourts')" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-slate-600 hover:bg-slate-100">
+            <i data-lucide="map-pin" class="w-4 h-4"></i>
+            <span>Venue & Lapangan</span>
+          </button>
+          <button onclick="showTab('tabBookings')" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-slate-600 hover:bg-slate-100">
+            <i data-lucide="calendar-check-2" class="w-4 h-4"></i>
+            <span>Semua Reservasi</span>
+          </button>
+          <button onclick="showTab('tabVouchers')" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-slate-600 hover:bg-slate-100">
+            <i data-lucide="ticket" class="w-4 h-4"></i>
+            <span>Voucher Promo</span>
+          </button>
+        </nav>
+
+        <!-- VENUE OWNER NAV (Hidden by default) -->
+        <nav id="navVenue" class="space-y-1 mt-1 hidden">
+          <div class="p-2 mb-2 bg-slate-50 rounded-xl border border-slate-200">
+            <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Pilih Venue Anda:</label>
+            <select id="selectVenueOwnerCourt" onchange="loadVenueStats()" class="w-full text-xs font-semibold bg-white border border-slate-300 rounded-lg p-1.5 focus:outline-none focus:ring-2 focus:ring-apBlue">
+              <option value="c1">Padel Pro Kemang (c1)</option>
+              <option value="c2">Social Padel House Menteng (c2)</option>
+              <option value="c3">Social Padel House Setiabudi (c3)</option>
+              <option value="c4">HPC Atlas Beach Club Bali (c4)</option>
+              <option value="c5">Rekket Space BSD (c5)</option>
+              <option value="c6">Verde Sports Hub PIK 2 (c6)</option>
+              <option value="c7">Nine Padel Monas (c7)</option>
+              <option value="c8">Bali Social Club Canggu (c8)</option>
+              <option value="c9">Monster Padel Uluwatu (c9)</option>
+              <option value="c10">Jungle Padel Canggu (c10)</option>
+              <option value="c11">SPACE PADEL PIK 2 (c11)</option>
+              <option value="c12">Maison de Padel (c12)</option>
+            </select>
+          </div>
+          <button onclick="showTab('tabVenueScan')" class="nav-btn-venue active w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-bold transition text-white bg-apBlue">
+            <i data-lucide="qr-code" class="w-4 h-4"></i>
+            <span>Validasi Tiket QR</span>
+          </button>
+          <button onclick="showTab('tabVenueSlots')" class="nav-btn-venue w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-slate-600 hover:bg-slate-100">
+            <i data-lucide="wrench" class="w-4 h-4"></i>
+            <span>Kelola Slot Maintenance</span>
+          </button>
+          <button onclick="showTab('tabVenueStats')" class="nav-btn-venue w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-slate-600 hover:bg-slate-100">
+            <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+            <span>Laporan Venue</span>
+          </button>
+        </nav>
+
+        <!-- System Quick Info -->
+        <div class="mt-8 pt-4 border-t border-slate-100 text-xs text-slate-400 space-y-1">
+          <div class="flex justify-between">
+            <span>Environment:</span>
+            <span class="font-bold text-slate-600">Production Ready</span>
+          </div>
+          <div class="flex justify-between">
+            <span>App Version:</span>
+            <span class="font-bold text-slate-600">1.0.0+1</span>
+          </div>
+          <div class="flex justify-between">
+            <span>Company:</span>
+            <span class="font-bold text-apBlue">hellens.dev</span>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- CONTENT AREA -->
+    <main class="flex-1 space-y-6">
+
+      <!-- ============================================== -->
+      <!-- TAB 1: SUPERADMIN OVERVIEW & KPI -->
+      <!-- ============================================== -->
+      <section id="tabOverview" class="tab-pane space-y-6">
+        
+        <!-- Welcome banner -->
+        <div class="glass-card rounded-2xl p-6 bg-gradient-to-r from-apDark to-apBlue text-white relative overflow-hidden">
+          <div class="relative z-10 max-w-xl">
+            <span class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-apLime text-apDark uppercase tracking-wider">
+              Super Admin Dashboard
+            </span>
+            <h1 class="text-2xl font-extrabold mt-2 text-white">Selamat Datang, Afan! 👋</h1>
+            <p class="text-white/80 text-sm mt-1">
+              Pantau seluruh aktivitas reservasi padel, omset platform, utilisasi lapangan mitra, dan kode voucher promo se-Indonesia.
+            </p>
+          </div>
+          <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+        </div>
+
+        <!-- KPI Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="glass-card rounded-2xl p-5">
+            <div class="flex items-center justify-between text-slate-400">
+              <span class="text-xs font-bold uppercase tracking-wider">Total Omset (GMV)</span>
+              <div class="w-8 h-8 rounded-xl bg-blue-50 text-apBlue flex items-center justify-center">
+                <i data-lucide="wallet" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div id="kpiRevenue" class="text-2xl font-black text-slate-900 mt-2">Rp0</div>
+            <span class="text-[11px] font-semibold text-emerald-600 mt-1 inline-block">↑ Terkonfirmasi real-time</span>
+          </div>
+
+          <div class="glass-card rounded-2xl p-5">
+            <div class="flex items-center justify-between text-slate-400">
+              <span class="text-xs font-bold uppercase tracking-wider">Total Reservasi</span>
+              <div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                <i data-lucide="calendar" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div id="kpiBookings" class="text-2xl font-black text-slate-900 mt-2">0</div>
+            <span id="kpiActiveSub" class="text-[11px] font-semibold text-slate-500 mt-1 inline-block">0 aktif saat ini</span>
+          </div>
+
+          <div class="glass-card rounded-2xl p-5">
+            <div class="flex items-center justify-between text-slate-400">
+              <span class="text-xs font-bold uppercase tracking-wider">Venue / Lapangan</span>
+              <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <i data-lucide="map-pin" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div id="kpiCourts" class="text-2xl font-black text-slate-900 mt-2">0</div>
+            <span class="text-[11px] font-semibold text-slate-500 mt-1 inline-block">Di 5 kota besar</span>
+          </div>
+
+          <div class="glass-card rounded-2xl p-5">
+            <div class="flex items-center justify-between text-slate-400">
+              <span class="text-xs font-bold uppercase tracking-wider">Pemain & Komunitas</span>
+              <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i data-lucide="users" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div id="kpiUsers" class="text-2xl font-black text-slate-900 mt-2">0</div>
+            <span class="text-[11px] font-semibold text-emerald-600 mt-1 inline-block">Google OAuth + Tamu</span>
+          </div>
+        </div>
+
+        <!-- Charts & Breakdown -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 glass-card rounded-2xl p-5">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-sm font-extrabold uppercase tracking-wider text-slate-500">Omset per Venue Lapangan</h2>
+              <span class="text-xs text-slate-400 font-medium">Dalam Ribuan Rupiah</span>
+            </div>
+            <div class="h-64">
+              <canvas id="chartRevenuePerCourt"></canvas>
+            </div>
+          </div>
+
+          <div class="glass-card rounded-2xl p-5">
+            <h2 class="text-sm font-extrabold uppercase tracking-wider text-slate-500 mb-4">Aksi Cepat Superadmin</h2>
+            <div class="space-y-3">
+              <button onclick="openAddCourtModal()" class="w-full py-3 px-4 rounded-xl bg-apBlue text-white font-bold text-sm flex items-center justify-center space-x-2 shadow-sm hover:bg-blue-700 transition">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                <span>Tambah Lapangan Baru</span>
+              </button>
+              <button onclick="openAddVoucherModal()" class="w-full py-3 px-4 rounded-xl bg-apDark text-white font-bold text-sm flex items-center justify-center space-x-2 shadow-sm hover:bg-slate-900 transition">
+                <i data-lucide="tag" class="w-4 h-4"></i>
+                <span>Buat Voucher Promo</span>
+              </button>
+              <button onclick="refreshAllData()" class="w-full py-3 px-4 rounded-xl bg-slate-100 text-slate-700 font-bold text-sm flex items-center justify-center space-x-2 hover:bg-slate-200 transition">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                <span>Muat Ulang Data Real-time</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Transactions Table -->
+        <div class="glass-card rounded-2xl p-5 overflow-hidden">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-sm font-extrabold uppercase tracking-wider text-slate-500">Transaksi Reservasi Terbaru</h2>
+            <button onclick="showTab('tabBookings')" class="text-xs font-bold text-apBlue hover:underline">Lihat Semua →</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 uppercase font-extrabold">
+                <tr>
+                  <th class="py-3 px-3">Kode Booking</th>
+                  <th class="py-3 px-3">Nama Pemain</th>
+                  <th class="py-3 px-3">Venue Lapangan</th>
+                  <th class="py-3 px-3">Jadwal & Slot</th>
+                  <th class="py-3 px-3">Total Bayar</th>
+                  <th class="py-3 px-3">Status</th>
+                </tr>
+              </thead>
+              <tbody id="tableRecentBookings" class="divide-y divide-slate-100 font-medium">
+                <tr><td colspan="6" class="text-center py-4 text-slate-400">Memuat data transaksi...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 2: SUPERADMIN COURTS MANAGEMENT -->
+      <!-- ============================================== -->
+      <section id="tabCourts" class="tab-pane space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900">Manajemen Venue & Lapangan</h1>
+            <p class="text-sm text-slate-500">Kelola daftar lapangan mitra, tarif sewa per jam, dan fasilitas.</p>
+          </div>
+          <button onclick="openAddCourtModal()" class="px-4 py-2.5 rounded-xl bg-apBlue text-white font-bold text-xs flex items-center space-x-2 shadow-sm hover:bg-blue-700 transition shrink-0">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Tambah Lapangan Baru</span>
+          </button>
+        </div>
+
+        <!-- Courts Grid -->
+        <div id="gridCourts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 3: SUPERADMIN ALL BOOKINGS -->
+      <!-- ============================================== -->
+      <section id="tabBookings" class="tab-pane space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900">Semua Reservasi Pelanggan</h1>
+            <p class="text-sm text-slate-500">Daftar lengkap booking aktif, tiket selesai check-in, dan pembatalan.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <input type="text" id="inputSearchBooking" onkeyup="filterBookingsTable()" placeholder="Cari kode atau nama..." class="px-3 py-2 rounded-xl text-xs border border-slate-300 focus:outline-none focus:ring-2 focus:ring-apBlue bg-white">
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-5 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 uppercase font-extrabold">
+                <tr>
+                  <th class="py-3 px-3">Kode Booking</th>
+                  <th class="py-3 px-3">Pemain</th>
+                  <th class="py-3 px-3">Venue Lapangan</th>
+                  <th class="py-3 px-3">Tanggal & Jam</th>
+                  <th class="py-3 px-3">Metode Bayar</th>
+                  <th class="py-3 px-3">Total</th>
+                  <th class="py-3 px-3">Status</th>
+                  <th class="py-3 px-3 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tableAllBookings" class="divide-y divide-slate-100 font-medium">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 4: SUPERADMIN VOUCHERS -->
+      <!-- ============================================== -->
+      <section id="tabVouchers" class="tab-pane space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-black text-slate-900">Manajemen Voucher Promo</h1>
+            <p class="text-sm text-slate-500">Buat kupon potongan harga untuk kampanye promosi dan loyalitas member.</p>
+          </div>
+          <button onclick="openAddVoucherModal()" class="px-4 py-2.5 rounded-xl bg-apDark text-white font-bold text-xs flex items-center space-x-2 shadow-sm hover:bg-slate-900 transition shrink-0">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Buat Voucher Baru</span>
+          </button>
+        </div>
+
+        <div id="gridVouchers" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 5: VENUE OWNER - SCAN & VERIFIKASI TIKET QR -->
+      <!-- ============================================== -->
+      <section id="tabVenueScan" class="tab-pane space-y-6 hidden">
+        <div>
+          <span class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-blue-100 text-apBlue uppercase tracking-wider">
+            Resepsionis & Gate Check-In
+          </span>
+          <h1 class="text-2xl font-black text-slate-900 mt-2">Validasi Tiket QR Pemain</h1>
+          <p class="text-sm text-slate-500">Pindai kode QR dari layar smartphone pemain atau masukkan kode booking manual.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Scanner Card -->
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <h2 class="text-sm font-extrabold uppercase tracking-wider text-slate-500">1. Input Kode Booking / QR</h2>
+            
+            <div class="flex gap-2">
+              <input type="text" id="inputScanBookingId" placeholder="Contoh: ACE-C1-1900 atau ACE-C1-1800-1889" class="flex-1 px-4 py-3 rounded-xl border border-slate-300 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-apBlue uppercase">
+              <button onclick="verifyTicketAction()" class="px-5 py-3 rounded-xl bg-apBlue text-white font-bold text-sm hover:bg-blue-700 transition">
+                Verifikasi
+              </button>
+            </div>
+
+            <div class="pt-2 text-xs text-slate-400">
+              💡 <strong>Tips Cepat Kasir:</strong> Anda dapat mencoba memverifikasi kode preset contoh: <code class="bg-slate-100 px-1 py-0.5 rounded text-apBlue font-mono font-bold cursor-pointer" onclick="testCode('ACE-C1-1900')">ACE-C1-1900</code>
+            </div>
+
+            <!-- Validation Result Box -->
+            <div id="ticketResultBox" class="hidden mt-4 p-5 rounded-2xl border transition">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Quick Check-in Instructions -->
+          <div class="glass-card rounded-2xl p-6 space-y-4 bg-slate-50">
+            <h2 class="text-sm font-extrabold uppercase tracking-wider text-slate-500">Panduan Operasional Resepsionis</h2>
+            <ul class="text-xs space-y-3 text-slate-600">
+              <li class="flex items-start space-x-2">
+                <span class="w-5 h-5 rounded-full bg-apLime text-apDark font-bold flex items-center justify-center shrink-0">1</span>
+                <span>Pemain tiba di venue dan menunjukkan e-tiket digital pada aplikasi Ace Padel di ponselnya.</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="w-5 h-5 rounded-full bg-apLime text-apDark font-bold flex items-center justify-center shrink-0">2</span>
+                <span>Masukkan kode tiket pemain pada kotak di samping kiri dan klik <strong>Verifikasi</strong>.</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="w-5 h-5 rounded-full bg-apLime text-apDark font-bold flex items-center justify-center shrink-0">3</span>
+                <span>Periksa apakah nama pemain, jam slot, dan sewa alat (raket/bola) sudah sesuai.</span>
+              </li>
+              <li class="flex items-start space-x-2">
+                <span class="w-5 h-5 rounded-full bg-apLime text-apDark font-bold flex items-center justify-center shrink-0">4</span>
+                <span>Klik tombol hijau <strong>"Check-In Sekarang"</strong>. Status tiket akan otomatis terupdate dan tercatat dalam sistem keuangan.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 6: VENUE OWNER - SLOT MAINTENANCE -->
+      <!-- ============================================== -->
+      <section id="tabVenueSlots" class="tab-pane space-y-6 hidden">
+        <div>
+          <span class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 uppercase tracking-wider">
+            Pengaturan Jadwal Operasional
+          </span>
+          <h1 class="text-2xl font-black text-slate-900 mt-2">Kelola Slot & Maintenance Lapangan</h1>
+          <p class="text-sm text-slate-500">Blokir slot jam untuk turnamen / perbaikan karpet, atau buka kembali untuk publik.</p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-6 space-y-5">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="text-xs font-bold text-slate-600 block mb-1">Tanggal Operasional:</label>
+              <input type="date" id="inputSlotDate" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold">
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-600 block mb-1">Pilih Jam Slot:</label>
+              <select id="selectSlotHour" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold bg-white">
+                <option value="08:00">08:00 - 09:00 WIB</option>
+                <option value="09:00">09:00 - 10:00 WIB</option>
+                <option value="10:00">10:00 - 11:00 WIB</option>
+                <option value="14:00">14:00 - 15:00 WIB</option>
+                <option value="15:00">15:00 - 16:00 WIB</option>
+                <option value="16:00">16:00 - 17:00 WIB</option>
+                <option value="17:00">17:00 - 18:00 WIB</option>
+                <option value="18:00">18:00 - 19:00 WIB</option>
+                <option value="19:00">19:00 - 20:00 WIB</option>
+                <option value="20:00">20:00 - 21:00 WIB</option>
+                <option value="21:00">21:00 - 22:00 WIB</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-600 block mb-1">Alasan Penutupan Slot:</label>
+              <input type="text" id="inputSlotReason" value="Perawatan Karpet & Kaca" placeholder="Misal: Turnamen Internal" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold">
+            </div>
+          </div>
+
+          <div class="flex space-x-3 pt-2">
+            <button onclick="toggleSlotAction('block')" class="px-5 py-2.5 rounded-xl bg-amber-500 text-white font-bold text-xs hover:bg-amber-600 transition flex items-center space-x-1.5 shadow-sm">
+              <i data-lucide="lock" class="w-4 h-4"></i>
+              <span>Blokir Slot Ini</span>
+            </button>
+            <button onclick="toggleSlotAction('unblock')" class="px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition flex items-center space-x-1.5 shadow-sm">
+              <i data-lucide="unlock" class="w-4 h-4"></i>
+              <span>Buka Kembali untuk Umum</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- TAB 7: VENUE OWNER - LAPORAN KEUANGAN VENUE -->
+      <!-- ============================================== -->
+      <section id="tabVenueStats" class="tab-pane space-y-6 hidden">
+        <div>
+          <span class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 uppercase tracking-wider">
+            Rekap Finansial Mitra
+          </span>
+          <h1 class="text-2xl font-black text-slate-900 mt-2">Laporan & Statistik Venue Saya</h1>
+          <p class="text-sm text-slate-500">Ringkasan transaksi dan penerimaan dana bagi hasil venue padel Anda.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div class="glass-card rounded-2xl p-5">
+            <span class="text-xs font-bold uppercase text-slate-400">Total Booking Venue</span>
+            <div id="venueStatTotalBookings" class="text-3xl font-black text-slate-900 mt-2">0</div>
+            <span class="text-xs text-slate-500 mt-1 inline-block">Sesi terdaftar</span>
+          </div>
+
+          <div class="glass-card rounded-2xl p-5">
+            <span class="text-xs font-bold uppercase text-slate-400">Pemain Selesai Check-In</span>
+            <div id="venueStatCheckedIn" class="text-3xl font-black text-emerald-600 mt-2">0</div>
+            <span class="text-xs text-slate-500 mt-1 inline-block">Telah divalidasi kasir</span>
+          </div>
+
+          <div class="glass-card rounded-2xl p-5">
+            <span class="text-xs font-bold uppercase text-slate-400">Estimasi Pendapatan Venue</span>
+            <div id="venueStatRevenue" class="text-3xl font-black text-apBlue mt-2">Rp0</div>
+            <span class="text-xs text-slate-500 mt-1 inline-block">Berdasarkan tarif jam</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL TAMBAH LAPANGAN -->
+  <div id="modalAddCourt" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="text-base font-extrabold text-slate-900">Tambah Lapangan Baru</h3>
+        <button onclick="closeModal('modalAddCourt')" class="text-slate-400 hover:text-slate-600">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Nama Lapangan:</label>
+          <input type="text" id="newCourtName" placeholder="Misal: Panorama Glass Court" class="w-full px-3 py-2 rounded-xl border border-slate-300">
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Nama Venue Mitra:</label>
+          <input type="text" id="newCourtVenue" placeholder="Misal: Ace Padel Club SCBD" class="w-full px-3 py-2 rounded-xl border border-slate-300">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Area / Kota:</label>
+            <input type="text" id="newCourtArea" placeholder="SCBD, Jakarta" class="w-full px-3 py-2 rounded-xl border border-slate-300">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Harga per Jam (Ribu Rp):</label>
+            <input type="number" id="newCourtPrice" value="200" class="w-full px-3 py-2 rounded-xl border border-slate-300">
+          </div>
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Tipe Lapangan:</label>
+          <select id="newCourtIndoor" class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white">
+            <option value="true">Indoor (Ber-AC)</option>
+            <option value="false">Outdoor (Terbuka)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-2 pt-3 border-t">
+        <button onclick="closeModal('modalAddCourt')" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100">Batal</button>
+        <button onclick="submitNewCourt()" class="px-5 py-2 rounded-xl text-xs font-bold bg-apBlue text-white hover:bg-blue-700">Simpan Lapangan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL BUAT VOUCHER -->
+  <div id="modalAddVoucher" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 class="text-base font-extrabold text-slate-900">Buat Voucher Promo Baru</h3>
+        <button onclick="closeModal('modalAddVoucher')" class="text-slate-400 hover:text-slate-600">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Kode Voucher:</label>
+          <input type="text" id="newVoucherCode" placeholder="Misal: PROMOSMASH" class="w-full px-3 py-2 rounded-xl border border-slate-300 uppercase font-mono">
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Nominal Diskon (Ribu Rp):</label>
+          <input type="number" id="newVoucherDiscount" value="30" class="w-full px-3 py-2 rounded-xl border border-slate-300">
+        </div>
+        <div>
+          <label class="font-bold text-slate-700 block mb-1">Deskripsi Promosi:</label>
+          <input type="text" id="newVoucherDesc" placeholder="Diskon akhir pekan untuk semua venue" class="w-full px-3 py-2 rounded-xl border border-slate-300">
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-2 pt-3 border-t">
+        <button onclick="closeModal('modalAddVoucher')" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100">Batal</button>
+        <button onclick="submitNewVoucher()" class="px-5 py-2 rounded-xl text-xs font-bold bg-apDark text-white hover:bg-slate-900">Terbitkan Voucher</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 right-6 px-4 py-3 rounded-2xl shadow-xl text-xs font-bold text-white transition transform translate-y-24 opacity-0 z-50 flex items-center space-x-2">
+    <span id="toastIcon">✓</span>
+    <span id="toastMessage">Pemberitahuan</span>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let currentRole = 'superadmin';
+    let chartInstance = null;
+    let cachedBookings = [];
+
+    // Initialize Lucide Icons
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initSlotDate();
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('role') === 'venue_owner') {
+        switchRole('venue_owner');
+      } else {
+        refreshAllData();
+      }
+    });
+
+    function initSlotDate() {
+      const today = new Date().toISOString().split('T')[0];
+      const slotInput = document.getElementById('inputSlotDate');
+      if (slotInput) slotInput.value = today;
+    }
+
+    function switchRole(role) {
+      currentRole = role;
+      const btnSuper = document.getElementById('btnRoleSuperadmin');
+      const btnVenue = document.getElementById('btnRoleVenue');
+      const navSuper = document.getElementById('navSuperadmin');
+      const navVenue = document.getElementById('navVenue');
+      const roleLabel = document.getElementById('sidebarRoleLabel');
+      const userName = document.getElementById('userName');
+      const userRoleBadge = document.getElementById('userRoleBadge');
+
+      if (role === 'superadmin') {
+        btnSuper.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 bg-white text-apBlue shadow-xs';
+        btnVenue.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 text-slate-600 hover:text-slate-900';
+        navSuper.classList.remove('hidden');
+        navVenue.classList.add('hidden');
+        roleLabel.innerText = 'Super Admin Menu';
+        userName.innerText = 'Afan (Superadmin)';
+        userRoleBadge.innerText = 'hellens.dev HQ';
+        showTab('tabOverview');
+      } else {
+        btnVenue.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 bg-white text-apBlue shadow-xs';
+        btnSuper.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 text-slate-600 hover:text-slate-900';
+        navVenue.classList.remove('hidden');
+        navSuper.classList.add('hidden');
+        roleLabel.innerText = 'Menu Pengelola Venue';
+        userName.innerText = 'Mitra Lapangan';
+        userRoleBadge.innerText = 'Venue Manager';
+        showTab('tabVenueScan');
+        loadVenueStats();
+      }
+    }
+
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+      const activePane = document.getElementById(tabId);
+      if (activePane) activePane.classList.remove('hidden');
+
+      // Update sidebar active state
+      if (currentRole === 'superadmin') {
+        document.querySelectorAll('#navSuperadmin .nav-btn').forEach(btn => {
+          btn.className = 'nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-slate-600 hover:bg-slate-100';
+        });
+        const targetBtn = Array.from(document.querySelectorAll('#navSuperadmin .nav-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+        if (targetBtn) targetBtn.className = 'nav-btn active w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-bold transition text-white bg-apBlue';
+      } else {
+        document.querySelectorAll('#navVenue .nav-btn-venue').forEach(btn => {
+          btn.className = 'nav-btn-venue w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition text-slate-600 hover:bg-slate-100';
+        });
+        const targetBtn = Array.from(document.querySelectorAll('#navVenue .nav-btn-venue')).find(b => b.getAttribute('onclick').includes(tabId));
+        if (targetBtn) targetBtn.className = 'nav-btn-venue active w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-bold transition text-white bg-apBlue';
+      }
+
+      lucide.createIcons();
+    }
+
+    // ============================================
+    // API CALLS & DATA REFRESH
+    // ============================================
+    async function refreshAllData() {
+      showToast('Memuat data terbaru dari API...', 'info');
+      try {
+        const res = await fetch('/api/admin/overview');
+        const json = await res.json();
+        if (json.success) {
+          renderOverview(json.data);
+        }
+
+        // Fetch courts
+        loadCourts();
+        // Fetch all bookings
+        loadBookings();
+        // Fetch vouchers
+        loadVouchers();
+
+        showToast('Data berhasil disinkronisasi!', 'success');
+      } catch (err) {
+        console.error('Error fetching admin data:', err);
+        showToast('Gagal terhubung ke API backend: ' + err.message, 'error');
+      }
+    }
+
+    function renderOverview(data) {
+      const m = data.metrics;
+      document.getElementById('kpiRevenue').innerText = m.totalRevenueFormatted;
+      document.getElementById('kpiBookings').innerText = m.totalBookings;
+      document.getElementById('kpiActiveSub').innerText = `${m.activeBookings} aktif, ${m.checkedInBookings} check-in`;
+      document.getElementById('kpiCourts').innerText = `${m.totalCourts} Lapangan (${m.totalVenues} Venue)`;
+      document.getElementById('kpiUsers').innerText = `${m.totalUsers} Pemain`;
+
+      // Render chart
+      renderRevenueChart(data.courtsBreakdown);
+
+      // Render recent bookings table
+      const tbody = document.getElementById('tableRecentBookings');
+      if (!data.recentBookings || data.recentBookings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-slate-400">Belum ada data reservasi</td></tr>';
+      } else {
+        tbody.innerHTML = data.recentBookings.map(b => `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-3 px-3 font-mono font-bold text-apBlue">${b.id}</td>
+            <td class="py-3 px-3 font-semibold text-slate-900">${b.userName || 'Pemain Tamu'}</td>
+            <td class="py-3 px-3 text-slate-600">${b.courtId ? b.courtId.toUpperCase() : '-'}</td>
+            <td class="py-3 px-3 text-slate-600">${(b.date || '').split('T')[0]} • ${b.slot}</td>
+            <td class="py-3 px-3 font-bold text-slate-800">Rp${b.finalPrice || b.pricePerHour || 0}.000</td>
+            <td class="py-3 px-3">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${getStatusBadgeClass(b.status)}">
+                ${b.status}
+              </span>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    function renderRevenueChart(courts) {
+      const ctx = document.getElementById('chartRevenuePerCourt');
+      if (!ctx) return;
+
+      const labels = courts.map(c => c.name);
+      const values = courts.map(c => c.revenueThousands);
+
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Pendapatan (Ribuan Rp)',
+            data: values,
+            backgroundColor: '#2334DB',
+            borderRadius: 8,
+            hoverBackgroundColor: '#C7F23C'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: '#F1F5F9' },
+              ticks: { callback: v => 'Rp' + v + 'k' }
+            },
+            x: {
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
+
+    async function loadCourts() {
+      const res = await fetch('/api/admin/courts');
+      const json = await res.json();
+      const grid = document.getElementById('gridCourts');
+      if (!grid) return;
+
+      if (!json.data || json.data.length === 0) {
+        grid.innerHTML = '<div class="col-span-3 text-slate-400 text-center py-8">Tidak ada lapangan</div>';
+        return;
+      }
+
+      grid.innerHTML = json.data.map(c => `
+        <div class="glass-card rounded-2xl p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${c.indoor ? 'bg-blue-100 text-apBlue' : 'bg-emerald-100 text-emerald-800'}">
+              ${c.indoor ? 'INDOOR BER-AC' : 'OUTDOOR PANORAMIC'}
+            </span>
+            <div class="flex items-center text-amber-500 font-bold text-xs space-x-1">
+              <span>★</span>
+              <span>${c.rating}</span>
+            </div>
+          </div>
+          <div>
+            <h3 class="text-base font-extrabold text-slate-900">${c.name}</h3>
+            <p class="text-xs text-slate-500">${c.venue} • ${c.area}</p>
+          </div>
+          <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] text-slate-400 block uppercase font-bold">Tarif Sewa</span>
+              <span class="text-sm font-black text-apBlue">Rp${c.pricePerHour}.000 <span class="text-xs font-normal text-slate-400">/ jam</span></span>
+            </div>
+            <span class="text-[10px] font-mono font-bold bg-slate-100 text-slate-600 px-2 py-1 rounded-md">ID: ${c.id}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function loadBookings() {
+      const res = await fetch('/api/admin/bookings');
+      const json = await res.json();
+      cachedBookings = json.data || [];
+      renderBookingsTable(cachedBookings);
+    }
+
+    function renderBookingsTable(list) {
+      const tbody = document.getElementById('tableAllBookings');
+      if (!tbody) return;
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-slate-400">Tidak ada data booking</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(b => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="py-3 px-3 font-mono font-bold text-apBlue">${b.id}</td>
+          <td class="py-3 px-3 font-semibold text-slate-900">${b.userName || 'Pemain Tamu'}</td>
+          <td class="py-3 px-3 text-slate-600">${b.courtId ? b.courtId.toUpperCase() : '-'}</td>
+          <td class="py-3 px-3 text-slate-600">${(b.date || '').split('T')[0]} • ${b.slot}</td>
+          <td class="py-3 px-3 text-slate-600">${b.paymentMethod || 'On-site'}</td>
+          <td class="py-3 px-3 font-bold text-slate-800">Rp${b.finalPrice || b.pricePerHour || 0}.000</td>
+          <td class="py-3 px-3">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${getStatusBadgeClass(b.status)}">
+              ${b.status}
+            </span>
+          </td>
+          <td class="py-3 px-3 text-right">
+            ${b.status === 'Terkonfirmasi' ? `
+              <button onclick="quickCheckIn('${b.id}')" class="px-2 py-1 rounded-lg bg-emerald-600 text-white font-bold text-[10px] hover:bg-emerald-700">Check-In</button>
+            ` : `<span class="text-slate-300">-</span>`}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterBookingsTable() {
+      const query = document.getElementById('inputSearchBooking').value.toLowerCase();
+      const filtered = cachedBookings.filter(b => 
+        (b.id && b.id.toLowerCase().includes(query)) ||
+        (b.userName && b.userName.toLowerCase().includes(query)) ||
+        (b.slot && b.slot.includes(query))
+      );
+      renderBookingsTable(filtered);
+    }
+
+    async function loadVouchers() {
+      const res = await fetch('/api/admin/vouchers');
+      const json = await res.json();
+      const grid = document.getElementById('gridVouchers');
+      if (!grid) return;
+
+      if (!json.data || json.data.length === 0) {
+        grid.innerHTML = '<div class="col-span-3 text-slate-400 text-center py-6">Tidak ada voucher promo</div>';
+        return;
+      }
+
+      grid.innerHTML = json.data.map(v => `
+        <div class="glass-card rounded-2xl p-5 space-y-3 relative overflow-hidden border-dashed border-2">
+          <div class="flex items-center justify-between">
+            <span class="font-mono font-black text-lg text-apDark tracking-wider bg-slate-100 px-2 py-0.5 rounded-lg border">${v.code}</span>
+            <button onclick="deleteVoucherAction('${v.code}')" class="text-red-400 hover:text-red-600 font-bold text-xs">✕ Hapus</button>
+          </div>
+          <div class="text-xl font-black text-emerald-600">Diskon Rp${v.discount}.000</div>
+          <p class="text-xs text-slate-500">${v.description || 'Voucher promosi reservasi'}</p>
+        </div>
+      `).join('');
+    }
+
+    // ============================================
+    // VENUE OWNER INTERACTIONS
+    // ============================================
+    async function verifyTicketAction() {
+      const input = document.getElementById('inputScanBookingId');
+      const id = input.value.trim();
+      if (!id) {
+        showToast('Masukkan kode booking terlebih dahulu', 'error');
+        return;
+      }
+
+      const box = document.getElementById('ticketResultBox');
+      box.className = 'mt-4 p-5 rounded-2xl border bg-slate-50 border-slate-200 text-xs font-semibold';
+      box.classList.remove('hidden');
+      box.innerHTML = 'Memeriksa ke server...';
+
+      try {
+        const res = await fetch('/api/venue/verify-ticket', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId: id })
+        });
+        const json = await res.json();
+
+        if (json.success && json.valid) {
+          const b = json.data;
+          box.className = 'mt-4 p-5 rounded-2xl border bg-emerald-50 border-emerald-300 text-xs';
+          box.innerHTML = `
+            <div class="flex items-center justify-between border-b border-emerald-200 pb-2 mb-3">
+              <span class="font-bold text-emerald-800 text-sm">✓ TIKET VALID & RESMI</span>
+              <span class="font-mono font-bold text-emerald-900">${b.id}</span>
+            </div>
+            <div class="space-y-1 text-slate-700">
+              <div><strong>Nama Pemain:</strong> ${b.userName || 'Pemain Tamu'}</div>
+              <div><strong>Venue & Lapangan:</strong> ${b.court ? b.court.name : b.courtId} (${b.court ? b.court.venue : ''})</div>
+              <div><strong>Jadwal Slot:</strong> ${(b.date || '').split('T')[0]} • ${b.slot} WIB</div>
+              <div><strong>Status Tiket:</strong> <span class="font-bold text-emerald-700">${b.status}</span></div>
+              ${b.addOns && b.addOns.length ? `<div><strong>Sewa Alat:</strong> ${b.addOns.join(', ')}</div>` : ''}
+              <div><strong>Total Bayar:</strong> Rp${b.finalPrice || b.pricePerHour || 0}.000 (${b.paymentMethod || 'On-site'})</div>
+            </div>
+            ${b.status !== 'Check-in Selesai' ? `
+              <button onclick="checkInTicketAction('${b.id}')" class="mt-4 w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition">
+                ✓ Validasi & Check-In Pemain Sekarang
+              </button>
+            ` : `<div class="mt-3 text-center text-emerald-800 font-bold">Pemain ini sudah selesai check-in.</div>`}
+          `;
+          showToast('Tiket ditemukan dan valid!', 'success');
+        } else {
+          box.className = 'mt-4 p-5 rounded-2xl border bg-red-50 border-red-300 text-xs text-red-700';
+          box.innerHTML = `✕ ${json.message || 'Tiket tidak valid'}`;
+          showToast(json.message || 'Tiket tidak valid', 'error');
+        }
+      } catch (err) {
+        box.className = 'mt-4 p-5 rounded-2xl border bg-red-50 border-red-300 text-xs text-red-700';
+        box.innerHTML = 'Gagal menghubungi server verifikasi';
+      }
+    }
+
+    async function checkInTicketAction(bookingId) {
+      try {
+        const res = await fetch('/api/venue/check-in', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message, 'success');
+          verifyTicketAction();
+          loadVenueStats();
+          loadBookings();
+        } else {
+          showToast(json.message, 'error');
+        }
+      } catch (err) {
+        showToast('Gagal check-in tiket', 'error');
+      }
+    }
+
+    async function quickCheckIn(bookingId) {
+      await checkInTicketAction(bookingId);
+    }
+
+    function testCode(code) {
+      document.getElementById('inputScanBookingId').value = code;
+      verifyTicketAction();
+    }
+
+    async function toggleSlotAction(action) {
+      const courtId = document.getElementById('selectVenueOwnerCourt').value;
+      const date = document.getElementById('inputSlotDate').value;
+      const slot = document.getElementById('selectSlotHour').value;
+      const reason = document.getElementById('inputSlotReason').value;
+
+      try {
+        const res = await fetch('/api/venue/toggle-slot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ courtId, date, slot, action, reason })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message, 'success');
+          loadBookings();
+        } else {
+          showToast(json.message, 'error');
+        }
+      } catch (err) {
+        showToast('Gagal mengubah status slot', 'error');
+      }
+    }
+
+    async function loadVenueStats() {
+      const courtId = document.getElementById('selectVenueOwnerCourt').value;
+      try {
+        const res = await fetch(`/api/venue/stats/${courtId}`);
+        const json = await res.json();
+        if (json.success) {
+          const d = json.data;
+          document.getElementById('venueStatTotalBookings').innerText = d.totalBookings;
+          document.getElementById('venueStatCheckedIn').innerText = d.checkedInCount;
+          document.getElementById('venueStatRevenue').innerText = d.estimatedRevenueFormatted;
+        }
+      } catch (err) {
+        console.error('Error fetching venue stats:', err);
+      }
+    }
+
+    // ============================================
+    // MODALS & CREATION ACTIONS
+    // ============================================
+    function openAddCourtModal() {
+      document.getElementById('modalAddCourt').classList.remove('hidden');
+    }
+
+    function openAddVoucherModal() {
+      document.getElementById('modalAddVoucher').classList.remove('hidden');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    async function submitNewCourt() {
+      const name = document.getElementById('newCourtName').value.trim();
+      const venue = document.getElementById('newCourtVenue').value.trim();
+      const area = document.getElementById('newCourtArea').value.trim();
+      const pricePerHour = document.getElementById('newCourtPrice').value;
+      const indoor = document.getElementById('newCourtIndoor').value === 'true';
+
+      if (!name || !venue || !area || !pricePerHour) {
+        showToast('Semua field wajib diisi', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/admin/courts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, venue, area, pricePerHour, indoor })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message, 'success');
+          closeModal('modalAddCourt');
+          refreshAllData();
+        } else {
+          showToast(json.message, 'error');
+        }
+      } catch (err) {
+        showToast('Gagal menyimpan lapangan baru', 'error');
+      }
+    }
+
+    async function submitNewVoucher() {
+      const code = document.getElementById('newVoucherCode').value.trim();
+      const discount = document.getElementById('newVoucherDiscount').value;
+      const description = document.getElementById('newVoucherDesc').value.trim();
+
+      if (!code || !discount) {
+        showToast('Kode voucher dan diskon wajib diisi', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/admin/vouchers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, discount, description })
+        });
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message, 'success');
+          closeModal('modalAddVoucher');
+          loadVouchers();
+        } else {
+          showToast(json.message, 'error');
+        }
+      } catch (err) {
+        showToast('Gagal membuat voucher baru', 'error');
+      }
+    }
+
+    async function deleteVoucherAction(code) {
+      if (!confirm(`Hapus voucher promo ${code}?`)) return;
+      try {
+        const res = await fetch(`/api/admin/vouchers/${code}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+          showToast(json.message, 'success');
+          loadVouchers();
+        }
+      } catch (err) {
+        showToast('Gagal menghapus voucher', 'error');
+      }
+    }
+
+    function getStatusBadgeClass(status) {
+      switch (status) {
+        case 'Check-in Selesai': return 'bg-emerald-100 text-emerald-800';
+        case 'Terkonfirmasi': return 'bg-blue-100 text-apBlue';
+        case 'Maintenance': return 'bg-amber-100 text-amber-800';
+        case 'Dibatalkan': return 'bg-red-100 text-red-800';
+        default: return 'bg-slate-100 text-slate-800';
+      }
+    }
+
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      const msg = document.getElementById('toastMessage');
+      const icon = document.getElementById('toastIcon');
+
+      msg.innerText = message;
+      if (type === 'success') {
+        toast.className = 'fixed bottom-6 right-6 px-4 py-3 rounded-2xl shadow-xl text-xs font-bold text-white transition transform translate-y-0 opacity-100 z-50 flex items-center space-x-2 bg-emerald-600';
+        icon.innerText = '✓';
+      } else if (type === 'error') {
+        toast.className = 'fixed bottom-6 right-6 px-4 py-3 rounded-2xl shadow-xl text-xs font-bold text-white transition transform translate-y-0 opacity-100 z-50 flex items-center space-x-2 bg-red-600';
+        icon.innerText = '✕';
+      } else {
+        toast.className = 'fixed bottom-6 right-6 px-4 py-3 rounded-2xl shadow-xl text-xs font-bold text-white transition transform translate-y-0 opacity-100 z-50 flex items-center space-x-2 bg-slate-900';
+        icon.innerText = 'ℹ';
+      }
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-24', 'opacity-0');
+      }, 3500);
+    }
+  </script>
+</body>
+</html>
