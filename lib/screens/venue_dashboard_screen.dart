@@ -993,7 +993,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                       ? 'ID: ${booking.id} • ${booking.paymentMethod}'
                       : (isMaintenance
                           ? 'Mitra Lapangan'
-                          : 'Tarif normal: Rp${_selectedCourt.pricePerHour}.000'),
+                          : 'Tarif: Rp${_selectedCourt.pricePerHour}.000'),
                   style:  TextStyle(color: AP.slate, fontSize: 11),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
