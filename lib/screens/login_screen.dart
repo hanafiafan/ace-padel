@@ -320,7 +320,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Container(
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AP.surface,
                         borderRadius: BorderRadius.circular(22),
                         border: Border.all(color: AP.line),
                         boxShadow: APShadows.card,
@@ -417,7 +417,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _handleGoogleSignIn,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
+                          backgroundColor: AP.surface,
                           foregroundColor: AP.ink,
                           elevation: 1,
                           shadowColor: Colors.black.withValues(alpha: 0.2),
