@@ -27,7 +27,7 @@ route('me', P, async ({ el, user }) => {
 
 route('me/court/:id', P, async ({ el, params }) => {
   const [c, addons] = await Promise.all([get('/courts/' + params.id).then((r) => r.data), get('/addons').then((r) => r.data).catch(() => [])]);
-  let date = today(), slot = '', disc = 0, vcode = '';
+  let date = today(), slot = '', disc = 0, vcode = '', adv = false;
   const days = Array.from({ length: 7 }, (_, i) => addDays(today(), i));
   mount(el, html`<a href="#/me" class="btn ghost sm">${icon('left')}Kembali</a>
     <div class="court-hero" style="background-image:url('${imgUrl(c)}')" role="img" aria-label="${c.name}"></div>
@@ -65,6 +65,7 @@ route('me/court/:id', P, async ({ el, params }) => {
   };
   const drawSlots = () => loadInto(sl, async () => {
     slot = ''; const sr = await get(`/courts/${c.id}/slots`, { date }), rows = sr.slots || sr.data || [];
+    if (!adv && date === today() && !rows.some((s) => s.available)) { adv = true; $$('[data-d]', el)[1]?.click(); return; } // hari ini penuh/lewat: lompat ke besok
     mount(sl, html`<div class="slots">${rows.map((s) => html`<button class="slot ${s.available ? '' : 'blocked'}" data-s="${s.slot}" ${raw(s.available ? '' : 'disabled')} aria-pressed="false"><b>${s.slot}</b><small>${s.available ? 'Tersedia' : s.past ? 'Lewat' : s.blocked ? 'Ditutup' : 'Penuh'}</small></button>`)}</div>`);
     drawSum();
   });
