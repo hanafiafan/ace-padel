@@ -171,12 +171,12 @@ class HelpScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Text(
+                    Text(
                       'Ace Padel by hellens.dev',
                       style: TextStyle(
                         fontWeight: FontWeight.w800,
                         fontSize: 13,
-                        color: AP.onLime,
+                        color: AP.ink,
                         letterSpacing: 0.2,
                       ),
                     ),
