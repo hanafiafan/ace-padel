@@ -1,0 +1,15 @@
+{
+  "name": "Ace Padel",
+  "short_name": "Ace Padel",
+  "description": "Booking lapangan padel real-time, mabar, coaching, dan leaderboard.",
+  "lang": "id",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0A0F36",
+  "theme_color": "#0A0F36",
+  "icons": [
+    { "src": "/Icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/img/logo.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

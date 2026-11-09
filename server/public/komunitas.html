@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mabar Padel &amp; Leaderboard Pemain | Ace Padel</title>
+<meta name="description" content="Gabung match terbuka (mabar) yang masih punya slot, lihat podium leaderboard, dan pelajari cara mengumpulkan poin serta achievement.">
+<meta name="theme-color" content="#0A0F36">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://acepadel.hellens.dev/komunitas">
+<link rel="icon" href="/favicon.png">
+<link rel="apple-touch-icon" href="/Icon-192.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:site_name" content="Ace Padel">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="id_ID">
+<meta property="og:title" content="Mabar Padel &amp; Leaderboard Pemain | Ace Padel">
+<meta property="og:description" content="Gabung match terbuka (mabar) yang masih punya slot, lihat podium leaderboard, dan pelajari cara mengumpulkan poin serta achievement.">
+<meta property="og:url" content="https://acepadel.hellens.dev/komunitas">
+<meta property="og:image" content="https://acepadel.hellens.dev/img/banner.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Mabar Padel &amp; Leaderboard Pemain | Ace Padel">
+<meta name="twitter:description" content="Gabung match terbuka (mabar) yang masih punya slot, lihat podium leaderboard, dan pelajari cara mengumpulkan poin serta achievement.">
+<meta name="twitter:image" content="https://acepadel.hellens.dev/img/banner.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="preload" href="/fonts/BarlowCondensed-ExtraBold.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="stylesheet" href="/css/site.css">
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('ace-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Beranda","item":"https://acepadel.hellens.dev/"},{"@type":"ListItem","position":2,"name":"Komunitas","item":"https://acepadel.hellens.dev/komunitas"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Lewati ke konten</a>
+<header id="site-header" class="hdr"><noscript><div class="wrap"><a class="brand" href="/">ACE PADEL</a><a href="/fitur">Fitur</a><a href="/venue">Venue</a><a href="/pelatih">Pelatih</a><a href="/komunitas">Komunitas</a><a href="/pemilik">Pemilik</a><a href="/promo">Promo</a><a href="/bantuan">Bantuan</a><a href="/app/#/login">Masuk</a></div></noscript></header>
+<main id="main">
+<section class="phero blue cut-b" aria-labelledby="h1">
+  <div class="phero__bg" aria-hidden="true"><img src="/img/court_social_menteng.jpg" alt="" width="520" height="397"></div>
+  <svg class="hero__court" viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false" data-par="-.05"><rect x="8" y="6" width="184" height="88"/><line x1="100" y1="6" x2="100" y2="94"/><line x1="30" y1="6" x2="30" y2="94"/><line x1="170" y1="6" x2="170" y2="94"/><line x1="30" y1="50" x2="170" y2="50"/></svg>
+  <div class="wrap phero__in" style="text-align:center;justify-items:center">
+    <ol class="crumbs" aria-label="Breadcrumb"><li><a href="/">Beranda</a></li><li aria-current="page">Komunitas</li></ol>
+    <h1 class="h-xxl" id="h1">Empat pemain.<br>Satu match.</h1>
+    <p class="lead" style="margin-inline:auto">Padel selalu lebih seru berempat. Gabung mabar yang masih punya slot, lalu kumpulkan poin dan naik peringkat.</p>
+    <div class="hero__cta"><a class="btn btn--lg" href="#mabar">Cari Mabar</a><a class="btn btn--ghost btn--lg" href="#leaderboard">Lihat Podium</a></div>
+  </div>
+</section>
+
+<section class="sec" id="mabar" aria-labelledby="m-h">
+  <div class="wrap">
+    <header class="sec__h sec__h--row rv"><div><span class="kick"><span class="live" style="gap:8px"><i style="width:10px;height:10px;background:var(--lime-ink);display:inline-block"></i> Live</span></span><h2 class="h-xl" id="m-h" style="margin-top:14px">Mabar terbuka</h2></div><p class="muted" id="m-count" role="status"></p></header>
+    <div class="grid grid--3" id="matches" aria-busy="true"><div class="skel" aria-hidden="true"></div><div class="skel" aria-hidden="true"></div><div class="skel" aria-hidden="true"></div></div>
+  </div>
+</section>
+
+<section class="sec dark cut-b" id="leaderboard" aria-labelledby="l-h">
+  <div class="wrap">
+    <header class="sec__h rv"><span class="kick">Leaderboard</span><h2 class="h-xl" id="l-h">Siapa raja lapangan?</h2></header>
+    <div id="lb" aria-busy="true"><div class="skel" style="min-height:260px;max-width:760px" aria-hidden="true"></div></div>
+  </div>
+</section>
+
+<section class="sec" id="achievement" aria-labelledby="a-h">
+  <div class="wrap">
+    <header class="sec__h rv"><span class="kick">Achievement</span><h2 class="h-xl" id="a-h">Delapan lencana untuk dikejar.</h2><p class="lead">Lencana terbuka otomatis dari aktivitas bermain. Progres pribadi kamu tampil di aplikasi setelah masuk.</p></header>
+    <div class="values">
+      <div class="value rv"><h3>First Serve</h3><p>Selesaikan booking pertama.</p></div>
+      <div class="value rv"><h3>Rajin Main</h3><p>Main 10 kali.</p></div>
+      <div class="value rv"><h3>Early Bird</h3><p>Booking slot pagi 5 kali.</p></div>
+      <div class="value rv"><h3>Globetrotter</h3><p>Main di 4 venue berbeda.</p></div>
+      <div class="value rv"><h3>Win Streak</h3><p>Menang 5 kali.</p></div>
+      <div class="value rv"><h3>Centurion</h3><p>Capai 100 jam main.</p></div>
+      <div class="value rv"><h3>Top 3</h3><p>Masuk tiga besar leaderboard.</p></div>
+      <div class="value rv"><h3>Ace Master</h3><p>Kumpulkan 3.000 poin.</p></div>
+    </div>
+    <div class="hero__cta rv" style="margin-top:36px"><a class="btn btn--blue btn--lg" href="/app/#/register">Mulai Kumpulkan Poin</a></div>
+  </div>
+</section>
+
+<section class="blue cut-b sec cta" aria-labelledby="cta-h">
+  <svg class="hero__court" viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false" data-par="-.05"><rect x="8" y="6" width="184" height="88"/><line x1="100" y1="6" x2="100" y2="94"/><line x1="30" y1="6" x2="30" y2="94"/><line x1="170" y1="6" x2="170" y2="94"/><line x1="30" y1="50" x2="170" y2="50"/></svg>
+  <div class="wrap cta__in"><h2 class="h-xl" id="cta-h">Siap smash?</h2>
+  <p class="lead">Cari venue, kunci jam main, dan bayar lewat DOKU. Pemain tidak dikenakan biaya langganan.</p>
+  <div class="hero__cta"><a class="btn btn--lg" href="/venue">Cari Venue</a><a class="btn btn--ghost btn--lg" href="/app/#/register">Daftar Gratis</a></div></div>
+</section>
+
+</main>
+<footer id="site-footer" class="foot"><noscript><div class="wrap"><p>&copy; Ace Padel by hellens.dev. Pembayaran online diproses oleh DOKU.</p><p><a href="/fitur">Fitur</a> | <a href="/venue">Venue</a> | <a href="/pelatih">Pelatih</a> | <a href="/komunitas">Komunitas</a> | <a href="/pemilik">Pemilik</a> | <a href="/promo">Promo</a> | <a href="/bantuan">Bantuan</a> | <a href="/syarat">Syarat &amp; Ketentuan</a> | <a href="/privacy">Kebijakan Privasi</a></p></div></noscript></footer>
+<script type="module" src="/js/pages/komunitas.js"></script>
+</body>
+</html>

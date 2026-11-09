@@ -47,6 +47,9 @@ app.use('/uploads', express.static(path.join(__dirname, '../data/uploads')));
 app.use(express.static(PUB, { extensions: ['html'] }));
 app.get(['/app', '/app/*'], (req, res) => res.sendFile(path.join(PUB, 'app/index.html')));
 
+// Halaman tidak ditemukan (web)
+app.use((req, res) => res.status(404).sendFile(path.join(PUB, '404.html')));
+
 app.use((err, req, res, next) => {
   if (err instanceof HttpError) return res.status(err.status).json({ success: false, message: err.message });
   if (err.type === 'entity.parse.failed') return res.status(400).json({ success: false, message: 'JSON tidak valid' });
