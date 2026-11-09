@@ -163,10 +163,12 @@ video.cam { width: 100%; max-height: 300px; border-radius: 12px; background: #00
   .table.stack thead { display: none; } .table.stack td { display: flex; justify-content: space-between; gap: 12px; padding: 8px 14px; border: 0; } .table.stack tr { display: block; border-bottom: 1px solid var(--line); padding: 6px 0; } .table.stack td::before { content: attr(data-label); color: var(--muted); font-size: 12px; }
 }
 @media (max-width: 860px) { .g2 { grid-template-columns: 1fr; } }
-@media (max-width: 560px) { .g4, .g3 { grid-template-columns: 1fr 1fr; } .stat-val { font-size: 28px; } .toolbar .input { max-width: none; flex-basis: 100%; } .slots { grid-template-columns: repeat(3, 1fr); } .g2.one { grid-template-columns: 1fr; } .stat { padding: 14px; } }
+@media (max-width: 560px) { .g4, .g3 { grid-template-columns: 1fr 1fr; } .stat-val { font-size: 28px; } .toolbar .input { max-width: none; flex-basis: calc(50% - 5px); } .toolbar .grow { flex-basis: 100%; max-width: none; } .slots { grid-template-columns: repeat(3, 1fr); } .g2.one { grid-template-columns: 1fr; } .stat { padding: 14px; } }
 .view > div > * + * { margin-top: 20px; } .view > div > .toolbar + *, .view > div > .tabs + * { margin-top: 0; } .view > div > .tabs + .toolbar, .view > div > .tabs + section { margin-top: 16px; }
 code { font-size: 12.5px; white-space: nowrap; }
 .court-img .badge { background: rgba(21,28,78,.88); color: #fff; backdrop-filter: blur(4px); } .court-img .badge.ok, .court-img .badge.warn, .court-img .badge.danger { background: var(--surface); }
 
 .gbtn { min-height: 44px; display: flex; justify-content: center; } .gbtn:empty { display: none; }
 .or { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 12px; margin-top: 14px; } .or::before, .or::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
