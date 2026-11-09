@@ -46,7 +46,7 @@ test('checkout DOKU → URL tersimpan; notifikasi bertanda tangan → Lunas; pal
   assert.equal(c.paymentUrl, 'https://checkout.doku.com/x');
   assert.equal(sent.url, 'https://api.doku.com/checkout/v1/payment');
   assert.equal(sent.body.order.amount, bk.finalPrice * 1000);
-  assert.deepEqual(sent.body.payment.payment_method_types, ['QRIS']);
+  assert.equal(sent.body.payment.payment_method_types, undefined); // semua channel aktif
   assert.equal(sent.init.headers['Client-Id'], 'BRN-TEST');
   // simulasi bayar harus mati saat DOKU aktif
   assert.equal((await call('POST', `/api/bookings/${bk.id}/pay`, null, T)).status, 403);

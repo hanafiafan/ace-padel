@@ -133,7 +133,7 @@ r.post('/bookings/:id/checkout', auth(), wrapA(async (req, res) => {
     });
   } catch (e) {
     console.error('DOKU checkout gagal:', e.message, JSON.stringify(e.doku || {}).slice(0, 400));
-    throw new HttpErr(502, 'Gagal membuat pembayaran DOKU. Coba lagi atau pilih Bayar di tempat.');
+    throw new HttpErr(424, 'Gagal membuat pembayaran DOKU. Coba lagi atau pilih Bayar di tempat.');
   }
   db.prepare('UPDATE bookings SET payment_ref = ? WHERE id = ?').run(url, b.id);
   ok(res, U.booking(db.prepare(`${U.BOOKING_SELECT} WHERE b.id = ?`).get(b.id)), { paymentUrl: url });

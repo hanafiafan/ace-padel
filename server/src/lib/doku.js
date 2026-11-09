@@ -45,7 +45,8 @@ async function createCheckout({ invoice, amountRp, method, dueMinutes = 15, cust
       callback_url: callbackUrl, callback_url_cancel: callbackUrl,
       line_items: [{ name: itemName.slice(0, 100), quantity: 1, price: amountRp }],
     },
-    payment: { payment_due_date: dueMinutes, ...(METHOD_TYPES[method] && { payment_method_types: METHOD_TYPES[method] }) },
+    payment: { payment_due_date: dueMinutes, // Default: tampilkan semua channel yang aktif di akun DOKU. Set DOKU_RESTRICT_METHODS=1 setelah QRIS/VA diaktifkan.
+      ...(process.env.DOKU_RESTRICT_METHODS === '1' && METHOD_TYPES[method] && { payment_method_types: METHOD_TYPES[method] }) },
     customer: { name: customer.name.slice(0, 255), email: customer.email },
   };
   const r = await call('POST', '/checkout/v1/payment', body);
