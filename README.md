@@ -17,7 +17,8 @@ Didesain dengan palet warna premium: Royal Blue (`#2334DB`), Dark Blue (`#151C4E
   - Kontrol stepper `[-]` & `[+]` dengan kalkulasi total dinamis.
 - **Voucher Promo**: Validasi kode voucher otomatis (misal: `ACEWEEKEND` diskon Rp25.000).
 
-### 2. Simulasi Pembayaran Interaktif
+### 2. Pembayaran
+Pembayaran online (QRIS / Virtual Account) diproses oleh DOKU Checkout; status dicek otomatis. Mode simulasi di bawah hanya aktif bila server berjalan dengan provider `simulated`.
 - **QRIS Instant Pay**: Modal QRIS standar nasional dengan grafis QR berlogo padel, countdown batas waktu 15:00, dan tombol *Simulasikan Pembayaran Berhasil*.
 - **Virtual Account (BCA & Mandiri)**: Nomor VA instan dengan tombol *Salin Nomor VA* 1-tap dan simulasi transfer bank.
 - **Bayar di Venue (On-Site)**: Opsi pembayaran tunai / EDC langsung di meja resepsionis.

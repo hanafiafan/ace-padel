@@ -10,6 +10,7 @@ import '../services/api_service.dart';
 import '../store.dart';
 import '../theme.dart';
 import '../main.dart' show tabIndex;
+import 'doku_payment_sheet.dart';
 import 'ticket_screen.dart';
 
 class ConfirmScreen extends StatefulWidget {
@@ -428,6 +429,13 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
     // Online: reserve the slot first (status Menunggu) to get the VA / QRIS reference.
     final b = await _createBooking();
     if (b == null || !mounted) return;
+    if (await ApiService.instance.getPaymentProvider() == 'doku') {
+      if (!mounted) return;
+      final paid = await showDokuPaymentSheet(context, b);
+      if (paid != null && mounted) _finish(paid);
+      return;
+    }
+    if (!mounted) return;
     if (_selectedPayment == 'QRIS Instant') {
       _showQrisSheet(b);
     } else {

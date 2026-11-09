@@ -203,6 +203,25 @@ class BookingStore extends ChangeNotifier with LoadState {
     return nb;
   }
 
+  void _replace(Booking nb) {
+    _active = [for (final x in _active) x.id == nb.id ? nb : x];
+    notifyListeners();
+  }
+
+  /// DOKU: returns the hosted payment page URL.
+  Future<String> checkout(Booking b) async {
+    final url = await _api.checkoutBooking(b.id);
+    _replace(b.copyWith(paymentUrl: url));
+    return url;
+  }
+
+  /// DOKU: sync status with the server. Returns the fresh booking and paid flag.
+  Future<(Booking, bool)> refreshPayment(Booking b) async {
+    final r = await _api.refreshPaymentStatus(b.id);
+    _replace(r.$1);
+    return r;
+  }
+
   Future<void> cancel(Booking b) async {
     final res = await _api.delete('/bookings/${b.id}');
     final nb = Booking.fromJson(res['data'] as Map<String, dynamic>);

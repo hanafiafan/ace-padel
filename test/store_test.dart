@@ -25,6 +25,7 @@ http.Response _json(Object body, [int status = 200]) =>
 
 /// Tiny fake backend. [log] records "METHOD path" and the auth header.
 MockClient _server(List<String> log, {String role = 'player', bool conflict = false}) {
+  var polls = 0;
   return MockClient((req) async {
     final path = req.url.path.replaceFirst('/api', '');
     log.add('${req.method} $path auth=${req.headers['Authorization']}');
@@ -41,6 +42,13 @@ MockClient _server(List<String> log, {String role = 'player', bool conflict = fa
         return _json({'success': true, 'data': _booking()}, 201);
       case 'POST /bookings/ACE-C1-1800-1234/pay':
         return _json({'success': true, 'data': _booking(pay: 'Lunas')});
+      case 'GET /payments/config':
+        return _json({'success': true, 'data': {'provider': 'doku'}});
+      case 'POST /bookings/ACE-C1-1800-1234/checkout':
+        return _json({'success': true, 'paymentUrl': 'https://sandbox.doku.com/pay/abc', 'data': {..._booking(), 'paymentUrl': 'https://sandbox.doku.com/pay/abc'}});
+      case 'GET /bookings/ACE-C1-1800-1234/payment-status':
+        final paid = ++polls >= 2;
+        return _json({'success': true, 'paid': paid, 'data': _booking(pay: paid ? 'Lunas' : 'Menunggu')});
       case 'DELETE /bookings/ACE-C1-1800-1234':
         return _json({'success': true, 'data': _booking(status: 'Dibatalkan')});
       case 'GET /courts/c1/slots':
@@ -139,6 +147,27 @@ void main() {
     expect(OwnerStore.instance.selected?.id, 'c1');
     await UserStore.instance.logout();
     expect(UserStore.instance.isVenueOwner, false);
+  });
+
+  test('DOKU: provider -> checkout -> status polling -> paid', () async {
+    await UserStore.instance.login('a@b.id', 'secret123');
+    api.resetPaymentProvider();
+    expect(await api.getPaymentProvider(), 'doku');
+    final court = Court.fromJson(_court);
+    final store = BookingStore.instance;
+    final b = await store.book(court, DateTime(2030, 1, 2), '18:00', paymentMethod: 'QRIS Instant');
+    final url = await store.checkout(b);
+    expect(url, startsWith('https://sandbox.doku.com/'));
+    expect(store.activeBookings.first.paymentUrl, url);
+    final (b1, paid1) = await store.refreshPayment(b);
+    expect(paid1, false);
+    expect(b1.isPendingPayment, true);
+    final (b2, paid2) = await store.refreshPayment(b);
+    expect(paid2, true);
+    expect(b2.isPaid, true);
+    expect(store.activeBookings.first.isPaid, true);
+    await UserStore.instance.logout();
+    api.resetPaymentProvider();
   });
 
   test('BookingStore: book -> slot taken -> pay -> cancel', () async {

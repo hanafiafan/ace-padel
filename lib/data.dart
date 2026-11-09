@@ -86,6 +86,7 @@ class Booking {
   final String paymentStatus; // 'Belum Bayar' | 'Menunggu' | 'Lunas' | ...
   final String? paymentRef; // VA number / QRIS payload
   final DateTime? paymentExpiresAt;
+  final String? paymentUrl; // DOKU hosted payment page (set after checkout)
   final int? serverFinalPrice; // thousands of Rupiah, computed by the server
   final String? userName;
   final String? note;
@@ -106,6 +107,7 @@ class Booking {
     this.paymentStatus = 'Belum Bayar',
     this.paymentRef,
     this.paymentExpiresAt,
+    this.paymentUrl,
     this.serverFinalPrice,
     this.userName,
     this.note,
@@ -134,6 +136,7 @@ class Booking {
       paymentStatus: (m['paymentStatus'] as String?) ?? 'Belum Bayar',
       paymentRef: m['paymentRef'] as String?,
       paymentExpiresAt: DateTime.tryParse('${m['paymentExpiresAt']}')?.toLocal(),
+      paymentUrl: m['paymentUrl'] as String?,
       serverFinalPrice: (m['finalPrice'] as num?)?.toInt(),
       userName: m['userName'] as String?,
       note: m['note'] as String?,
@@ -152,7 +155,7 @@ class Booking {
   bool get isPendingPayment => status == 'Terkonfirmasi' && paymentStatus == 'Menunggu';
   bool get isPaid => paymentStatus == 'Lunas';
 
-  Booking copyWith({String? status, String? paymentStatus}) => Booking(
+  Booking copyWith({String? status, String? paymentStatus, String? paymentUrl}) => Booking(
         id: id,
         court: court,
         date: date,
@@ -168,6 +171,7 @@ class Booking {
         paymentStatus: paymentStatus ?? this.paymentStatus,
         paymentRef: paymentRef,
         paymentExpiresAt: paymentExpiresAt,
+        paymentUrl: paymentUrl ?? this.paymentUrl,
         serverFinalPrice: serverFinalPrice,
         userName: userName,
         note: note,

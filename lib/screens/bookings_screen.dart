@@ -10,6 +10,7 @@ import '../services/api_service.dart';
 import '../store.dart';
 import '../theme.dart';
 import '../main.dart' show tabIndex;
+import 'doku_payment_sheet.dart';
 import 'ticket_screen.dart';
 
 class BookingsScreen extends StatefulWidget {
@@ -454,7 +455,9 @@ c.image, fallbackUrl: c.imageUrl,
 
 /// Shows the VA number / QRIS reference for an unpaid online booking and lets
 /// the (simulated) gateway confirm it via POST /bookings/:id/pay.
-void showPendingPaymentDialog(BuildContext context, Booking b) {
+Future<void> showPendingPaymentDialog(BuildContext context, Booking b) async {
+  final doku = await ApiService.instance.getPaymentProvider() == 'doku';
+  if (!context.mounted) return;
   showDialog(
     context: context,
     builder: (ctx) => AlertDialog(
@@ -468,10 +471,13 @@ void showPendingPaymentDialog(BuildContext context, Booking b) {
         children: [
           Text('Total tagihan: Rp${b.finalPrice}.000', style: const TextStyle(fontWeight: FontWeight.w800)),
           const SizedBox(height: 10),
-          Text(b.paymentMethod.contains('QRIS') ? 'Kode QRIS' : 'Nomor Virtual Account',
+          if (!doku) Text(b.paymentMethod.contains('QRIS') ? 'Kode QRIS' : 'Nomor Virtual Account',
               style: TextStyle(color: AP.slate, fontSize: 12)),
-          SelectableText(b.paymentRef ?? '-',
-              style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.w900, fontSize: 16)),
+          if (doku)
+            Text('Bayar lewat halaman DOKU (QRIS / Virtual Account).', style: TextStyle(color: AP.slate, fontSize: 12))
+          else
+            SelectableText(b.paymentRef ?? '-',
+                style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.w900, fontSize: 16)),
           if (b.paymentExpiresAt != null) ...[
             const SizedBox(height: 10),
             Text('Berlaku sampai ${DateFormat('HH:mm').format(b.paymentExpiresAt!)}',
@@ -484,6 +490,11 @@ void showPendingPaymentDialog(BuildContext context, Booking b) {
         ElevatedButton(
           onPressed: () async {
             Navigator.pop(ctx);
+            if (doku) {
+              final paid = await showDokuPaymentSheet(context, b, allowClose: true);
+              if (paid != null && context.mounted) showInfo(context, 'Pembayaran berhasil.');
+              return;
+            }
             try {
               await BookingStore.instance.pay(b);
               if (context.mounted) showInfo(context, 'Pembayaran berhasil.');
@@ -492,7 +503,7 @@ void showPendingPaymentDialog(BuildContext context, Booking b) {
             }
           },
           style: ElevatedButton.styleFrom(backgroundColor: AP.lime, foregroundColor: AP.onLime, elevation: 0),
-          child: const Text('Simulasikan Pembayaran', style: TextStyle(fontWeight: FontWeight.w800)),
+          child: Text(doku ? 'Bayar sekarang' : 'Simulasikan Pembayaran', style: TextStyle(fontWeight: FontWeight.w800)),
         ),
       ],
     ),

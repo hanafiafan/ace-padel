@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../data.dart' show Booking;
 
 /// Error from the backend (or the network) with a user-friendly message.
 class ApiException implements Exception {
@@ -157,6 +158,38 @@ class ApiService {
     } catch (_) {
       return false;
     }
+  }
+
+  // ---- payments (DOKU) ----
+  String? _paymentProvider;
+
+  /// Test hook: forget the cached provider.
+  void resetPaymentProvider() => _paymentProvider = null;
+
+  /// `'doku'` or `'simulated'`; cached per session. Falls back to
+  /// 'simulated' (uncached) when the server cannot be reached.
+  Future<String> getPaymentProvider() async {
+    if (_paymentProvider != null) return _paymentProvider!;
+    try {
+      final d = await get('/payments/config', auth: false);
+      return _paymentProvider = ((d as Map)['provider'] as String?) ?? 'simulated';
+    } on ApiException {
+      return 'simulated';
+    }
+  }
+
+  /// POST /bookings/:id/checkout -> DOKU hosted payment URL.
+  Future<String> checkoutBooking(String id) async {
+    final res = await post('/bookings/$id/checkout');
+    final url = res['paymentUrl'] as String?;
+    if (url == null || url.isEmpty) throw const ApiException('Link pembayaran tidak tersedia. Coba lagi.');
+    return url;
+  }
+
+  /// GET /bookings/:id/payment-status (server syncs with DOKU).
+  Future<(Booking, bool)> refreshPaymentStatus(String id) async {
+    final res = await request('GET', '/bookings/$id/payment-status');
+    return (Booking.fromJson(res['data'] as Map<String, dynamic>), res['paid'] == true);
   }
 }
 
