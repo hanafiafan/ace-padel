@@ -44,7 +44,8 @@ app.use('/api', (req, res) => res.status(404).json({ success: false, message: `E
 // Web: landing + panel (statis, tanpa build step)
 const PUB = path.join(__dirname, '../public');
 app.use('/uploads', express.static(path.join(__dirname, '../data/uploads')));
-app.use(express.static(PUB, { extensions: ['html'] }));
+// js/css/html revalidate via ETag (no stale 4h browser/CDN cache after deploys); images & fonts keep a long cache.
+app.use(express.static(PUB, { extensions: ['html'], setHeaders: (res, f) => { if (/\.(js|css|html)$/.test(f)) res.setHeader('Cache-Control', 'no-cache'); else res.setHeader('Cache-Control', 'public, max-age=86400'); } }));
 app.get(['/app', '/app/*'], (req, res) => res.sendFile(path.join(PUB, 'app/index.html')));
 
 // Halaman tidak ditemukan (web)
