@@ -9,7 +9,7 @@ export async function api(path, { method = 'GET', body, query } = {}) {
     r = await fetch('/api' + path + qs, { method, headers: { ...(body ? { 'Content-Type': 'application/json' } : {}), ...(getToken() ? { Authorization: 'Bearer ' + getToken() } : {}) }, body: body ? JSON.stringify(body) : undefined });
     j = await r.json().catch(() => ({}));
   } catch { throw Object.assign(new Error('Tidak dapat terhubung ke server. Periksa koneksi Anda.'), { status: 0 }); }
-  if (r.status === 401 && !path.startsWith('/auth/login') && !path.startsWith('/auth/register')) { setToken(''); location.hash = '#/login'; }
+  if (r.status === 401 && !path.startsWith('/auth/login') && !path.startsWith('/auth/register') && !path.startsWith('/auth/google')) { setToken(''); location.hash = '#/login'; }
   if (!r.ok || j.success === false) throw Object.assign(new Error(j.message || 'Terjadi kesalahan (' + r.status + ')'), { status: r.status, body: j });
   return j;
 }

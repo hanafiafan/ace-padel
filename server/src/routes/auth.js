@@ -48,7 +48,8 @@ const google = async (req, res) => {
   if (idToken) {
     const g = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`).then((x) => x.json()).catch(() => ({}));
     const aud = process.env.GOOGLE_CLIENT_ID;
-    if (!g.email || g.email_verified === 'false' || (aud && g.aud !== aud)) throw new HttpError(401, 'Token Google tidak valid');
+    if (!aud) throw new HttpError(503, 'Login Google belum dikonfigurasi di server');
+    if (!g.email || g.email_verified === 'false' || g.aud !== aud) throw new HttpError(401, 'Token Google tidak valid');
     ({ email, name, picture: photoUrl, sub: googleId } = { ...g, name: g.name || name });
   } else if (process.env.ALLOW_UNVERIFIED_GOOGLE !== '1') {
     throw new HttpError(401, 'idToken Google diperlukan');
@@ -59,8 +60,8 @@ const google = async (req, res) => {
   if (u && u.status !== 'active') throw new HttpError(403, 'Akun Anda ditangguhkan.');
   if (!u) {
     const id = `u_${crypto.randomUUID()}`;
-    db.prepare('INSERT INTO users (id,name,email,username,photo_url,auth_provider,google_id,created_at) VALUES (?,?,?,?,?,?,?,?)')
-      .run(id, name || email.split('@')[0], email, uniqueUsername(email.split('@')[0]), photoUrl || null, 'google', googleId || null, new Date().toISOString());
+    db.prepare('INSERT INTO users (id,name,email,username,photo_url,auth_provider,google_id,created_at,role) VALUES (?,?,?,?,?,?,?,?,?)')
+      .run(id, name || email.split('@')[0], email, uniqueUsername(email.split('@')[0]), photoUrl || null, 'google', googleId || null, new Date().toISOString(), req.body.role === 'owner' ? 'owner' : 'player');
     u = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
   } else {
     db.prepare('UPDATE users SET photo_url = COALESCE(?, photo_url), google_id = COALESCE(?, google_id) WHERE id = ?').run(photoUrl || null, googleId || null, u.id);
@@ -69,6 +70,9 @@ const google = async (req, res) => {
   session(res, u);
 };
 r.post('/google', limit, (req, res, next) => google(req, res).catch(next));
+
+// Konfigurasi publik untuk klien web (Client ID bukan rahasia).
+r.get('/config', (req, res) => res.json({ googleClientId: process.env.GOOGLE_CLIENT_ID || null }));
 
 r.get('/me', auth(), (req, res) => ok(res, publicUser(req.user)));
 
