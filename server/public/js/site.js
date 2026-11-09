@@ -120,7 +120,7 @@ function footerHTML() {
       <nav aria-label="Sosial"><h3>Ikuti</h3><span>Instagram (segera)</span><span>TikTok (segera)</span><span>YouTube (segera)</span></nav>
     </div>
     <div class="foot__bar"><span>&copy; ${new Date().getFullYear()} Ace Padel by hellens.dev</span><span>Pembayaran online diproses oleh DOKU. Ace Padel tidak menyimpan data kartu atau kredensial pembayaran.</span></div>
-  </div><div class="foot__big" aria-hidden="true">Ace Padel</div>`;
+  </div><div class="foot__big" aria-hidden="true"><canvas></canvas></div>`;
 }
 
 function mount() {
@@ -135,7 +135,7 @@ function mount() {
   drawer.innerHTML = drawerHTML();
   document.body.append(drawer);
   const ft = $('#site-footer');
-  if (ft) ft.innerHTML = footerHTML();
+  if (ft) { ft.innerHTML = footerHTML(); import('/js/halftone.js').then((m) => m.halftoneFooter(ft.querySelector('.foot__big'))); }
   const top = document.createElement('button');
   top.className = 'totop'; top.type = 'button'; top.setAttribute('aria-label', 'Kembali ke atas'); top.innerHTML = ic('arrow');
   document.body.append(top);

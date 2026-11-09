@@ -302,7 +302,8 @@ p { margin: 0; }
 .badge small { font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; color: inherit; opacity: .85; }
 .badge b { font: 800 1.2rem/1.1 var(--display); text-transform: uppercase; letter-spacing: .04em; }
 .foot__bar { margin-top: 44px; padding-block: 22px; border-top: 2px solid rgba(255,255,255,.14); display: flex; flex-wrap: wrap; gap: 10px 28px; justify-content: space-between; font-size: .85rem; color: #B4BBDD; }
-.foot__big { font: italic 800 clamp(4rem, 19vw, 17rem)/.8 var(--display); color: transparent; -webkit-text-stroke: 2px rgba(255,255,255,.14); text-transform: uppercase; text-align: center; margin-top: 36px; overflow: hidden; white-space: nowrap; user-select: none; }
+.foot__big { position: relative; height: clamp(110px, 19vw, 300px); margin-top: 36px; overflow: hidden; user-select: none; }
+.foot__big canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
 /* Reveal */
 .js .rv { opacity: 0; translate: 0 28px; transition: opacity .6s var(--ease), translate .6s var(--ease); transition-delay: var(--d, 0s); }
