@@ -2,6 +2,7 @@ const express = require('express');
 const crypto = require('crypto');
 const { db } = require('../db');
 const { hashPassword, verifyPassword, signToken, rateLimit } = require('../lib/security');
+const { verifyFirebaseToken } = require('../lib/firebase');
 const { ok, bad, conflict, str, pick, auth, publicUser, HttpError } = require('../lib/util');
 
 const r = express.Router();
@@ -54,6 +55,10 @@ const google = async (req, res) => {
   } else if (process.env.ALLOW_UNVERIFIED_GOOGLE !== '1') {
     throw new HttpError(401, 'idToken Google diperlukan');
   }
+  return googleUser(req, res, { email, name, photoUrl, googleId });
+};
+
+function googleUser(req, res, { email, name, photoUrl, googleId }) {
   if (!email) throw bad('Email Google diperlukan');
   email = email.toLowerCase();
   let u = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
@@ -68,11 +73,20 @@ const google = async (req, res) => {
     u = db.prepare('SELECT * FROM users WHERE id = ?').get(u.id);
   }
   session(res, u);
-};
+}
 r.post('/google', limit, (req, res, next) => google(req, res).catch(next));
 
+// Login Google dari web via Firebase Auth: ID token Firebase diverifikasi di server.
+r.post('/firebase', limit, async (req, res, next) => {
+  try {
+    const t = await verifyFirebaseToken(req.body.idToken).catch(() => { throw new HttpError(401, 'Token login tidak valid'); });
+    googleUser(req, res, { email: t.email, name: t.name, photoUrl: t.picture, googleId: t.firebase?.identities?.['google.com']?.[0] || t.sub });
+  } catch (e) { next(e); }
+});
+
 // Konfigurasi publik untuk klien web (Client ID bukan rahasia).
-r.get('/config', (req, res) => res.json({ googleClientId: process.env.GOOGLE_CLIENT_ID || null }));
+const FB = { apiKey: process.env.FIREBASE_API_KEY || 'REDACTED-FIREBASE-API-KEY', authDomain: 'ace-padel-3f910.firebaseapp.com', projectId: 'ace-padel-3f910', appId: '1:198282293168:web:b45a79839c31b3f9bab075' };
+r.get('/config', (req, res) => res.json({ googleClientId: process.env.GOOGLE_CLIENT_ID || null, firebase: FB }));
 
 r.get('/me', auth(), (req, res) => ok(res, publicUser(req.user)));
 

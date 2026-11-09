@@ -9,23 +9,31 @@ const hero = html`<section class="auth-hero"><a class="brand" href="/"><img src=
   <div><h2>Kelola lapangan. <em>Main lebih sering.</em></h2><p>Satu tempat untuk pemilik lapangan, admin, dan pemain: jadwal, booking, check-in, dan pembayaran.</p></div>
   <ul><li>${icon('check')}Jadwal real-time &amp; blokir slot</li><li>${icon('check')}Check-in tiket dengan QR</li><li>${icon('check')}Laporan pendapatan harian</li></ul></section>`;
 
-// Google Identity Services: tombol resmi Google, ID token diverifikasi server.
-let gsi;
-const loadGsi = () => gsi ||= new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'https://accounts.google.com/gsi/client'; s.async = true; s.onload = ok; s.onerror = () => { gsi = null; no(new Error('gsi')); }; document.head.append(s); });
+// Login Google lewat Firebase Auth (popup). ID token Firebase diverifikasi server di /auth/firebase.
+const FB = 'https://www.gstatic.com/firebasejs/10.12.2/';
+let fbReady;
+const loadScript = (src) => new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.append(s); });
+const loadFirebase = (cfg) => fbReady ||= (async () => { await loadScript(FB + 'firebase-app-compat.js'); await loadScript(FB + 'firebase-auth-compat.js'); firebase.initializeApp(cfg); })().catch((e) => { fbReady = null; throw e; });
+const GLOGO = '<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.9-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>';
 async function googleButton(host, role, errEl) {
-  try {
-    const cfg = await fetch('/api/auth/config').then((r) => r.json());
-    if (!cfg.googleClientId) return;
-    await loadGsi();
-    const dark = document.documentElement.dataset.theme === 'dark';
-    google.accounts.id.initialize({ client_id: cfg.googleClientId, callback: async ({ credential }) => {
-      errEl.hidden = true;
-      try { await finish(await api('/auth/google', { method: 'POST', body: { idToken: credential, role: role() } })); } catch (e) { errEl.textContent = e.message; errEl.hidden = false; }
-    } });
-    host.innerHTML = '';
-    google.accounts.id.renderButton(host, { theme: dark ? 'filled_black' : 'outline', size: 'large', text: 'continue_with', shape: 'rectangular', width: Math.min(400, host.clientWidth || 360), locale: 'id' });
-    host.insertAdjacentHTML('afterend', '<div class="or"><span>atau dengan email</span></div>');
-  } catch { /* tanpa Google, form email tetap berfungsi */ }
+  host.innerHTML = `<button class="btn lg block gbtn-b" type="button">${GLOGO}<span>Lanjutkan dengan Google</span></button>`;
+  host.insertAdjacentHTML('afterend', '<div class="or"><span>atau dengan email</span></div>');
+  const btn = host.firstElementChild;
+  btn.addEventListener('click', () => busy(btn, async () => {
+    errEl.hidden = true;
+    try {
+      const cfg = (await fetch('/api/auth/config').then((r) => r.json())).firebase;
+      await loadFirebase(cfg);
+      const cred = await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());
+      const idToken = await cred.user.getIdToken();
+      await firebase.auth().signOut();
+      await finish(await api('/auth/firebase', { method: 'POST', body: { idToken, role: role() } }));
+    } catch (e) {
+      if (['auth/popup-closed-by-user', 'auth/cancelled-popup-request'].includes(e.code)) return;
+      errEl.textContent = e.code === 'auth/popup-blocked' ? 'Popup diblokir browser. Izinkan popup untuk situs ini lalu coba lagi.' : e.code?.startsWith('auth/') ? 'Login Google gagal (' + e.code.slice(5) + '). Coba lagi atau pakai email.' : e.message;
+      errEl.hidden = false;
+    }
+  }));
 }
 
 async function finish(res) {
