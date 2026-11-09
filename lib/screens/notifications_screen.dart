@@ -1,3 +1,4 @@
+import '../core/widgets/app_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/utils/ui.dart';
@@ -79,7 +80,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 action: TextButton(onPressed: () => requireLogin(context, 'melihat notifikasi'), child: const Text('Masuk')));
           }
           if (_store.isLoading && _store.items.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
+            return const Padding(padding: EdgeInsets.all(16), child: AppSkeletonList(count: 6, itemHeight: 84));
           }
           if (_store.error != null && _store.items.isEmpty) {
             return _centerNote(_store.error!, action: TextButton(onPressed: _store.refresh, child: const Text('Coba lagi')));

@@ -1,3 +1,4 @@
+import '../core/widgets/app_skeleton.dart';
 import '../core/widgets/ap_banners.dart';
 import 'package:flutter/material.dart';
 import '../core/widgets/app_empty_state.dart';
@@ -101,7 +102,7 @@ class _BookingsScreenState extends State<BookingsScreen>
                     );
                   }
                   if (store.isLoading && active.isEmpty && history.isEmpty) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const AppSkeletonList(count: 3, itemHeight: 150);
                   }
                   if (store.error != null && active.isEmpty && history.isEmpty) {
                     return AppEmptyState(

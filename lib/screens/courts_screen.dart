@@ -1,3 +1,4 @@
+import '../core/widgets/app_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
@@ -393,7 +394,7 @@ class _CourtsScreenState extends State<CourtsScreen> {
             Expanded(
               child: list.isEmpty
                   ? (CatalogStore.instance.isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ? const AppSkeletonList(count: 3, itemHeight: 210)
                       : _empty())
                   : RefreshIndicator(
                       onRefresh: () async {

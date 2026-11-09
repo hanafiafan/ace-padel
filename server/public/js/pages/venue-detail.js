@@ -58,7 +58,8 @@ function dates() {
   const now = new Date(); const box = $('#dates');
   box.innerHTML = Array.from({ length: 7 }, (_, i) => { const d = new Date(now.getTime() + i * 864e5); return `<button class="dchip" type="button" data-d="${tz(d)}" data-full="${esc(full.format(d))}" aria-pressed="${i === 0}"><small>${i === 0 ? 'Hari ini' : esc(dow.format(d))}</small><b>${tz(d).slice(8)}</b></button>`; }).join('');
   box.addEventListener('click', (e) => { const b = e.target.closest('.dchip'); if (!b) return; [...box.children].forEach((x) => x.setAttribute('aria-pressed', x === b)); slots(b.dataset.d); });
-  slots(tz(now));
+  // Hari ini sudah penuh/lewat? Langsung tampilkan hari berikutnya.
+  slots(tz(now)).then((free) => { if (free === 0) box.children[1]?.click(); });
 }
 
 async function slots(date) {
@@ -67,16 +68,19 @@ async function slots(date) {
   el.innerHTML = Array.from({ length: 10 }, () => '<div class="skel" style="min-height:56px" aria-hidden="true"></div>').join('');
   try {
     const d = await api(`/courts/${encodeURIComponent(id)}/slots?date=${date}`);
-    if (current !== date) return;
+    if (current !== date) return -1;
     const list = d.slots || d;
     const free = list.filter((s) => s.available).length;
     el.innerHTML = list.map((s) => s.available ? `<div class="slot ok" role="img" aria-label="${s.slot}, tersedia">${esc(s.slot)}</div>` : `<div class="slot no" role="img" aria-label="${s.slot}, ${s.past ? 'sudah lewat' : s.blocked ? 'ditutup' : 'terisi'}">${esc(s.slot)}<small>${s.past ? 'lewat' : s.blocked ? 'ditutup' : 'terisi'}</small></div>`).join('')
       + `<p class="muted" style="grid-column:1/-1" role="status">${free} dari ${list.length} jam tersedia</p>`;
+    el.setAttribute('aria-busy', 'false');
+    return free;
   } catch (e) {
     el.innerHTML = `<div class="empty" style="padding:20px"><p>Slot belum bisa dimuat.</p><button class="btn btn--sm btn--blue" type="button" id="retry">Coba lagi</button></div>`;
     $('#retry').addEventListener('click', () => slots(date));
   }
   el.setAttribute('aria-busy', 'false');
+  return -1;
 }
 
 if (!id) fail('Alamat halaman ini belum memuat ID venue. Pilih venue dari daftar.');
