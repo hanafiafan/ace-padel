@@ -9,5 +9,5 @@ USER node
 ENV NODE_ENV=production PORT=3001 DB_PATH=/data/acepadel.sqlite NODE_NO_WARNINGS=1
 VOLUME /data
 EXPOSE 3001
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s CMD wget -qO- http://localhost:3001/api/health || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s CMD wget -qO- http://127.0.0.1:3001/api/health || exit 1
 CMD ["node", "src/index.js"]
