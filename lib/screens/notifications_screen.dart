@@ -111,7 +111,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: AP.surface,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: unread ? AP.blue.withValues(alpha: 0.4) : AP.line,
                 width: unread ? 1.5 : 1,

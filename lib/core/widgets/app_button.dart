@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../utils/haptics.dart';
+import 'ap_shape.dart';
 
 enum AppButtonVariant { primary, secondary, lime, outline, ghost }
 
@@ -92,11 +93,10 @@ class _AppButtonState extends State<AppButton> {
           height: widget.height,
           padding: widget.padding,
           alignment: Alignment.center,
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: bg,
-            borderRadius: BorderRadius.circular(16),
-            border: border,
-            boxShadow: _isPressed ? null : shadow,
+            shape: ChamferBorder(br: 12, tl: 12, side: border?.top ?? BorderSide.none),
+            shadows: _isPressed ? null : shadow,
           ),
           child: widget.isLoading
               ? SizedBox(
@@ -117,12 +117,14 @@ class _AppButtonState extends State<AppButton> {
                     ],
                     Flexible(
                       child: Text(
-                        widget.label,
+                        widget.label.toUpperCase(),
                         style: TextStyle(
                           color: fg,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.2,
+                          fontFamily: 'Display',
+                          fontStyle: FontStyle.italic,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.6,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

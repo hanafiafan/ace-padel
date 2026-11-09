@@ -1,3 +1,4 @@
+import '../core/widgets/ap_shape.dart';
 import '../core/widgets/ap_banners.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -118,7 +119,7 @@ class _CoachesScreenState extends State<CoachesScreen> {
                     child: coach.image.isEmpty
                         ? Text(
                             coach.name.split(' ').map((e) => e[0]).take(2).join(),
-                            style: const TextStyle(fontFamily: 'Display', 
+                            style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                               color: Colors.white,
                               fontWeight: FontWeight.w800,
                               fontSize: 18.4,
@@ -133,7 +134,7 @@ class _CoachesScreenState extends State<CoachesScreen> {
                       children: [
                         Text(
                           'Private Coaching: ${coach.name}',
-                          style: const TextStyle(fontFamily: 'Display', 
+                          style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                               fontSize: 18.4, fontWeight: FontWeight.w800),
                         ),
                         const SizedBox(height: 2),
@@ -271,7 +272,7 @@ class _CoachesScreenState extends State<CoachesScreen> {
                     ),
                     Text(
                       'Rp${coach.ratePerHour}k',
-                      style:  TextStyle(fontFamily: 'Display', 
+                      style:  TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                         fontSize: 20.7,
                         fontWeight: FontWeight.w800,
                         color: AP.blue,
@@ -309,9 +310,7 @@ class _CoachesScreenState extends State<CoachesScreen> {
                     backgroundColor: AP.lime,
                     foregroundColor: AP.onLime,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                    shape: ChamferBorder(br: 10, tl: 10),
                   ),
                   child: const Text(
                     'Konfirmasi Jadwal Coaching',
@@ -359,7 +358,7 @@ class _CoachesScreenState extends State<CoachesScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -390,7 +389,7 @@ class _CoachesScreenState extends State<CoachesScreen> {
                 const SizedBox(height: 12),
                 const Text(
                   'Tingkatkan Level Permainan Anda',
-                  style: TextStyle(fontFamily: 'Display', 
+                  style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                     color: Colors.white,
                     fontSize: 20.7,
                     fontWeight: FontWeight.w800,
@@ -529,7 +528,7 @@ class _CoachCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AP.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AP.line),
         boxShadow: [
           BoxShadow(
@@ -552,7 +551,7 @@ class _CoachCard extends StatelessWidget {
                 child: coach.image.isEmpty
                     ? Text(
                         coach.name.split(' ').map((e) => e[0]).take(2).join(),
-                        style: const TextStyle(fontFamily: 'Display', 
+                        style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                           color: Colors.white,
                           fontWeight: FontWeight.w800,
                           fontSize: 20.7,
@@ -570,7 +569,7 @@ class _CoachCard extends StatelessWidget {
                         Flexible(
                           child: Text(
                             coach.name,
-                            style: const TextStyle(fontFamily: 'Display', 
+                            style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                               fontSize: 18.4,
                               fontWeight: FontWeight.w800,
                             ),
@@ -666,7 +665,7 @@ class _CoachCard extends StatelessWidget {
                       style: TextStyle(color: AP.slate, fontSize: 11)),
                   Text(
                     'Rp${coach.ratePerHour}k',
-                    style:  TextStyle(fontFamily: 'Display', 
+                    style:  TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                       fontSize: 19.55,
                       fontWeight: FontWeight.w800,
                       color: AP.blue,
@@ -687,9 +686,7 @@ class _CoachCard extends StatelessWidget {
                   elevation: 0,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  shape: ChamferBorder(br: 10, tl: 10),
                 ),
               ),
             ],

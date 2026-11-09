@@ -1,3 +1,4 @@
+import '../core/widgets/ap_shape.dart';
 import 'package:flutter/material.dart';
 import '../core/widgets/ap_banners.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -197,7 +198,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
             const SizedBox(height: 18),
             const Text(
               'Gunakan Voucher Promo',
-              style: TextStyle(fontFamily: 'Display', fontSize: 20.7, fontWeight: FontWeight.w800),
+              style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 14),
 
@@ -233,8 +234,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AP.blue,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
+                    shape: ChamferBorder(br: 10, tl: 10),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 14),
                   ),
@@ -378,7 +378,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
             const SizedBox(height: 18),
             const Text(
               'Pilih Metode Pembayaran',
-              style: TextStyle(fontFamily: 'Display', fontSize: 20.7, fontWeight: FontWeight.w800),
+              style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 14),
             ..._paymentOptions.map((opt) {
@@ -507,7 +507,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
             const SizedBox(height: 4),
             Text(
               'Rp${b.finalPrice}.000',
-              style:  TextStyle(fontFamily: 'Display', 
+              style:  TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                 fontSize: 29.12,
                 fontWeight: FontWeight.w800,
                 color: AP.blue,
@@ -519,7 +519,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: AP.surface,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AP.ink, width: 2),
                 boxShadow: [
                   BoxShadow(
@@ -560,7 +560,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: AP.lime.withValues(alpha: 0.25),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(14),
               ),
               child:  Row(
                 mainAxisSize: MainAxisSize.min,
@@ -610,9 +610,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AP.lime,
                   elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  shape: ChamferBorder(br: 10, tl: 10),
                 ),
               ),
             ),
@@ -685,7 +683,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                   children: [
                     Text(
                       bankName,
-                      style: const TextStyle(fontFamily: 'Display', fontSize: 18.4, fontWeight: FontWeight.w800),
+                      style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 18.4, fontWeight: FontWeight.w800),
                     ),
                      Text(
                       'Transfer instan otomatis terverifikasi',
@@ -766,7 +764,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                           style: TextStyle(color: AP.slate, fontSize: 12)),
                       Text(
                         'Rp${b.finalPrice}.000',
-                        style:  TextStyle(fontFamily: 'Display', 
+                        style:  TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                           fontSize: 18.4,
                           fontWeight: FontWeight.w800,
                           color: AP.ink,
@@ -808,9 +806,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AP.lime,
                   elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  shape: ChamferBorder(br: 10, tl: 10),
                 ),
               ),
             ),
@@ -866,7 +862,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(14),
           child: SizedBox(
             height: 132,
             child: APPhoto(
@@ -882,7 +878,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(c.name,
-                              style: const TextStyle(fontFamily: 'Display', 
+                              style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                                   color: Colors.white,
                                   fontSize: 20.7,
                                   fontWeight: FontWeight.w800)),
@@ -1114,7 +1110,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                                           });
                                         }
                                       : null,
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: BorderRadius.circular(14),
                                   child: Container(
                                     width: 30,
                                     height: 30,
@@ -1151,7 +1147,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                                       _selectedAddOns[item.id] = count + 1;
                                     });
                                   },
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: BorderRadius.circular(14),
                                   child: Container(
                                     width: 30,
                                     height: 30,
@@ -1230,7 +1226,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
         const Text(
           'Booking Berhasil!',
           textAlign: TextAlign.center,
-          style: TextStyle(fontFamily: 'Display', 
+          style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
             fontSize: 26.88,
             fontWeight: FontWeight.w800,
             letterSpacing: -0.4,
@@ -1249,7 +1245,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: AP.surface,
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(color: AP.line),
             boxShadow: [
               BoxShadow(
@@ -1286,7 +1282,7 @@ c.image, fallbackUrl: c.imageUrl,
                       children: [
                         Text(
                           c.name,
-                          style: const TextStyle(fontFamily: 'Display', 
+                          style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                             fontSize: 18.4,
                             fontWeight: FontWeight.w800,
                           ),
@@ -1332,7 +1328,7 @@ c.image, fallbackUrl: c.imageUrl,
                   ),
                   Text(
                     'Rp${b?.finalPrice ?? _finalTotal}k',
-                    style:  TextStyle(fontFamily: 'Display', 
+                    style:  TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                       fontSize: 22.4,
                       fontWeight: FontWeight.w800,
                       color: AP.blue,
@@ -1486,11 +1482,10 @@ c.image, fallbackUrl: c.imageUrl,
                   backgroundColor: AP.lime,
                   foregroundColor: AP.onLime,
                   elevation: 0,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
+                  shape: ChamferBorder(br: 10, tl: 10),
                 ),
                 child: Text(label,
-                    style: const TextStyle(fontFamily: 'Display', 
+                    style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                         fontSize: 18.4, fontWeight: FontWeight.w800)),
               )
             : OutlinedButton(
@@ -1498,8 +1493,7 @@ c.image, fallbackUrl: c.imageUrl,
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AP.blue,
                   side:  BorderSide(color: AP.blue),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
+                  shape: ChamferBorder(br: 10, tl: 10),
                 ),
                 child: Text(label,
                     style: const TextStyle(

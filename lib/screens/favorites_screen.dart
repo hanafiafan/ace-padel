@@ -1,3 +1,4 @@
+import '../core/widgets/ap_shape.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
@@ -50,7 +51,7 @@ class FavoritesScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                      Text(
                       'Belum ada venue favorit',
-                      style: TextStyle(fontFamily: 'Display', 
+                      style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                         fontSize: 20.7,
                         fontWeight: FontWeight.w800,
                         color: AP.ink,
@@ -70,9 +71,7 @@ class FavoritesScreen extends StatelessWidget {
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
+                        shape: ChamferBorder(br: 10, tl: 10),
                       ),
                       child: const Text(
                         'Eksplor Lapangan',

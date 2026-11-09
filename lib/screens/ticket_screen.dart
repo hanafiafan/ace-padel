@@ -1,3 +1,4 @@
+import '../core/widgets/ap_shape.dart';
 import '../core/widgets/ap_banners.dart';
 import 'package:flutter/material.dart';
 import '../core/utils/launch.dart';
@@ -59,7 +60,7 @@ class TicketScreen extends StatelessWidget {
                     children: [
                       Text(
                         'Simpan ke Kalender',
-                        style: TextStyle(fontFamily: 'Display', 
+                        style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                             fontSize: 20.7, fontWeight: FontWeight.w800),
                       ),
                       Text(
@@ -107,7 +108,7 @@ class TicketScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AP.lime,
                     foregroundColor: AP.onLime,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: ChamferBorder(br: 10, tl: 10),
                   ),
                 ),
               ),
@@ -176,7 +177,7 @@ class TicketScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(c.name,
-                            style: const TextStyle(fontFamily: 'Display', fontSize: 19.55, fontWeight: FontWeight.w800)),
+                            style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 19.55, fontWeight: FontWeight.w800)),
                         Text('${c.venue} • ${c.area}', style: TextStyle(color: AP.slate, fontSize: 12)),
                       ],
                     ),
@@ -231,9 +232,7 @@ class TicketScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AP.lime,
                     foregroundColor: AP.onLime,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                    shape: ChamferBorder(br: 10, tl: 10),
                   ),
                 ),
               ),
@@ -290,7 +289,7 @@ class TicketScreen extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               color: AP.surface,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(14),
               border: Border.all(color: AP.line),
               boxShadow: [
                 BoxShadow(
@@ -336,7 +335,7 @@ class TicketScreen extends StatelessWidget {
                               color: isCancelled
                                   ? Colors.red.withValues(alpha: 0.2)
                                   : AP.lime,
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(14),
                             ),
                             child: Text(
                               isCancelled ? 'DIBATALKAN' : 'TERKONFIRMASI',
@@ -361,7 +360,7 @@ class TicketScreen extends StatelessWidget {
                       const SizedBox(height: 16),
                       Text(
                         c.name,
-                        style: const TextStyle(fontFamily: 'Display', 
+                        style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                           color: Colors.white,
                           fontSize: 24.64,
                           fontWeight: FontWeight.w800,
@@ -597,9 +596,7 @@ class TicketScreen extends StatelessWidget {
                     foregroundColor: AP.ink,
                     side:  BorderSide(color: AP.line),
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                    shape: ChamferBorder(br: 10, tl: 10),
                     backgroundColor: AP.surface,
                   ),
                 ),
@@ -618,9 +615,7 @@ class TicketScreen extends StatelessWidget {
                     foregroundColor: AP.onLime,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                    shape: ChamferBorder(br: 10, tl: 10),
                   ),
                 ),
               ),

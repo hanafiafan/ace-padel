@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../utils/haptics.dart';
 import 'ap_decor.dart';
+import 'ap_shape.dart';
 
 class AppCard extends StatelessWidget {
   final Widget child;
@@ -30,11 +31,10 @@ class AppCard extends StatelessWidget {
     final cardContent = Container(
       margin: margin,
       padding: padding,
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: color ?? APColors.surface,
-        borderRadius: BorderRadius.circular(borderRadius),
-        border: border ?? Border.all(color: APColors.line, width: 1.0),
-        boxShadow: boxShadow ?? APShadows.card,
+        shape: ChamferBorder(br: 16, side: BorderSide(color: APColors.line)),
+        shadows: boxShadow ?? APShadows.card,
       ),
       child: child,
     );
@@ -48,7 +48,7 @@ class AppCard extends StatelessWidget {
           APHaptics.light();
           onTap?.call();
         },
-        borderRadius: BorderRadius.circular(borderRadius),
+        customBorder: const ChamferBorder(br: 16),
         splashColor: APColors.blue.withValues(alpha: 0.08),
         highlightColor: APColors.blue.withValues(alpha: 0.04),
         child: cardContent,

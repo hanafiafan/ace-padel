@@ -1,3 +1,4 @@
+import '../core/widgets/ap_shape.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -181,15 +182,15 @@ class _DokuPaymentSheetState extends State<DokuPaymentSheet> {
 
   List<Widget> _waiting() => [
         Text(_b.paymentMethod,
-            style: const TextStyle(fontFamily: 'Display', fontSize: 18.4, fontWeight: FontWeight.w800)),
+            style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 18.4, fontWeight: FontWeight.w800)),
         const SizedBox(height: 4),
         Text('Total tagihan', style: TextStyle(color: AP.slate, fontSize: 12)),
         Text('Rp${_b.finalPrice}.000',
-            style: TextStyle(fontFamily: 'Display', fontSize: 26, fontWeight: FontWeight.w800, color: AP.ink)),
+            style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 26, fontWeight: FontWeight.w800, color: AP.ink)),
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(color: AP.lime.withValues(alpha: 0.25), borderRadius: BorderRadius.circular(20)),
+          decoration: BoxDecoration(color: AP.lime.withValues(alpha: 0.25), borderRadius: BorderRadius.circular(14)),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             Icon(LucideIcons.timer, size: 14, color: AP.ink),
             const SizedBox(width: 6),
@@ -215,7 +216,7 @@ class _DokuPaymentSheetState extends State<DokuPaymentSheet> {
             onPressed: _checking ? null : () => _check(),
             style: OutlinedButton.styleFrom(
               side: BorderSide(color: AP.line),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: ChamferBorder(br: 10, tl: 10),
             ),
             child: _checking
                 ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
@@ -237,7 +238,7 @@ class _DokuPaymentSheetState extends State<DokuPaymentSheet> {
       Icon(expired ? LucideIcons.clockAlert : LucideIcons.circleAlert, size: 40, color: AP.slate),
       const SizedBox(height: 12),
       Text(expired ? 'Waktu pembayaran habis' : 'Pembayaran belum bisa dimulai',
-          style: const TextStyle(fontFamily: 'Display', fontSize: 18.4, fontWeight: FontWeight.w800)),
+          style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 18.4, fontWeight: FontWeight.w800)),
       const SizedBox(height: 8),
       Text(
         expired
@@ -275,7 +276,7 @@ class _DokuPaymentSheetState extends State<DokuPaymentSheet> {
           style: ElevatedButton.styleFrom(
             backgroundColor: AP.lime,
             elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: ChamferBorder(br: 10, tl: 10),
           ),
         ),
       );

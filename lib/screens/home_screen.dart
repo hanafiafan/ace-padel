@@ -1,3 +1,4 @@
+import '../core/widgets/ap_shape.dart';
 import 'package:flutter/material.dart';
 import '../core/theme/theme_controller.dart';
 import '../core/widgets/ap_banners.dart';
@@ -146,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const Text(
                     'Filter & Preferensi',
-                    style: TextStyle(fontFamily: 'Display', fontSize: 20.7, fontWeight: FontWeight.w800),
+                    style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
                   ),
                   if (_indoorFilter != null)
                     TextButton(
@@ -223,7 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundColor: AP.lime,
                     foregroundColor: AP.onLime,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: ChamferBorder(br: 10, tl: 10),
                   ),
                   child: const Text('Terapkan Filter', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
                 ),
@@ -359,7 +360,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
-                    borderRadius: BorderRadius.circular(22),
+                    borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
                         color: const Color(0xFF0F143A).withValues(alpha: 0.25),
@@ -467,9 +468,7 @@ next.court.image, fallbackUrl: next.court.imageUrl,
                               elevation: 0,
                               minimumSize: Size.zero,
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                              shape: ChamferBorder(br: 10, tl: 10),
                               textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
                             ),
                           ),
@@ -620,7 +619,7 @@ next.court.image, fallbackUrl: next.court.imageUrl,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: AP.surface,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: AP.line),
                   ),
                   child: Row(
@@ -694,8 +693,7 @@ m.court.image, fallbackUrl: m.court.imageUrl,
                           elevation: 0,
                           minimumSize: Size.zero,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
+                          shape: ChamferBorder(br: 10, tl: 10),
                         ),
                         child: const Text('Gabung',
                             style: TextStyle(
@@ -720,7 +718,7 @@ m.court.image, fallbackUrl: m.court.imageUrl,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: AP.surface,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AP.line),
               ),
               child: Row(
@@ -768,8 +766,7 @@ m.court.image, fallbackUrl: m.court.imageUrl,
                       elevation: 0,
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                      shape: ChamferBorder(br: 10, tl: 10),
                     ),
                     child: const Text('Lihat',
                         style: TextStyle(

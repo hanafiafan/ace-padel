@@ -1,3 +1,4 @@
+import '../core/widgets/ap_shape.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -169,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       Text(
                         'Konfigurasi Google OAuth',
-                        style: TextStyle(fontFamily: 'Display', 
+                        style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                             fontSize: 19.55, fontWeight: FontWeight.w800),
                       ),
                       Text(
@@ -243,9 +244,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     backgroundColor: AP.blue,
                     foregroundColor: Colors.white,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                    shape: ChamferBorder(br: 10, tl: 10),
                   ),
                 ),
               ),
@@ -288,7 +287,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ).popIn(),
                       const SizedBox(height: 12),
                       const Text('Ace Padel',
-                          style: TextStyle(fontFamily: 'Display', fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.8))
+                          style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.8))
                           .reveal(1),
                       const SizedBox(height: 4),
                       Text('Booking lapangan padel, tanpa ribet.',
@@ -306,7 +305,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     const SizedBox(height: 20),
                     Text(_register ? 'Buat Akun Baru' : 'Selamat Datang',
-                        style: TextStyle(fontFamily: 'Display', fontSize: 24.64, fontWeight: FontWeight.w800, color: AP.ink, letterSpacing: -0.4))
+                        style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 24.64, fontWeight: FontWeight.w800, color: AP.ink, letterSpacing: -0.4))
                         .reveal(3),
                     const SizedBox(height: 6),
                     Text(
@@ -321,7 +320,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
                         color: AP.surface,
-                        borderRadius: BorderRadius.circular(22),
+                        borderRadius: BorderRadius.circular(14),
                         border: Border.all(color: AP.line),
                         boxShadow: APShadows.card,
                       ),
@@ -381,12 +380,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                   backgroundColor: AP.blue,
                                   foregroundColor: Colors.white,
                                   elevation: 0,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                  shape: ChamferBorder(br: 10, tl: 10),
                                 ),
                                 child: _isLoading
                                     ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
                                     : Text(_register ? 'Daftar' : 'Masuk',
-                                        style: const TextStyle(fontFamily: 'Display', fontSize: 18, fontWeight: FontWeight.w800)),
+                                        style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 18, fontWeight: FontWeight.w800)),
                               ),
                             ),
                             TextButton(
@@ -422,7 +421,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           elevation: 1,
                           shadowColor: Colors.black.withValues(alpha: 0.2),
                           side: BorderSide(color: AP.line, width: 1.2),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          shape: ChamferBorder(br: 10, tl: 10),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -430,7 +429,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             _buildGoogleGLogo(),
                             const SizedBox(width: 12),
                             Text('Masuk dengan Google',
-                                style: TextStyle(fontFamily: 'Display', fontSize: 18.4, fontWeight: FontWeight.w800, color: AP.ink)),
+                                style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 18.4, fontWeight: FontWeight.w800, color: AP.ink)),
                           ],
                         ),
                       ),

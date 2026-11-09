@@ -1,3 +1,4 @@
+import '../core/widgets/ap_shape.dart';
 import '../core/widgets/ap_banners.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -63,7 +64,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
               const SizedBox(height: 18),
               const Text(
                 'Buat Match Mabar Baru',
-                style: TextStyle(fontFamily: 'Display', fontSize: 20.7, fontWeight: FontWeight.w800),
+                style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 16),
               TextField(
@@ -165,12 +166,10 @@ class _MatchesScreenState extends State<MatchesScreen> {
                     backgroundColor: AP.lime,
                     foregroundColor: AP.onLime,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                    shape: ChamferBorder(br: 10, tl: 10),
                   ),
                   child: const Text('Publikasikan Match',
-                      style: TextStyle(fontFamily: 'Display', fontWeight: FontWeight.w800, fontSize: 18.4)),
+                      style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontWeight: FontWeight.w800, fontSize: 18.4)),
                 ),
               ),
             ],
@@ -226,7 +225,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                     fit: BoxFit.cover,
                     colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: .62), BlendMode.darken),
                   ),
-                  borderRadius: BorderRadius.circular(22),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Row(
                   children: [
@@ -236,7 +235,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                         children: [
                           Text(
                             'Main Bareng Komunitas',
-                            style: TextStyle(fontFamily: 'Display', 
+                            style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                               color: Colors.white,
                               fontSize: 19.55,
                               fontWeight: FontWeight.w800,
@@ -306,7 +305,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                 children: [
                   const Text(
                     'Match Terbuka Tersedia',
-                    style: TextStyle(fontFamily: 'Display', fontSize: 20.7, fontWeight: FontWeight.w800),
+                    style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
                   ),
                   Text(
                     '${list.length} match aktif',
@@ -322,7 +321,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                   padding: const EdgeInsets.all(28),
                   decoration: BoxDecoration(
                     color: AP.surface,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: AP.line),
                   ),
                   child: Column(
@@ -376,7 +375,7 @@ class _MatchCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: AP.surface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: joined ? AP.blue : AP.line,
           width: joined ? 1.5 : 1,
@@ -551,7 +550,7 @@ c.image, fallbackUrl: c.imageUrl,
                       children: [
                         Text(
                           'Rp${match.pricePerPlayer}k',
-                          style:  TextStyle(fontFamily: 'Display', 
+                          style:  TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                             fontSize: 18.4,
                             fontWeight: FontWeight.w800,
                             color: AP.blue,
@@ -592,9 +591,7 @@ c.image, fallbackUrl: c.imageUrl,
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AP.blue,
                               side:  BorderSide(color: AP.blue),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
+                              shape: ChamferBorder(br: 10, tl: 10),
                             ),
                           )
                         : ElevatedButton(
@@ -619,9 +616,7 @@ c.image, fallbackUrl: c.imageUrl,
                               foregroundColor: AP.onLime,
                               disabledBackgroundColor: AP.line,
                               elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
+                              shape: ChamferBorder(br: 10, tl: 10),
                             ),
                             child: Text(
                               isFull ? 'Slot Penuh' : 'Gabung Slot Mabar',

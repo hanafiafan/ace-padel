@@ -1,3 +1,4 @@
+import '../core/widgets/ap_shape.dart';
 import 'package:flutter/material.dart';
 import 'settings_screen.dart';
 import '../core/widgets/ap_banners.dart';
@@ -53,7 +54,7 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: 18),
               const Text(
                 'Ubah Data Profil',
-                style: TextStyle(fontFamily: 'Display', fontSize: 20.7, fontWeight: FontWeight.w800),
+                style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 16),
               TextField(
@@ -138,9 +139,7 @@ class ProfileScreen extends StatelessWidget {
                     backgroundColor: AP.lime,
                     foregroundColor: AP.onLime,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
+                    shape: ChamferBorder(br: 10, tl: 10),
                   ),
                   child: const Text('Simpan Perubahan',
                       style: TextStyle(fontWeight: FontWeight.w800)),
@@ -158,10 +157,10 @@ class ProfileScreen extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AP.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: const Text(
           'Keluar dari Akun?',
-          style: TextStyle(fontFamily: 'Display', fontWeight: FontWeight.w800, fontSize: 20.7),
+          style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontWeight: FontWeight.w800, fontSize: 20.7),
         ),
         content:  Text(
           'Apakah Anda yakin ingin keluar dari sesi aplikasi Ace Padel?',
@@ -187,9 +186,7 @@ class ProfileScreen extends StatelessWidget {
               backgroundColor: Colors.red.shade600,
               foregroundColor: Colors.white,
               elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              shape: ChamferBorder(br: 10, tl: 10),
             ),
             child: const Text('Ya, Keluar',
                 style: TextStyle(fontWeight: FontWeight.w700)),
@@ -207,7 +204,7 @@ class ProfileScreen extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
         children: [
           const Text('Profil Saya',
-              style: TextStyle(fontFamily: 'Display', fontSize: 24.64, fontWeight: FontWeight.w800)).reveal(),
+              style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 24.64, fontWeight: FontWeight.w800)).reveal(),
           const SizedBox(height: 16),
 
           // User Card
@@ -216,7 +213,7 @@ class ProfileScreen extends StatelessWidget {
             builder: (context, _) {
               final user = UserStore.instance.profile;
               return ClipRRect(
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(14),
                 child: Stack(children: [
                   const Positioned.fill(
                     child: APPhoto(asset: 'assets/images/court_nine_monas.jpg', scrim: .82),
@@ -238,7 +235,7 @@ class ProfileScreen extends StatelessWidget {
                         children: [
                           Text(
                             user.name,
-                            style: const TextStyle(fontFamily: 'Display', 
+                            style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                               color: Colors.white,
                               fontSize: 22.4,
                               fontWeight: FontWeight.w800,
@@ -291,7 +288,7 @@ class ProfileScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: AP.surface,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(14),
               border: Border.all(color: AP.line),
               boxShadow: APShadows.subtle,
             ),
@@ -382,7 +379,7 @@ class ProfileScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('Pencapaian',
-                  style: TextStyle(fontFamily: 'Display', fontSize: 20.7, fontWeight: FontWeight.w800)),
+                  style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800)),
               GestureDetector(
                 onTap: () => Navigator.push(
                   context,
@@ -501,7 +498,7 @@ class ProfileScreen extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
                     color: AP.blue.withValues(alpha: 0.2),
@@ -584,9 +581,7 @@ class ProfileScreen extends StatelessWidget {
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 14, vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: ChamferBorder(br: 10, tl: 10),
                     ),
                     child: const Text(
                       'Buka',
@@ -620,7 +615,7 @@ class ProfileScreen extends StatelessWidget {
                 child: Text(
                   value,
                   key: ValueKey(value),
-                  style:  TextStyle(fontFamily: 'Display', 
+                  style:  TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                       fontSize: 22.4,
                       fontWeight: FontWeight.w800,
                       color: AP.blue),

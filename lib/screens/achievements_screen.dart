@@ -1,3 +1,4 @@
+import '../core/widgets/ap_shape.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
@@ -55,7 +56,7 @@ void showAchievementDetailModal(BuildContext context, Achievement a) {
           const SizedBox(height: 16),
           Text(
             a.title,
-            style:  TextStyle(fontFamily: 'Display', 
+            style:  TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
               fontSize: 22.4,
               fontWeight: FontWeight.w800,
               color: AP.ink,
@@ -140,9 +141,7 @@ void showAchievementDetailModal(BuildContext context, Achievement a) {
               style: ElevatedButton.styleFrom(
                 backgroundColor: on ? AP.lime : AP.blue,
                 foregroundColor: on ? AP.onLime : Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
+                shape: ChamferBorder(br: 10, tl: 10),
                 elevation: 0,
               ),
               child: Text(
@@ -234,7 +233,7 @@ class AchievementsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               gradient:  LinearGradient(colors: [AP.blueDark, AP.blue]),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
               children: [
@@ -245,7 +244,7 @@ class AchievementsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('$unlocked dari ${achievements.length} terbuka',
-                          style: const TextStyle(fontFamily: 'Display', 
+                          style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                               color: Colors.white,
                               fontSize: 20.7,
                               fontWeight: FontWeight.w800)),

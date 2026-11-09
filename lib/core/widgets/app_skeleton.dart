@@ -36,7 +36,7 @@ class _AppSkeletonListState extends State<AppSkeletonList> with SingleTickerProv
             height: widget.itemHeight,
             decoration: BoxDecoration(
               color: Color.lerp(AP.surface, AP.line, reduce ? .5 : .25 + .5 * _c.value),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(14),
               border: Border.all(color: AP.line),
             ),
           ),

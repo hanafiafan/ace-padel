@@ -1,3 +1,4 @@
+import '../core/widgets/ap_shape.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
@@ -68,7 +69,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       children: [
                          Text(
                           'Leaderboard',
-                          style: TextStyle(fontFamily: 'Display', 
+                          style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                             fontSize: 24.64,
                             fontWeight: FontWeight.w800,
                             color: AP.ink,
@@ -97,9 +98,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: ChamferBorder(br: 10, tl: 10),
                     ),
                   ),
                 ],
@@ -259,7 +258,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
       decoration: BoxDecoration(
         color: AP.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AP.line),
       ),
       child: Column(
@@ -275,7 +274,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
           const SizedBox(height: 16),
            Text(
             'Belum Ada Teman di Leaderboard',
-            style: TextStyle(fontFamily: 'Display', 
+            style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
               fontWeight: FontWeight.w800,
               fontSize: 19.55,
               color: AP.ink,
@@ -301,9 +300,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               foregroundColor: Colors.white,
               elevation: 0,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
+              shape: ChamferBorder(br: 10, tl: 10),
             ),
           ),
         ],
@@ -350,9 +347,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               foregroundColor: AP.onLime,
               backgroundColor: AP.lime,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+              shape: ChamferBorder(br: 10, tl: 10),
             ),
             child: const Text(
               '+ Teman',
@@ -442,7 +437,7 @@ class _AddFriendsModalState extends State<_AddFriendsModal> {
             children: [
                Text(
                 'Tambah Teman Pemain',
-                style: TextStyle(fontFamily: 'Display', 
+                style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                   fontWeight: FontWeight.w800,
                   fontSize: 20.7,
                   color: AP.ink,
@@ -584,9 +579,7 @@ class _AddFriendsModalState extends State<_AddFriendsModal> {
                               elevation: 0,
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 6),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                              shape: ChamferBorder(br: 10, tl: 10),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -727,7 +720,7 @@ class _PodiumItem extends StatelessWidget {
           child: Column(
             children: [
               Text('$rank',
-                  style: TextStyle(fontFamily: 'Display', 
+                  style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                       color: medal, fontSize: 26.88, fontWeight: FontWeight.w800)),
               const SizedBox(height: 4),
               AnimatedSwitcher(
@@ -766,14 +759,14 @@ class _MyRankCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient:  LinearGradient(colors: [AP.blueDark, AP.blue]),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
         children: [
           SizedBox(
             width: 32,
             child: Text('#$rank',
-                style: const TextStyle(fontFamily: 'Display', 
+                style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                     color: AP.lime, fontWeight: FontWeight.w800, fontSize: 18.4)),
           ),
           const SizedBox(width: 6),
@@ -791,7 +784,7 @@ class _MyRankCard extends StatelessWidget {
                 Row(
                   children: [
                     const Text('Kamu',
-                        style: TextStyle(fontFamily: 'Display', 
+                        style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                             color: Colors.white,
                             fontWeight: FontWeight.w800,
                             fontSize: 18.4)),
@@ -827,7 +820,7 @@ class _MyRankCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text('${player.points}',
-                  style: const TextStyle(fontFamily: 'Display', 
+                  style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                       color: AP.lime,
                       fontWeight: FontWeight.w800,
                       fontSize: 20.7)),

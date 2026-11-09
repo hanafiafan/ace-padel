@@ -159,6 +159,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _section(String t) => Padding(
         padding: const EdgeInsets.fromLTRB(4, 22, 4, 10),
-        child: Text(t, style: const TextStyle(fontFamily: 'Display', fontSize: 20, fontWeight: FontWeight.w800)),
+        child: Text(t, style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20, fontWeight: FontWeight.w800)),
       );
 }

@@ -1,3 +1,4 @@
+import '../core/widgets/ap_shape.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
@@ -102,10 +103,10 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDlgState) => AlertDialog(
           backgroundColor: AP.surface,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           title: Text(
             'Tutup Slot $slot?',
-            style: const TextStyle(fontFamily: 'Display', fontWeight: FontWeight.w800, fontSize: 20.7),
+            style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontWeight: FontWeight.w800, fontSize: 20.7),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -177,9 +178,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange.shade800,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                shape: ChamferBorder(br: 10, tl: 10),
               ),
               child: const Text('Tutup Slot',
                   style: TextStyle(fontWeight: FontWeight.w700)),
@@ -206,9 +205,9 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AP.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: Text('Booking Walk-in $slot',
-            style: const TextStyle(fontFamily: 'Display', fontWeight: FontWeight.w800, fontSize: 20.7)),
+            style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontWeight: FontWeight.w800, fontSize: 20.7)),
         content: TextField(
           controller: ctrl,
           decoration: InputDecoration(
@@ -256,7 +255,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
           children: [
             const Text(
               'Portal Pengelola',
-              style: TextStyle(fontFamily: 'Display', height: 1.1,
+              style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, height: 1.1,
                 color: Colors.white,
                 fontSize: 19.55,
                 fontWeight: FontWeight.w800,
@@ -291,9 +290,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
               style: TextButton.styleFrom(
                 backgroundColor: Colors.white.withValues(alpha: 0.12),
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                shape: ChamferBorder(br: 10, tl: 10),
               ),
             ),
           ),
@@ -376,7 +373,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: AP.surface,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(color: AP.line),
             boxShadow: [
               BoxShadow(
@@ -402,7 +399,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                   const SizedBox(width: 10),
                    Text(
                     'Pemindai Tiket Masuk',
-                    style: TextStyle(fontFamily: 'Display', 
+                    style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                       fontSize: 18.4,
                       fontWeight: FontWeight.w800,
                       color: AP.ink,
@@ -517,9 +514,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 18, vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+                      shape: ChamferBorder(br: 10, tl: 10),
                     ),
                     child: _isVerifying
                         ? const SizedBox(
@@ -635,7 +630,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AP.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: statusColor.withValues(alpha: 0.5), width: 1.5),
         boxShadow: [
           BoxShadow(
@@ -689,9 +684,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                     backgroundColor: const Color(0xFF16A34A),
                     foregroundColor: Colors.white,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
+                    shape: ChamferBorder(br: 10, tl: 10),
                   ),
                 ),
               ),
@@ -734,7 +727,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AP.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AP.line),
       ),
       child: Column(
@@ -1020,9 +1013,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                 foregroundColor: Colors.orange.shade800,
                 backgroundColor: Colors.orange.shade50,
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                shape: ChamferBorder(br: 10, tl: 10),
               ),
             )
           else if (isMaintenance)
@@ -1033,9 +1024,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                 foregroundColor: Colors.white,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                shape: ChamferBorder(br: 10, tl: 10),
               ),
               child: const Text('Buka Slot',
                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
@@ -1052,9 +1041,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                 foregroundColor: Colors.white,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                shape: ChamferBorder(br: 10, tl: 10),
               ),
               child: const Text('Check-in',
                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
@@ -1151,7 +1138,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(14),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1169,7 +1156,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
               const SizedBox(height: 8),
               Text(
                 'Rp$revenue.000',
-                style: const TextStyle(fontFamily: 'Display', 
+                style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                   color: AP.lime,
                   fontSize: 31.36,
                   fontWeight: FontWeight.w800,
@@ -1216,7 +1203,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             color: AP.surface,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(color: AP.line),
           ),
           child: Column(
@@ -1306,7 +1293,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
           const SizedBox(height: 10),
           Text(
             value,
-            style: TextStyle(fontFamily: 'Display', 
+            style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
               fontSize: 20.7,
               fontWeight: FontWeight.w800,
               color: color,

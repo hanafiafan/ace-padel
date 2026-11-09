@@ -129,7 +129,7 @@ class _APBannerCarouselState extends State<APBannerCarousel> {
                   b.onTap();
                 },
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(14),
                   child: APPhoto(
                     asset: b.asset,
                     alignment: b.alignment,
@@ -239,7 +239,7 @@ class APPhotoHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(14),
         child: SizedBox(
           height: 208,
           child: APPhoto(

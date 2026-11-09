@@ -28,7 +28,7 @@ class AppEmptyState extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(14),
               child: SizedBox(
                 width: 220,
                 height: 130,
@@ -43,7 +43,7 @@ class AppEmptyState extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style:  TextStyle(fontFamily: 'Display', 
+              style:  TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                 fontSize: 20.7,
                 fontWeight: FontWeight.w800,
                 color: APColors.ink,

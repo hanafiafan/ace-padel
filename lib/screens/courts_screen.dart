@@ -1,3 +1,4 @@
+import '../core/widgets/ap_shape.dart';
 import '../core/widgets/app_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -141,7 +142,7 @@ class _CourtsScreenState extends State<CourtsScreen> {
                 children: [
                   const Text(
                     'Filter & Urutkan',
-                    style: TextStyle(fontFamily: 'Display', fontSize: 20.7, fontWeight: FontWeight.w800),
+                    style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
                   ),
                   TextButton(
                     onPressed: () {
@@ -232,8 +233,7 @@ class _CourtsScreenState extends State<CourtsScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AP.blue,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
+                    shape: ChamferBorder(br: 10, tl: 10),
                   ),
                   child: const Text('Terapkan Filter',
                       style:
@@ -266,7 +266,7 @@ class _CourtsScreenState extends State<CourtsScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Cari Lapangan',
-                      style: TextStyle(fontFamily: 'Display', fontSize: 24.64, fontWeight: FontWeight.w800)),
+                      style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 24.64, fontWeight: FontWeight.w800)),
                   Row(
                     children: [
                       IconButton(
@@ -338,7 +338,7 @@ class _CourtsScreenState extends State<CourtsScreen> {
                       margin: const EdgeInsets.only(right: 8),
                       decoration: BoxDecoration(
                         color: _city != null ? AP.blue : AP.blueDark,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       child: Row(
                         children: [
@@ -447,7 +447,7 @@ class _CourtsScreenState extends State<CourtsScreen> {
              Icon(LucideIcons.mapPin, size: 56, color: AP.slate),
             const SizedBox(height: 12),
             const Text('Tidak ada lapangan',
-                style: TextStyle(fontFamily: 'Display', fontWeight: FontWeight.w800, fontSize: 18.4)),
+                style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontWeight: FontWeight.w800, fontSize: 18.4)),
             const SizedBox(height: 4),
              Text('Coba kota atau kriteria filter lain.',
                 style: TextStyle(color: AP.slate)),
@@ -466,9 +466,7 @@ class _CourtsScreenState extends State<CourtsScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AP.blue,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
+                shape: ChamferBorder(br: 10, tl: 10),
               ),
               child: const Text('Reset Filter',
                   style: TextStyle(fontWeight: FontWeight.w700)),
@@ -487,7 +485,7 @@ class _CourtsScreenState extends State<CourtsScreen> {
         margin: const EdgeInsets.only(right: 8),
         decoration: BoxDecoration(
           color: selected ? AP.blue : AP.surface,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(color: selected ? AP.blue : AP.line),
           boxShadow: selected
               ? [
@@ -521,7 +519,7 @@ class _CourtsScreenState extends State<CourtsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
           color: selected ? AP.lime : AP.surface,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(color: selected ? AP.lime : AP.line),
           boxShadow: selected
               ? [
@@ -586,7 +584,7 @@ class _CityPickerState extends State<_CityPicker> {
           ),
           const SizedBox(height: 16),
           const Text('Pilih Kota / Wilayah',
-              style: TextStyle(fontFamily: 'Display', fontSize: 20.7, fontWeight: FontWeight.w800)),
+              style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           TextField(
             controller: _controller,

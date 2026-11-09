@@ -1,3 +1,4 @@
+import '../core/widgets/ap_shape.dart';
 import '../core/widgets/app_skeleton.dart';
 import '../core/widgets/ap_banners.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +49,7 @@ class _BookingsScreenState extends State<BookingsScreen>
           children: [
             const Text(
               'Booking Saya',
-              style: TextStyle(fontFamily: 'Display', fontSize: 24.64, fontWeight: FontWeight.w800),
+              style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 24.64, fontWeight: FontWeight.w800),
             ).reveal(),
             const SizedBox(height: 14),
 
@@ -185,10 +186,10 @@ class _BookingCard extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AP.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: const Text(
           'Batalkan Reservasi?',
-          style: TextStyle(fontFamily: 'Display', fontWeight: FontWeight.w800, fontSize: 20.7),
+          style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontWeight: FontWeight.w800, fontSize: 20.7),
         ),
         content: Text(
           'Apakah Anda yakin ingin membatalkan jadwal bermain di ${booking.court.name} pada ${DateFormat('d MMM yyyy').format(booking.date)} pukul ${booking.slot} WIB?\n\nSlot jam ini akan segera dibuka kembali untuk pemain lain.',
@@ -214,9 +215,7 @@ class _BookingCard extends StatelessWidget {
               backgroundColor: Colors.red.shade600,
               foregroundColor: Colors.white,
               elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              shape: ChamferBorder(br: 10, tl: 10),
             ),
             child: const Text('Ya, Batalkan',
                 style: TextStyle(fontWeight: FontWeight.w700)),
@@ -246,7 +245,7 @@ class _BookingCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AP.surface,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(color: AP.line),
           boxShadow: [
             BoxShadow(
@@ -334,7 +333,7 @@ c.image, fallbackUrl: c.imageUrl,
                     children: [
                       Text(
                         c.name,
-                        style: const TextStyle(fontFamily: 'Display', 
+                        style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                             fontSize: 18.4, fontWeight: FontWeight.w800),
                       ),
                       const SizedBox(height: 2),
@@ -463,9 +462,9 @@ Future<void> showPendingPaymentDialog(BuildContext context, Booking b) async {
     context: context,
     builder: (ctx) => AlertDialog(
       backgroundColor: AP.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       title: Text(b.paymentMethod,
-          style: const TextStyle(fontFamily: 'Display', fontWeight: FontWeight.w800, fontSize: 20.7)),
+          style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontWeight: FontWeight.w800, fontSize: 20.7)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

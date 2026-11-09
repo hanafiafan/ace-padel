@@ -1,3 +1,4 @@
+import 'core/widgets/ap_shape.dart';
 import 'core/widgets/ap_banners.dart';
 import 'core/utils/ui.dart';
 import 'dart:ui';
@@ -27,11 +28,11 @@ class FeaturedCard extends StatelessWidget {
         width: 275,
         margin: const EdgeInsets.only(right: 16),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(14),
           boxShadow: APShadows.card,
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(14),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -135,7 +136,7 @@ court.image, fallbackUrl: court.imageUrl,
                     const Spacer(),
                     Text(
                       court.name,
-                      style: const TextStyle(fontFamily: 'Display', 
+                      style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                         color: Colors.white,
                         fontSize: 22.4,
                         fontWeight: FontWeight.w800,
@@ -182,7 +183,7 @@ court.image, fallbackUrl: court.imageUrl,
                             children: [
                               Text(
                                 APFormatters.idrCompact(court.pricePerHour),
-                                style: const TextStyle(fontFamily: 'Display', 
+                                style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                                   color: Colors.white,
                                   fontSize: 20.7,
                                   fontWeight: FontWeight.w800,
@@ -232,14 +233,14 @@ court.image, fallbackUrl: court.imageUrl,
 
   Widget _glassPill(String text) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(14),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
             color: Colors.black.withValues(alpha: 0.35),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: Colors.white.withValues(alpha: 0.25),
               width: 0.8,
@@ -290,11 +291,10 @@ class CourtRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: AP.surface,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: APColors.line),
-        boxShadow: APShadows.subtle,
+        shape: ChamferBorder(br: 18, side: BorderSide(color: APColors.line)),
+        shadows: APShadows.subtle,
       ),
       child: Material(
         color: Colors.transparent,
@@ -303,7 +303,7 @@ class CourtRow extends StatelessWidget {
             APHaptics.light();
             onTap();
           },
-          borderRadius: BorderRadius.circular(22),
+          customBorder: const ChamferBorder(br: 18),
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
@@ -335,7 +335,7 @@ court.image, fallbackUrl: court.imageUrl,
                           Expanded(
                             child: Text(
                               court.name,
-                              style:  TextStyle(fontFamily: 'Display', 
+                              style:  TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                                 fontSize: 18.4,
                                 fontWeight: FontWeight.w800,
                                 color: APColors.ink,
@@ -532,7 +532,7 @@ class SectionHeader extends StatelessWidget {
               title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style:  TextStyle(fontFamily: 'Display', 
+              style:  TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                 fontSize: 20.7,
                 fontWeight: FontWeight.w800,
                 color: APColors.ink,

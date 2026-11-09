@@ -89,7 +89,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
               children: [
@@ -112,7 +112,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                     children: [
                       Text(
                         'Pembayaran Aman & Transparan',
-                        style: TextStyle(fontFamily: 'Display', 
+                        style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                           color: Colors.white,
                           fontSize: 18.4,
                           fontWeight: FontWeight.w800,
@@ -134,7 +134,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
 
           const Text(
             'Metode Pembayaran Tersedia',
-            style: TextStyle(fontFamily: 'Display', fontSize: 20.7, fontWeight: FontWeight.w800),
+            style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 12),
 
@@ -155,7 +155,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AP.surface,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: isSelected ? AP.blue : AP.line,
                     width: isSelected ? 2 : 1,
@@ -245,7 +245,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: AP.surface,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(14),
               border: Border.all(color: AP.line),
             ),
             child:  Column(

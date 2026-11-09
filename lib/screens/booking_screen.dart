@@ -1,3 +1,4 @@
+import '../core/widgets/ap_shape.dart';
 import '../core/widgets/ap_banners.dart';
 import 'package:flutter/material.dart';
 import '../core/widgets/ap_decor.dart';
@@ -104,7 +105,7 @@ class _BookingScreenState extends State<BookingScreen> {
               const SizedBox(height: 18),
               Text(
                 'Beri Ulasan untuk ${widget.court.name}',
-                style: const TextStyle(fontFamily: 'Display', fontSize: 20.7, fontWeight: FontWeight.w800),
+                style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 14),
               Row(
@@ -156,9 +157,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AP.lime,
                     foregroundColor: AP.onLime,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                    shape: ChamferBorder(br: 10, tl: 10),
                   ),
                   child: const Text('Kirim Ulasan',
                       style:
@@ -283,7 +282,7 @@ c.image, fallbackUrl: c.imageUrl,
                           _tag(c.indoor ? 'Indoor Court' : 'Outdoor Court'),
                           const SizedBox(height: 10),
                           Text(c.name,
-                              style: const TextStyle(fontFamily: 'Display', 
+                              style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                                   color: Colors.white,
                                   fontSize: 29.12,
                                   fontWeight: FontWeight.w800)),
@@ -327,7 +326,7 @@ c.image, fallbackUrl: c.imageUrl,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: AP.surface,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: AP.line),
                     ),
                     child: Column(
@@ -335,7 +334,7 @@ c.image, fallbackUrl: c.imageUrl,
                       children: [
                         const Text(
                           'Tentang Venue',
-                          style: TextStyle(fontFamily: 'Display', 
+                          style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                               fontSize: 18.4, fontWeight: FontWeight.w800),
                         ),
                         const SizedBox(height: 6),
@@ -393,7 +392,7 @@ c.image, fallbackUrl: c.imageUrl,
 
                   const Text('Pilih tanggal',
                       style:
-                          TextStyle(fontFamily: 'Display', fontSize: 20.7, fontWeight: FontWeight.w800)),
+                          TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800)),
                   const SizedBox(height: 12),
                   SizedBox(
                     height: 76,
@@ -409,7 +408,7 @@ c.image, fallbackUrl: c.imageUrl,
 
                   const Text('Pilih Durasi Main',
                       style:
-                          TextStyle(fontFamily: 'Display', fontSize: 20.7, fontWeight: FontWeight.w800)),
+                          TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800)),
                   const SizedBox(height: 12),
                   _durationPicker(),
 
@@ -419,7 +418,7 @@ c.image, fallbackUrl: c.imageUrl,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text('Pilih Jam Main',
-                          style: TextStyle(fontFamily: 'Display', 
+                          style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                               fontSize: 20.7, fontWeight: FontWeight.w800)),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -507,7 +506,7 @@ c.image, fallbackUrl: c.imageUrl,
                       Row(
                         children: [
                           const Text('Ulasan Pemain',
-                              style: TextStyle(fontFamily: 'Display', 
+                              style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                                   fontSize: 20.7, fontWeight: FontWeight.w800)),
                           const SizedBox(width: 8),
                           const Icon(LucideIcons.star,
@@ -628,7 +627,7 @@ c.image, fallbackUrl: c.imageUrl,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: .2),
-            borderRadius: BorderRadius.circular(20)),
+            borderRadius: BorderRadius.circular(14)),
         child: Text(t,
             style: const TextStyle(
                 color: Colors.white, fontWeight: FontWeight.w600)),
@@ -675,7 +674,7 @@ c.image, fallbackUrl: c.imageUrl,
                     fontSize: 12)),
             const SizedBox(height: 4),
             Text('${d.day}',
-                style: TextStyle(fontFamily: 'Display', 
+                style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                     color: selected ? Colors.white : AP.ink,
                     fontSize: 20.7,
                     fontWeight: FontWeight.w800)),
@@ -876,7 +875,7 @@ c.image, fallbackUrl: c.imageUrl,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AP.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AP.line),
         boxShadow: APShadows.subtle,
       ),
@@ -929,7 +928,7 @@ c.image, fallbackUrl: c.imageUrl,
           const SizedBox(height: 12),
           const Text(
             'Visualisasi Spesifikasi Lapangan',
-            style: TextStyle(fontFamily: 'Display', fontSize: 18.4, fontWeight: FontWeight.w800),
+            style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 18.4, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 12),
 
@@ -1208,7 +1207,7 @@ c.image, fallbackUrl: c.imageUrl,
               Text('Total ($_selectedDurationMinutes Menit)',
                   style:  TextStyle(color: AP.slate, fontSize: 12)),
               Text('Rp${_calculatedPrice}k',
-                  style: const TextStyle(fontFamily: 'Display', 
+                  style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                       fontSize: 22.4, fontWeight: FontWeight.w800)),
             ],
           ),
@@ -1235,8 +1234,7 @@ c.image, fallbackUrl: c.imageUrl,
                           foregroundColor: AP.onLime,
                           elevation: 0,
                           minimumSize: const Size.fromHeight(54),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16)),
+                          shape: ChamferBorder(br: 10, tl: 10),
                         ),
                       )
                     : ElevatedButton.icon(
@@ -1251,8 +1249,7 @@ c.image, fallbackUrl: c.imageUrl,
                           disabledForegroundColor: AP.slate,
                           elevation: 0,
                           minimumSize: const Size.fromHeight(54),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16)),
+                          shape: ChamferBorder(br: 10, tl: 10),
                         ),
                       ),
               ),

@@ -13,32 +13,32 @@ class APColors {
   static Color _p(Color light, Color dark) => APTheme.isDark ? dark : light;
 
   // Brand
-  static Color get blue => _p(const Color(0xFF1F3BFF), const Color(0xFF5B78FF));
-  static const blueDark = Color(0xFF070A16); // header/gradient gelap (konstan)
+  static Color get blue => _p(const Color(0xFF2334DB), const Color(0xFF4C5CFF));
+  static const blueDark = Color(0xFF0A0F36); // header/gradient gelap (konstan)
   static const blueLight = Color(0xFF4D6BFF);
   static Color get blueSurface => _p(const Color(0xFFE9EDFF), const Color(0xFF1B2552));
 
-  static const lime = Color(0xFFB8FF1F);
-  static const limeDark = Color(0xFF8FD400);
-  static Color get limeLight => _p(const Color(0xFFEFFFC2), const Color(0xFF243307));
+  static const lime = Color(0xFFC7F23C);
+  static const limeDark = Color(0xFF9CC41A);
+  static Color get limeLight => _p(const Color(0xFFF3FCD0), const Color(0xFF263308));
   /// Teks/ikon di atas permukaan lime: selalu gelap.
-  static const onLime = Color(0xFF070A16);
+  static const onLime = Color(0xFF1A2300);
 
   // Neutrals & surfaces
-  static Color get ink => _p(const Color(0xFF070A16), const Color(0xFFF1F4FF));
+  static Color get ink => _p(const Color(0xFF12152B), const Color(0xFFEEF0FA));
   static Color get inkSecondary => _p(const Color(0xFF384061), const Color(0xFFC4CBE6));
-  static Color get slate => _p(const Color(0xFF6E789B), const Color(0xFF98A2C3));
-  static Color get cloud => _p(const Color(0xFFF3F6FC), const Color(0xFF090D1D));
-  static Color get surface => _p(Colors.white, const Color(0xFF131A33));
-  static Color get line => _p(const Color(0xFFE6E9F4), const Color(0xFF252E50));
+  static Color get slate => _p(const Color(0xFF5A6180), const Color(0xFF98A0C4));
+  static Color get cloud => _p(const Color(0xFFF2F4FB), const Color(0xFF070A16));
+  static Color get surface => _p(Colors.white, const Color(0xFF0E1226));
+  static Color get line => _p(const Color(0xFFE7EAF3), const Color(0xFF1E2548));
   static Color get lineDark => _p(const Color(0xFFD4D9EA), const Color(0xFF333E68));
 
   // Status
-  static const success = Color(0xFF10B981);
+  static const success = Color(0xFF12A150);
   static Color get successLight => _p(const Color(0xFFD1FAE5), const Color(0xFF0C3326));
-  static const warning = Color(0xFFF59E0B);
+  static const warning = Color(0xFFD98A00);
   static Color get warningLight => _p(const Color(0xFFFEF3C7), const Color(0xFF3A2C09));
-  static const danger = Color(0xFFEF4444);
+  static const danger = Color(0xFFD92D4A);
   static Color get dangerLight => _p(const Color(0xFFFEE2E2), const Color(0xFF3B1417));
   static const info = Color(0xFF3B82F6);
 }

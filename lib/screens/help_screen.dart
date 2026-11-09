@@ -1,3 +1,4 @@
+import '../core/widgets/ap_shape.dart';
 import 'package:flutter/material.dart';
 import '../core/utils/launch.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -55,14 +56,14 @@ class HelpScreen extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
                   'Butuh Bantuan Langsung?',
-                  style: TextStyle(fontFamily: 'Display', 
+                  style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                     color: Colors.white,
                     fontSize: 20.7,
                     fontWeight: FontWeight.w800,
@@ -84,9 +85,7 @@ class HelpScreen extends StatelessWidget {
                         backgroundColor: AP.lime,
                         foregroundColor: AP.onLime,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        shape: ChamferBorder(br: 10, tl: 10),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -99,9 +98,7 @@ class HelpScreen extends StatelessWidget {
                       ),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.white30),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        shape: ChamferBorder(br: 10, tl: 10),
                       ),
                     ),
                   ],
@@ -114,7 +111,7 @@ class HelpScreen extends StatelessWidget {
 
           const Text(
             'Pertanyaan Sering Diajukan (FAQ)',
-            style: TextStyle(fontFamily: 'Display', fontSize: 20.7, fontWeight: FontWeight.w800),
+            style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 14),
 
