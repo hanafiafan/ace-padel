@@ -111,7 +111,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Pembayaran Aman & Transparan',
+                        'PEMBAYARAN AMAN & TRANSPARAN',
                         style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                           color: Colors.white,
                           fontSize: 18.4,
@@ -133,7 +133,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
           const SizedBox(height: 24),
 
           const Text(
-            'Metode Pembayaran Tersedia',
+            'METODE PEMBAYARAN TERSEDIA',
             style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 12),

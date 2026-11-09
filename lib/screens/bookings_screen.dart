@@ -48,7 +48,7 @@ class _BookingsScreenState extends State<BookingsScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Booking Saya',
+              'BOOKING SAYA',
               style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 24.64, fontWeight: FontWeight.w800),
             ).reveal(),
             const SizedBox(height: 14),
@@ -188,7 +188,7 @@ class _BookingCard extends StatelessWidget {
         backgroundColor: AP.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: const Text(
-          'Batalkan Reservasi?',
+          'BATALKAN RESERVASI?',
           style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontWeight: FontWeight.w800, fontSize: 20.7),
         ),
         content: Text(

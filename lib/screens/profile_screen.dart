@@ -53,7 +53,7 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 18),
               const Text(
-                'Ubah Data Profil',
+                'UBAH DATA PROFIL',
                 style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 16),
@@ -159,7 +159,7 @@ class ProfileScreen extends StatelessWidget {
         backgroundColor: AP.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: const Text(
-          'Keluar dari Akun?',
+          'KELUAR DARI AKUN?',
           style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontWeight: FontWeight.w800, fontSize: 20.7),
         ),
         content:  Text(
@@ -203,7 +203,7 @@ class ProfileScreen extends StatelessWidget {
         child: APList(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
         children: [
-          const Text('Profil Saya',
+          const Text('PROFIL SAYA',
               style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 24.64, fontWeight: FontWeight.w800)).reveal(),
           const SizedBox(height: 16),
 
@@ -378,7 +378,7 @@ class ProfileScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Pencapaian',
+              const Text('PENCAPAIAN',
                   style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800)),
               GestureDetector(
                 onTap: () => Navigator.push(

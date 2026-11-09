@@ -527,9 +527,13 @@ class SectionHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          Container(
+            width: 6, height: 20, margin: const EdgeInsets.only(right: 10),
+            decoration: const ShapeDecoration(color: APColors.lime, shape: ChamferBorder(br: 4, tl: 4)),
+          ),
           Expanded(
             child: Text(
-              title,
+              title.toUpperCase(),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style:  TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 

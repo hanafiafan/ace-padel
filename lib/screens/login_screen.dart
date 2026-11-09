@@ -169,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Konfigurasi Google OAuth',
+                        'KONFIGURASI GOOGLE OAUTH',
                         style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                             fontSize: 19.55, fontWeight: FontWeight.w800),
                       ),
@@ -286,7 +286,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ).popIn(),
                       const SizedBox(height: 12),
-                      const Text('Ace Padel',
+                      const Text('ACE PADEL',
                           style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.8))
                           .reveal(1),
                       const SizedBox(height: 4),

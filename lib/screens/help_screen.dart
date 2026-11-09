@@ -62,7 +62,7 @@ class HelpScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Butuh Bantuan Langsung?',
+                  'BUTUH BANTUAN LANGSUNG?',
                   style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                     color: Colors.white,
                     fontSize: 20.7,
@@ -110,7 +110,7 @@ class HelpScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           const Text(
-            'Pertanyaan Sering Diajukan (FAQ)',
+            'PERTANYAAN SERING DIAJUKAN (FAQ)',
             style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 14),

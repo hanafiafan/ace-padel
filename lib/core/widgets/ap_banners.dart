@@ -1,3 +1,4 @@
+import 'ap_shape.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -211,10 +212,9 @@ class APQuickActions extends StatelessWidget {
                 Container(
                   width: 56,
                   height: 56,
-                  decoration: BoxDecoration(
+                  decoration: ShapeDecoration(
                     color: AP.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: APColors.line),
+                    shape: ChamferBorder(br: 12, side: BorderSide(color: APColors.line)),
                   ),
                   child: IconTheme(
                     data:  IconThemeData(color: APColors.ink, size: 24),

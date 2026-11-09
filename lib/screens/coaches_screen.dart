@@ -388,7 +388,7 @@ class _CoachesScreenState extends State<CoachesScreen> {
                 ),
                 const SizedBox(height: 12),
                 const Text(
-                  'Tingkatkan Level Permainan Anda',
+                  'TINGKATKAN LEVEL PERMAINAN ANDA',
                   style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                     color: Colors.white,
                     fontSize: 20.7,

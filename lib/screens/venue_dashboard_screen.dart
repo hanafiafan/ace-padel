@@ -254,7 +254,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Portal Pengelola',
+              'PORTAL PENGELOLA',
               style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, height: 1.1,
                 color: Colors.white,
                 fontSize: 19.55,
@@ -398,7 +398,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                   ),
                   const SizedBox(width: 10),
                    Text(
-                    'Pemindai Tiket Masuk',
+                    'PEMINDAI TIKET MASUK',
                     style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                       fontSize: 18.4,
                       fontWeight: FontWeight.w800,

@@ -141,7 +141,7 @@ class _CourtsScreenState extends State<CourtsScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Filter & Urutkan',
+                    'FILTER & URUTKAN',
                     style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
                   ),
                   TextButton(
@@ -265,7 +265,7 @@ class _CourtsScreenState extends State<CourtsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Cari Lapangan',
+                  const Text('CARI LAPANGAN',
                       style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 24.64, fontWeight: FontWeight.w800)),
                   Row(
                     children: [
@@ -336,9 +336,9 @@ class _CourtsScreenState extends State<CourtsScreen> {
                       padding:
                           const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
                       margin: const EdgeInsets.only(right: 8),
-                      decoration: BoxDecoration(
+                      decoration: ShapeDecoration(
                         color: _city != null ? AP.blue : AP.blueDark,
-                        borderRadius: BorderRadius.circular(14),
+                        shape: const ChamferBorder(br: 8, tl: 8),
                       ),
                       child: Row(
                         children: [
@@ -446,7 +446,7 @@ class _CourtsScreenState extends State<CourtsScreen> {
           children: [
              Icon(LucideIcons.mapPin, size: 56, color: AP.slate),
             const SizedBox(height: 12),
-            const Text('Tidak ada lapangan',
+            const Text('TIDAK ADA LAPANGAN',
                 style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontWeight: FontWeight.w800, fontSize: 18.4)),
             const SizedBox(height: 4),
              Text('Coba kota atau kriteria filter lain.',
@@ -483,19 +483,9 @@ class _CourtsScreenState extends State<CourtsScreen> {
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
         margin: const EdgeInsets.only(right: 8),
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: selected ? AP.blue : AP.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: selected ? AP.blue : AP.line),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: AP.blue.withValues(alpha: 0.25),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
+          shape: ChamferBorder(br: 8, tl: 8, side: BorderSide(color: selected ? AP.blue : AP.line)),
         ),
         child: Text(
           label,
@@ -583,7 +573,7 @@ class _CityPickerState extends State<_CityPicker> {
                 color: AP.line, borderRadius: BorderRadius.circular(2)),
           ),
           const SizedBox(height: 16),
-          const Text('Pilih Kota / Wilayah',
+          const Text('PILIH KOTA / WILAYAH',
               style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800)),
           const SizedBox(height: 12),
           TextField(

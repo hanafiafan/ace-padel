@@ -63,7 +63,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
               ),
               const SizedBox(height: 18),
               const Text(
-                'Buat Match Mabar Baru',
+                'BUAT MATCH MABAR BARU',
                 style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 16),
@@ -168,7 +168,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                     elevation: 0,
                     shape: ChamferBorder(br: 10, tl: 10),
                   ),
-                  child: const Text('Publikasikan Match',
+                  child: const Text('PUBLIKASIKAN MATCH',
                       style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontWeight: FontWeight.w800, fontSize: 18.4)),
                 ),
               ),
@@ -234,7 +234,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Main Bareng Komunitas',
+                            'MAIN BARENG KOMUNITAS',
                             style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                               color: Colors.white,
                               fontSize: 19.55,
@@ -304,7 +304,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Match Terbuka Tersedia',
+                    'MATCH TERBUKA TERSEDIA',
                     style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
                   ),
                   Text(

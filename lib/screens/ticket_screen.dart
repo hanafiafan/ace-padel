@@ -59,7 +59,7 @@ class TicketScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Simpan ke Kalender',
+                        'SIMPAN KE KALENDER',
                         style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                             fontSize: 20.7, fontWeight: FontWeight.w800),
                       ),

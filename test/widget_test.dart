@@ -45,7 +45,7 @@ void main() {
     }
     await tester.tap(find.text('Courts'));
     await tester.pumpAndSettle();
-    expect(find.text('Cari Lapangan'), findsOneWidget);
+    expect(find.text('CARI LAPANGAN'), findsOneWidget);
 
     // Guests must log in to see bookings
     await tester.tap(find.text('Bookings'));
@@ -54,7 +54,7 @@ void main() {
 
     await tester.tap(find.text('Profile'));
     await tester.pumpAndSettle();
-    expect(find.text('Profil Saya'), findsOneWidget);
+    expect(find.text('PROFIL SAYA'), findsOneWidget);
     expect(find.text('Masuk / Daftar'), findsOneWidget);
     // Owner portal is only offered to server-confirmed owners
     expect(find.text('Portal Mitra'), findsNothing);

@@ -197,7 +197,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
             ),
             const SizedBox(height: 18),
             const Text(
-              'Gunakan Voucher Promo',
+              'GUNAKAN VOUCHER PROMO',
               style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 14),
@@ -377,7 +377,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
             ),
             const SizedBox(height: 18),
             const Text(
-              'Pilih Metode Pembayaran',
+              'PILIH METODE PEMBAYARAN',
               style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 14),
@@ -1224,7 +1224,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
         ),
         const SizedBox(height: 18),
         const Text(
-          'Booking Berhasil!',
+          'BOOKING BERHASIL!',
           textAlign: TextAlign.center,
           style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
             fontSize: 26.88,

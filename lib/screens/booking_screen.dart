@@ -333,7 +333,7 @@ c.image, fallbackUrl: c.imageUrl,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Tentang Venue',
+                          'TENTANG VENUE',
                           style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                               fontSize: 18.4, fontWeight: FontWeight.w800),
                         ),
@@ -390,7 +390,7 @@ c.image, fallbackUrl: c.imageUrl,
 
                   const SizedBox(height: 24),
 
-                  const Text('Pilih tanggal',
+                  const Text('PILIH TANGGAL',
                       style:
                           TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800)),
                   const SizedBox(height: 12),
@@ -406,7 +406,7 @@ c.image, fallbackUrl: c.imageUrl,
 
                   const SizedBox(height: 24),
 
-                  const Text('Pilih Durasi Main',
+                  const Text('PILIH DURASI MAIN',
                       style:
                           TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 20.7, fontWeight: FontWeight.w800)),
                   const SizedBox(height: 12),
@@ -417,7 +417,7 @@ c.image, fallbackUrl: c.imageUrl,
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Pilih Jam Main',
+                      const Text('PILIH JAM MAIN',
                           style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                               fontSize: 20.7, fontWeight: FontWeight.w800)),
                       Container(
@@ -505,7 +505,7 @@ c.image, fallbackUrl: c.imageUrl,
                     children: [
                       Row(
                         children: [
-                          const Text('Ulasan Pemain',
+                          const Text('ULASAN PEMAIN',
                               style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                                   fontSize: 20.7, fontWeight: FontWeight.w800)),
                           const SizedBox(width: 8),
@@ -927,7 +927,7 @@ c.image, fallbackUrl: c.imageUrl,
           ),
           const SizedBox(height: 12),
           const Text(
-            'Visualisasi Spesifikasi Lapangan',
+            'VISUALISASI SPESIFIKASI LAPANGAN',
             style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 18.4, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 12),

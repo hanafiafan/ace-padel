@@ -50,7 +50,7 @@ class FavoritesScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                      Text(
-                      'Belum ada venue favorit',
+                      'BELUM ADA VENUE FAVORIT',
                       style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                         fontSize: 20.7,
                         fontWeight: FontWeight.w800,

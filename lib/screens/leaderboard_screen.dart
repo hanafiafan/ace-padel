@@ -68,7 +68,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                          Text(
-                          'Leaderboard',
+                          'LEADERBOARD',
                           style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                             fontSize: 24.64,
                             fontWeight: FontWeight.w800,
@@ -273,7 +273,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
           ),
           const SizedBox(height: 16),
            Text(
-            'Belum Ada Teman di Leaderboard',
+            'BELUM ADA TEMAN DI LEADERBOARD',
             style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
               fontWeight: FontWeight.w800,
               fontSize: 19.55,
@@ -436,7 +436,7 @@ class _AddFriendsModalState extends State<_AddFriendsModal> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
                Text(
-                'Tambah Teman Pemain',
+                'TAMBAH TEMAN PEMAIN',
                 style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                   fontWeight: FontWeight.w800,
                   fontSize: 20.7,
@@ -783,7 +783,7 @@ class _MyRankCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Text('Kamu',
+                    const Text('KAMU',
                         style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                             color: Colors.white,
                             fontWeight: FontWeight.w800,
