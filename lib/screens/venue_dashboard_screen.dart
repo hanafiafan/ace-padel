@@ -981,7 +981,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                         ),
-                        maxLines: 1,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
