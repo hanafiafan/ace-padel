@@ -1259,7 +1259,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
           ),
           child: Row(
             children: [
-               Icon(LucideIcons.headset, color: AP.onLime, size: 28),
+               Icon(LucideIcons.headset, color: AP.ink, size: 28),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -1426,7 +1426,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
         const SizedBox(width: 8),
         _miniStat('Check-in', '$checkedIn', const Color(0xFF16A34A)),
         const SizedBox(width: 8),
-        _miniStat('Pendapatan', 'Rp$revenue.000', AP.blueDark),
+        _miniStat('Pendapatan', 'Rp$revenue.000', AP.ink),
       ],
     );
   }

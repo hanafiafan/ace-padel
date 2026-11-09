@@ -321,7 +321,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       ),
       child: Row(
         children: [
-           Icon(LucideIcons.trophy, color: AP.onLime, size: 28),
+           Icon(LucideIcons.trophy, color: AP.ink, size: 28),
           const SizedBox(width: 12),
            Expanded(
             child: Column(
@@ -347,7 +347,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
           TextButton(
             onPressed: () => _showAddFriendsSheet(context),
             style: TextButton.styleFrom(
-              foregroundColor: AP.ink,
+              foregroundColor: AP.onLime,
               backgroundColor: AP.lime,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               shape: RoundedRectangleBorder(
@@ -740,7 +740,7 @@ class _PodiumItem extends StatelessWidget {
                 ),
               ),
               const Text('pts',
-                  style: TextStyle(color: Colors.white54, fontSize: 11)),
+                  style: TextStyle(color: Colors.white70, fontSize: 11)),
             ],
           ),
         ),
@@ -832,7 +832,7 @@ class _MyRankCard extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                       fontSize: 20.7)),
               const Text('poin',
-                  style: TextStyle(color: Colors.white54, fontSize: 11)),
+                  style: TextStyle(color: Colors.white70, fontSize: 11)),
             ],
           ),
         ],
