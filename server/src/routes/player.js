@@ -3,7 +3,11 @@ const express = require('express');
 const crypto = require('crypto');
 const { db, tx } = require('../db');
 const U = require('../lib/util');
+const doku = require('../lib/doku');
 const { ok, bad, forbid, notFound, conflict, auth, notify, ALL_SLOTS } = U;
+const { HttpError: HttpErr } = U;
+const wrapA = (fn) => (req, res, next) => fn(req, res, next).catch(next);
+const provider = () => (doku.enabled() ? 'doku' : 'simulated');
 
 const r = express.Router();
 
@@ -57,8 +61,10 @@ r.post('/bookings', auth(), (req, res) => {
     }
     const online = ONLINE.includes(paymentMethod);
     const id = `ACE-${c.id.toUpperCase()}-${slot.replace(':', '')}-${crypto.randomInt(1000, 10000)}`;
-    const ref = paymentMethod === 'QRIS Instant' ? `QRIS-${id}`
-      : online ? `${paymentMethod.startsWith('BCA') ? '12345' : '88608'}${crypto.randomInt(1e9, 1e10)}` : null;
+    // Provider DOKU: URL bayar dibuat lewat POST /bookings/:id/checkout. Mode simulasi: referensi palsu untuk demo.
+    const ref = provider() === 'doku' || !online ? null
+      : paymentMethod === 'QRIS Instant' ? `QRIS-${id}`
+      : `${paymentMethod.startsWith('BCA') ? '12345' : '88608'}${crypto.randomInt(1e9, 1e10)}`;
     try {
       db.prepare(`INSERT INTO bookings (id,court_id,user_id,date,slot,price,discount,add_ons,add_ons_total,final_price,payment_method,payment_status,payment_ref,payment_expires_at,voucher_code,created_at)
         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(
@@ -92,13 +98,66 @@ r.delete('/bookings/:id', auth(), (req, res) =>
 
 // Simulasi gateway pembayaran. PAYMENT_MODE=live mematikan ini → pakai webhook di bawah.
 r.post('/bookings/:id/pay', auth(), (req, res) => {
-  if (process.env.PAYMENT_MODE === 'live') throw forbid('Pembayaran live hanya lewat webhook gateway');
+  if (process.env.PAYMENT_MODE === 'live' || provider() === 'doku') throw forbid('Pembayaran live hanya lewat webhook gateway');
   const b = db.prepare('SELECT * FROM bookings WHERE id = ?').get(req.params.id);
   if (!b || b.user_id !== req.user.id) throw notFound('Booking tidak ditemukan');
   if (b.status !== 'Terkonfirmasi' || b.payment_status !== 'Menunggu') throw bad('Booking ini tidak menunggu pembayaran');
   db.prepare("UPDATE bookings SET payment_status = 'Lunas' WHERE id = ?").run(b.id);
   notify(req.user.id, 'Pembayaran diterima', `${b.id} lunas via ${b.payment_method}`, 'payment');
   ok(res, U.booking(db.prepare(`${U.BOOKING_SELECT} WHERE b.id = ?`).get(b.id)), { message: 'Pembayaran berhasil' });
+});
+
+r.get('/payments/config', (req, res) => ok(res, { provider: provider() }));
+
+function markPaid(b, via) {
+  if (b.status !== 'Terkonfirmasi' || b.payment_status === 'Lunas') return false;
+  db.prepare("UPDATE bookings SET payment_status = 'Lunas' WHERE id = ?").run(b.id);
+  notify(b.user_id, 'Pembayaran diterima', `${b.id} lunas via ${via || b.payment_method}`, 'payment');
+  return true;
+}
+
+// Buat/ambil halaman bayar DOKU untuk booking online milik user
+r.post('/bookings/:id/checkout', auth(), wrapA(async (req, res) => {
+  if (!doku.enabled()) throw bad('Gateway DOKU belum dikonfigurasi di server');
+  const b = db.prepare(`${U.BOOKING_SELECT} WHERE b.id = ?`).get(req.params.id);
+  if (!b || b.user_id !== req.user.id) throw notFound('Booking tidak ditemukan');
+  if (b.status !== 'Terkonfirmasi' || b.payment_status !== 'Menunggu') throw bad('Booking ini tidak menunggu pembayaran');
+  if (/^https?:/.test(b.payment_ref || '')) return ok(res, U.booking(b), { paymentUrl: b.payment_ref });
+  const left = Math.max(1, Math.floor((Date.parse(b.payment_expires_at) - Date.now()) / 60000));
+  let url;
+  try {
+    url = await doku.createCheckout({
+      invoice: b.id, amountRp: b.final_price * 1000, method: b.payment_method, dueMinutes: left,
+      customer: { name: req.user.name, email: req.user.email }, itemName: `Sewa ${b.c_name} - ${b.c_venue} ${b.date} ${b.slot}`,
+      callbackUrl: `${doku.env().publicUrl || `${req.protocol}://${req.get('host')}`}/app/#/me/bookings?paid=${encodeURIComponent(b.id)}`,
+    });
+  } catch (e) {
+    console.error('DOKU checkout gagal:', e.message, JSON.stringify(e.doku || {}).slice(0, 400));
+    throw new HttpErr(502, 'Gagal membuat pembayaran DOKU. Coba lagi atau pilih Bayar di tempat.');
+  }
+  db.prepare('UPDATE bookings SET payment_ref = ? WHERE id = ?').run(url, b.id);
+  ok(res, U.booking(db.prepare(`${U.BOOKING_SELECT} WHERE b.id = ?`).get(b.id)), { paymentUrl: url });
+}));
+
+// Sinkronkan status ke DOKU (dipakai setelah user kembali dari halaman bayar)
+r.get('/bookings/:id/payment-status', auth(), wrapA(async (req, res) => {
+  const b = db.prepare(`${U.BOOKING_SELECT} WHERE b.id = ?`).get(req.params.id);
+  if (!b || b.user_id !== req.user.id) throw notFound('Booking tidak ditemukan');
+  if (doku.enabled() && b.payment_status === 'Menunggu' && /^https?:/.test(b.payment_ref || '')) {
+    const st = await doku.checkStatus(b.id).catch(() => 'UNKNOWN');
+    if (st === 'SUCCESS') markPaid(b, 'DOKU');
+  }
+  const fresh = db.prepare(`${U.BOOKING_SELECT} WHERE b.id = ?`).get(b.id);
+  ok(res, U.booking(fresh), { paid: fresh.payment_status === 'Lunas' });
+}));
+
+// Notifikasi HTTP dari DOKU → set URL ini di DOKU Dashboard (Settings > Payment Settings > Notification URL)
+r.post('/payments/doku/notify', (req, res) => {
+  if (!doku.verifyNotification(req)) return res.status(401).json({ success: false, message: 'Signature tidak valid' });
+  const inv = req.body?.order?.invoice_number;
+  const b = inv && db.prepare('SELECT * FROM bookings WHERE id = ?').get(inv);
+  if (b && req.body?.transaction?.status === 'SUCCESS' && Number(req.body.order.amount) === b.final_price * 1000) markPaid(b, 'DOKU');
+  res.json({ success: true });
 });
 
 // Webhook gateway sungguhan (Midtrans/Xendit dsb.) — diamankan secret bersama

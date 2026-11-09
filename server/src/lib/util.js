@@ -69,7 +69,7 @@ const booking = (b) => b && ({
   id: b.id, courtId: b.court_id, userId: b.user_id, userName: b.user_name || null, userEmail: b.user_email || null,
   date: b.date, slot: b.slot, pricePerHour: b.price, discount: b.discount, addOns: JSON.parse(b.add_ons || '[]'),
   addOnsTotal: b.add_ons_total, finalPrice: b.final_price, paymentMethod: b.payment_method,
-  paymentStatus: b.payment_status, paymentRef: b.payment_ref, paymentExpiresAt: b.payment_expires_at,
+  paymentStatus: b.payment_status, paymentRef: b.payment_ref, paymentUrl: /^https?:/.test(b.payment_ref || '') ? b.payment_ref : null, paymentExpiresAt: b.payment_expires_at,
   voucherCode: b.voucher_code, status: b.status, note: b.note,
   createdAt: b.created_at, checkedInAt: b.checked_in_at, cancelledAt: b.cancelled_at,
   court: b.c_id ? court({ id: b.c_id, owner_id: b.c_owner, name: b.c_name, venue: b.c_venue, area: b.c_area, price_per_hour: b.c_price, indoor: b.c_indoor, rating: b.c_rating, image: b.c_image, facilities: b.c_fac, description: b.c_desc, status: b.c_status, created_at: '' }) : undefined,

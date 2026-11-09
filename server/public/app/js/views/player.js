@@ -58,7 +58,9 @@ route('me/court/:id', P, async ({ el, params }) => {
     });
     $('#bk', sum).onclick = (e) => busy(e.currentTarget, async () => {
       const r = await send('POST', '/bookings', { courtId: c.id, date, slot, paymentMethod: $('#pm', sum).value, voucherCode: disc ? vcode : undefined, addOns: $$('[name=ad]:checked', sum).map((x) => x.value) });
-      toast('Booking berhasil!'); bookingDrawer(r.data, 'player', null); go('#/me/bookings');
+      toast('Booking berhasil!');
+      if (r.data.paymentStatus === 'Menunggu' && (await get('/payments/config')).data.provider === 'doku') return payDoku(r.data.id); // arahkan ke halaman bayar DOKU
+      bookingDrawer(r.data, 'player', null); go('#/me/bookings');
     });
   };
   const drawSlots = () => loadInto(sl, async () => {
@@ -71,7 +73,15 @@ route('me/court/:id', P, async ({ el, params }) => {
   drawSlots();
 }, { title: 'Detail lapangan' });
 
+// Buka halaman pembayaran DOKU (QRIS / Virtual Account) untuk booking yang menunggu bayar
+async function payDoku(id) {
+  const r = await send('POST', `/bookings/${encodeURIComponent(id)}/checkout`);
+  location.href = r.paymentUrl;
+}
+
 route('me/bookings', P, async ({ el }) => {
+  const paid = new URLSearchParams(location.hash.split('?')[1] || '').get('paid'); // kembali dari DOKU → sinkronkan status
+  if (paid) { try { const r = await get(`/bookings/${encodeURIComponent(paid)}/payment-status`); toast(r.paid ? 'Pembayaran berhasil diterima.' : 'Pembayaran belum terkonfirmasi. Status diperbarui otomatis setelah DOKU mengirim notifikasi.'); } catch (x) { toast(x.message); } }
   const d = await get('/bookings');
   let tab = 'active';
   const draw = () => {
@@ -79,10 +89,11 @@ route('me/bookings', P, async ({ el }) => {
     mount(el, html`${pageHead('Booking saya', 'Tiket dan riwayat reservasi Anda.', html`<a class="btn lime" href="#/me">${icon('plus')}Booking baru</a>`)}
       <div class="tabs" role="tablist"><button role="tab" data-t="active" aria-selected="${String(tab === 'active')}">Aktif (${(d.data?.active || d.active).length})</button><button role="tab" data-t="history" aria-selected="${String(tab === 'history')}">Riwayat (${(d.data?.history || d.history).length})</button></div>
       ${rows.length ? html`<div class="court-grid">${rows.map((b, i) => html`<article class="card court-card" style="animation-delay:${i * 30}ms"><div class="court-body"><div style="display:flex;justify-content:space-between;gap:8px"><h3>${b.court?.name || b.courtId}</h3>${statusBadge(b.status)}</div><div class="muted">${b.court?.venue || ''}</div><div><b>${dateId(b.date)}</b> · ${b.slot}</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b>${rupiah(b.finalPrice)}</b>${statusBadge(b.paymentStatus)}</div>
-        ${b.paymentStatus === 'Menunggu' && b.paymentRef ? html`<div class="muted">Ref. bayar: <code>${b.paymentRef}</code></div>` : ''}<div class="row"><button class="btn sm" data-i="${i}">${icon('qr')}Tiket${b.status === 'Terkonfirmasi' ? ' & aksi' : ''}</button></div></div></article>`)}</div>`
+        ${b.paymentStatus === 'Menunggu' && b.paymentRef && !b.paymentUrl ? html`<div class="muted">Ref. bayar: <code>${b.paymentRef}</code></div>` : ''}<div class="row">${b.paymentStatus === 'Menunggu' && b.status === 'Terkonfirmasi' ? html`<button class="btn lime sm" data-pay="${b.id}">Bayar sekarang</button>` : ''}<button class="btn sm" data-i="${i}">${icon('qr')}Tiket${b.status === 'Terkonfirmasi' ? ' & aksi' : ''}</button></div></div></article>`)}</div>`
         : html`<div class="card">${empty(tab === 'active' ? 'Belum ada booking aktif' : 'Riwayat kosong', 'Pilih lapangan favorit Anda dan booking sekarang.', html`<a class="btn primary" href="#/me">Cari lapangan</a>`)}</div>`}`);
     on(el, 'click', '[data-t]', (e, b) => { tab = b.dataset.t; draw(); });
     on(el, 'click', '[data-i]', (e, b) => bookingDrawer(rows[+b.dataset.i], 'player', reload));
+    on(el, 'click', '[data-pay]', (e, b) => busy(b, async () => { const cfg = (await get('/payments/config')).data.provider; if (cfg === 'doku') return payDoku(b.dataset.pay); await send('POST', `/bookings/${encodeURIComponent(b.dataset.pay)}/pay`); toast('Pembayaran berhasil'); reload(); }));
   };
   draw();
 }, { title: 'Booking saya' });
