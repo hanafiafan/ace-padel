@@ -41,12 +41,12 @@ class ApiService {
 
   /// Default API endpoint:
   /// - Configurable via `--dart-define=API_URL=https://your-domain.com`
-  /// - Release mode default: https://api.hellens.dev
+  /// - Release mode default: https://acepadel.hellens.dev
   /// - Android emulator debug: http://10.0.2.2:3001
   /// - Web / desktop debug: http://localhost:3001
   String get baseUrl {
     if (_envApiUrl.isNotEmpty) return _envApiUrl;
-    if (kReleaseMode) return 'https://api.hellens.dev';
+    if (kReleaseMode) return 'https://acepadel.hellens.dev';
     if (kIsWeb) return 'http://localhost:3001';
     if (defaultTargetPlatform == TargetPlatform.android) {
       return 'http://10.0.2.2:3001';

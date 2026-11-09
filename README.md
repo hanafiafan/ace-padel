@@ -107,7 +107,7 @@ npm test
 ### 2. Menjalankan Aplikasi (terhubung ke backend nyata)
 Aplikasi memakai API server (`server/API.md`): login email/password atau Google, booking, mabar, teman, notifikasi, dan portal pemilik lapangan semuanya lewat server. Katalog lapangan/pelatih jatuh kembali ke data bawaan bila server tidak terjangkau (muncul snackbar "offline").
 
-Alamat API: `--dart-define=API_URL=...`; default debug `http://localhost:3001` (web/desktop) atau `http://10.0.2.2:3001` (Android emulator); release `https://api.hellens.dev`.
+Alamat API: `--dart-define=API_URL=...`; default debug `http://localhost:3001` (web/desktop) atau `http://10.0.2.2:3001` (Android emulator); release `https://acepadel.hellens.dev`.
 ```bash
 # terminal 1: backend
 cd server && npm install && npm start            # http://localhost:3001
