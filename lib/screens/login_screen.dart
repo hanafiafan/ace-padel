@@ -168,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'KONFIGURASI GOOGLE OAUTH',
                         style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
                             fontSize: 19.55, fontWeight: FontWeight.w800),
@@ -193,11 +193,11 @@ class _LoginScreenState extends State<LoginScreen> {
               child:  Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Agar Google Sign-In aktif di HP fisik / rilis:',
                     style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
                   ),
-                  SizedBox(height: 6),
+                  const SizedBox(height: 6),
                   Text(
                     '1. Daftarkan SHA-1 debug ini ke Firebase / Google Cloud Console:\n'
                     '   SHA-1: B9:68:02:8D:C9:3E:C5:15:40:26:C7:DF:A2:E9:AC:0B:7C:62:CF:E1\n'
@@ -244,7 +244,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     backgroundColor: AP.blue,
                     foregroundColor: Colors.white,
                     elevation: 0,
-                    shape: ChamferBorder(br: 10, tl: 10),
+                    shape: const ChamferBorder(br: 10, tl: 10),
                   ),
                 ),
               ),
@@ -380,7 +380,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   backgroundColor: AP.blue,
                                   foregroundColor: Colors.white,
                                   elevation: 0,
-                                  shape: ChamferBorder(br: 10, tl: 10),
+                                  shape: const ChamferBorder(br: 10, tl: 10),
                                 ),
                                 child: _isLoading
                                     ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
@@ -421,7 +421,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           elevation: 1,
                           shadowColor: Colors.black.withValues(alpha: 0.2),
                           side: BorderSide(color: AP.line, width: 1.2),
-                          shape: ChamferBorder(br: 10, tl: 10),
+                          shape: const ChamferBorder(br: 10, tl: 10),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,

@@ -148,6 +148,18 @@ class ApiService {
   Future<Map<String, dynamic>> put(String path, Object body) => request('PUT', path, body: body);
   Future<Map<String, dynamic>> delete(String path) => request('DELETE', path);
 
+  /// Best-effort: register this device's FCM push token with the backend
+  /// (requires a `POST /devices` route — see FCM_SETUP.md). Non-critical:
+  /// swallows errors so push setup never blocks the UI.
+  Future<void> registerDevice(String token, {String platform = 'android'}) async {
+    if (!hasToken) return; // only meaningful once logged in
+    try {
+      await post('/devices', {'token': token, 'platform': platform});
+    } catch (_) {
+      // ignore — push delivery is a non-critical enhancement
+    }
+  }
+
   /// Quick reachability probe.
   Future<bool> checkHealth() async {
     try {

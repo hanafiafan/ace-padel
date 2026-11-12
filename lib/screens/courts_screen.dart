@@ -233,7 +233,7 @@ class _CourtsScreenState extends State<CourtsScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AP.blue,
                     foregroundColor: Colors.white,
-                    shape: ChamferBorder(br: 10, tl: 10),
+                    shape: const ChamferBorder(br: 10, tl: 10),
                   ),
                   child: const Text('Terapkan Filter',
                       style:
@@ -466,7 +466,7 @@ class _CourtsScreenState extends State<CourtsScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AP.blue,
                 foregroundColor: Colors.white,
-                shape: ChamferBorder(br: 10, tl: 10),
+                shape: const ChamferBorder(br: 10, tl: 10),
               ),
               child: const Text('Reset Filter',
                   style: TextStyle(fontWeight: FontWeight.w700)),

@@ -85,7 +85,7 @@ class HelpScreen extends StatelessWidget {
                         backgroundColor: AP.lime,
                         foregroundColor: AP.onLime,
                         elevation: 0,
-                        shape: ChamferBorder(br: 10, tl: 10),
+                        shape: const ChamferBorder(br: 10, tl: 10),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -98,7 +98,7 @@ class HelpScreen extends StatelessWidget {
                       ),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.white30),
-                        shape: ChamferBorder(br: 10, tl: 10),
+                        shape: const ChamferBorder(br: 10, tl: 10),
                       ),
                     ),
                   ],

@@ -157,7 +157,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AP.lime,
                     foregroundColor: AP.onLime,
-                    shape: ChamferBorder(br: 10, tl: 10),
+                    shape: const ChamferBorder(br: 10, tl: 10),
                   ),
                   child: const Text('Kirim Ulasan',
                       style:
@@ -890,7 +890,7 @@ c.image, fallbackUrl: c.imageUrl,
                   color: AP.lime,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child:  Row(
+                child:  const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(LucideIcons.badgeCheck, size: 13, color: AP.onLime),
@@ -1111,7 +1111,7 @@ c.image, fallbackUrl: c.imageUrl,
                             ),
                             child: Text(
                               current['badge'] as String,
-                              style:  TextStyle(
+                              style:  const TextStyle(
                                 fontSize: 8,
                                 fontWeight: FontWeight.w900,
                                 color: AP.onLime,
@@ -1234,7 +1234,7 @@ c.image, fallbackUrl: c.imageUrl,
                           foregroundColor: AP.onLime,
                           elevation: 0,
                           minimumSize: const Size.fromHeight(54),
-                          shape: ChamferBorder(br: 10, tl: 10),
+                          shape: const ChamferBorder(br: 10, tl: 10),
                         ),
                       )
                     : ElevatedButton.icon(
@@ -1249,7 +1249,7 @@ c.image, fallbackUrl: c.imageUrl,
                           disabledForegroundColor: AP.slate,
                           elevation: 0,
                           minimumSize: const Size.fromHeight(54),
-                          shape: ChamferBorder(br: 10, tl: 10),
+                          shape: const ChamferBorder(br: 10, tl: 10),
                         ),
                       ),
               ),

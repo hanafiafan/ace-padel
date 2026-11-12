@@ -98,3 +98,11 @@ test('mabar, teman, favorit, notifikasi, achievements', async () => {
   assert.equal((await call('POST', '/api/coach-sessions', { coachId: 'coach1', date: tomorrow, slot: '15:00' }, a)).status, 201);
   assert.equal((await call('POST', '/api/coach-sessions', { coachId: 'coach1', date: tomorrow, slot: '15:00' }, a)).status, 409);
 });
+
+test('devices: register, validasi & unauth', async () => {
+  const a = await login('player@acepadel.id', 'player12345');
+  assert.equal((await call('POST', '/api/devices', { token: 'tok123' })).status, 401);
+  assert.equal((await call('POST', '/api/devices', { token: 'tok123', platform: 'android' }, a)).data.registered, true);
+  assert.equal((await call('POST', '/api/devices', {}, a)).status, 400);
+  assert.equal((await call('DELETE', '/api/devices', { token: 'tok123' }, a)).data.removed, true);
+});

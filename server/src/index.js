@@ -38,6 +38,7 @@ app.use('/api/owner', require('./routes/owner'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api', require('./routes/catalog'));
 app.use('/api', require('./routes/player'));
+app.use('/api', require('./routes/devices'));
 
 app.use('/api', (req, res) => res.status(404).json({ success: false, message: `Endpoint ${req.method} ${req.originalUrl} tidak ditemukan` }));
 

@@ -216,7 +216,7 @@ class _DokuPaymentSheetState extends State<DokuPaymentSheet> {
             onPressed: _checking ? null : () => _check(),
             style: OutlinedButton.styleFrom(
               side: BorderSide(color: AP.line),
-              shape: ChamferBorder(br: 10, tl: 10),
+              shape: const ChamferBorder(br: 10, tl: 10),
             ),
             child: _checking
                 ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
@@ -276,7 +276,7 @@ class _DokuPaymentSheetState extends State<DokuPaymentSheet> {
           style: ElevatedButton.styleFrom(
             backgroundColor: AP.lime,
             elevation: 0,
-            shape: ChamferBorder(br: 10, tl: 10),
+            shape: const ChamferBorder(br: 10, tl: 10),
           ),
         ),
       );

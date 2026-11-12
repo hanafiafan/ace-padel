@@ -224,7 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundColor: AP.lime,
                     foregroundColor: AP.onLime,
                     elevation: 0,
-                    shape: ChamferBorder(br: 10, tl: 10),
+                    shape: const ChamferBorder(br: 10, tl: 10),
                   ),
                   child: const Text('Terapkan Filter', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
                 ),
@@ -380,7 +380,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: AP.lime,
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child:  Text(
+                            child:  const Text(
                               'JADWAL MAIN ANDA',
                               style: TextStyle(
                                 color: AP.onLime,
@@ -468,7 +468,7 @@ next.court.image, fallbackUrl: next.court.imageUrl,
                               elevation: 0,
                               minimumSize: Size.zero,
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              shape: ChamferBorder(br: 10, tl: 10),
+                              shape: const ChamferBorder(br: 10, tl: 10),
                               textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
                             ),
                           ),
@@ -693,7 +693,7 @@ m.court.image, fallbackUrl: m.court.imageUrl,
                           elevation: 0,
                           minimumSize: Size.zero,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          shape: ChamferBorder(br: 10, tl: 10),
+                          shape: const ChamferBorder(br: 10, tl: 10),
                         ),
                         child: const Text('Gabung',
                             style: TextStyle(
@@ -737,14 +737,14 @@ m.court.image, fallbackUrl: m.court.imageUrl,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Private Coaching & Clinic',
                           style: TextStyle(
                             fontWeight: FontWeight.w800,
                             fontSize: 14,
                           ),
                         ),
-                        SizedBox(height: 2),
+                        const SizedBox(height: 2),
                         Text(
                           'Kuasai teknik dinding & smash bersama pelatih FIP',
                           style: TextStyle(color: AP.slate, fontSize: 11),
@@ -766,7 +766,7 @@ m.court.image, fallbackUrl: m.court.imageUrl,
                       elevation: 0,
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      shape: ChamferBorder(br: 10, tl: 10),
+                      shape: const ChamferBorder(br: 10, tl: 10),
                     ),
                     child: const Text('Lihat',
                         style: TextStyle(
@@ -837,14 +837,14 @@ m.court.image, fallbackUrl: m.court.imageUrl,
 }
 
   Widget _emptyResults() =>  Padding(
-        padding: EdgeInsets.only(top: 40),
+        padding: const EdgeInsets.only(top: 40),
         child: Column(
           children: [
             Icon(LucideIcons.search, size: 56, color: AP.slate),
-            SizedBox(height: 12),
-            Text('Lapangan tidak ditemukan',
+            const SizedBox(height: 12),
+            const Text('Lapangan tidak ditemukan',
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text('Coba kata kunci lain, mis. "Jakarta" atau "indoor".',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: AP.slate)),

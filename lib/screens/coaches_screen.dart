@@ -266,7 +266,7 @@ class _CoachesScreenState extends State<CoachesScreen> {
                       children: [
                         Text('Biaya Coaching (1 Jam)',
                             style: TextStyle(color: AP.slate, fontSize: 12)),
-                        Text('Termasuk lapangan & bola',
+                        const Text('Termasuk lapangan & bola',
                             style: TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.w600)),
                       ],
                     ),
@@ -310,7 +310,7 @@ class _CoachesScreenState extends State<CoachesScreen> {
                     backgroundColor: AP.lime,
                     foregroundColor: AP.onLime,
                     elevation: 0,
-                    shape: ChamferBorder(br: 10, tl: 10),
+                    shape: const ChamferBorder(br: 10, tl: 10),
                   ),
                   child: const Text(
                     'Konfirmasi Jadwal Coaching',
@@ -372,7 +372,7 @@ class _CoachesScreenState extends State<CoachesScreen> {
                         color: AP.lime,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child:  Text(
+                      child:  const Text(
                         'OFFICIAL COACHING',
                         style: TextStyle(
                           color: AP.onLime,
@@ -493,12 +493,12 @@ class _CoachesScreenState extends State<CoachesScreen> {
               child:  Column(
                 children: [
                   Icon(LucideIcons.search, size: 48, color: AP.slate),
-                  SizedBox(height: 10),
-                  Text(
+                  const SizedBox(height: 10),
+                  const Text(
                     'Tidak ada pelatih yang cocok',
                     style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     'Coba gunakan kata kunci atau filter lain.',
                     style: TextStyle(color: AP.slate, fontSize: 13),
@@ -686,7 +686,7 @@ class _CoachCard extends StatelessWidget {
                   elevation: 0,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  shape: ChamferBorder(br: 10, tl: 10),
+                  shape: const ChamferBorder(br: 10, tl: 10),
                 ),
               ),
             ],

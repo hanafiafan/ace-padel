@@ -71,7 +71,7 @@ class FavoritesScreen extends StatelessWidget {
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 14),
-                        shape: ChamferBorder(br: 10, tl: 10),
+                        shape: const ChamferBorder(br: 10, tl: 10),
                       ),
                       child: const Text(
                         'Eksplor Lapangan',

@@ -119,7 +119,7 @@ void showAchievementDetailModal(BuildContext context, Achievement a) {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(LucideIcons.badgeCheck, color: AP.blue, size: 18),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
                     'Pencapaian aktif di profil Anda',
                     style: TextStyle(
@@ -141,7 +141,7 @@ void showAchievementDetailModal(BuildContext context, Achievement a) {
               style: ElevatedButton.styleFrom(
                 backgroundColor: on ? AP.lime : AP.blue,
                 foregroundColor: on ? AP.onLime : Colors.white,
-                shape: ChamferBorder(br: 10, tl: 10),
+                shape: const ChamferBorder(br: 10, tl: 10),
                 elevation: 0,
               ),
               child: Text(

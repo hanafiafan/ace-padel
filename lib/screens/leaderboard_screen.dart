@@ -98,7 +98,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 8),
-                      shape: ChamferBorder(br: 10, tl: 10),
+                      shape: const ChamferBorder(br: 10, tl: 10),
                     ),
                   ),
                 ],
@@ -300,7 +300,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               foregroundColor: Colors.white,
               elevation: 0,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: ChamferBorder(br: 10, tl: 10),
+              shape: const ChamferBorder(br: 10, tl: 10),
             ),
           ),
         ],
@@ -332,7 +332,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                     color: AP.ink,
                   ),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
                   'Tambah lebih banyak lawan tanding untuk memanaskan persaingan ranking mingguan.',
                   style: TextStyle(color: AP.slate, fontSize: 11),
@@ -347,7 +347,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               foregroundColor: AP.onLime,
               backgroundColor: AP.lime,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              shape: ChamferBorder(br: 10, tl: 10),
+              shape: const ChamferBorder(br: 10, tl: 10),
             ),
             child: const Text(
               '+ Teman',
@@ -499,7 +499,7 @@ class _AddFriendsModalState extends State<_AddFriendsModal> {
                     child: Center(child: CircularProgressIndicator()))
                 : filtered.isEmpty
                 ?  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
+                    padding: const EdgeInsets.symmetric(vertical: 24),
                     child: Center(
                       child: Text(
                         'Pemain tidak ditemukan.',
@@ -562,13 +562,13 @@ class _AddFriendsModalState extends State<_AddFriendsModal> {
                             onPressed: () async {
                               try {
                                 final added = await friendStore.toggleFriend(p);
-                                if (!mounted) return;
+                                if (!context.mounted) return;
                                 setState(() {});
                                 showInfo(context, added
                                     ? '${p.name} ditambahkan ke teman!'
                                     : '${p.name} dihapus dari teman.');
                               } on ApiException catch (e) {
-                                if (mounted) showError(context, e);
+                                if (context.mounted) showError(context, e);
                               }
                             },
                             style: ElevatedButton.styleFrom(
@@ -579,7 +579,7 @@ class _AddFriendsModalState extends State<_AddFriendsModal> {
                               elevation: 0,
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 6),
-                              shape: ChamferBorder(br: 10, tl: 10),
+                              shape: const ChamferBorder(br: 10, tl: 10),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -713,7 +713,7 @@ class _PodiumItem extends StatelessWidget {
               end: Alignment.bottomCenter,
               colors: [AP.blue, AP.blueDark],
             ),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           ),
           alignment: Alignment.topCenter,
           padding: const EdgeInsets.only(top: 10),
@@ -773,7 +773,7 @@ class _MyRankCard extends StatelessWidget {
           CircleAvatar(
             backgroundColor: AP.lime,
             child: Text(player.initials,
-                style:  TextStyle(
+                style:  const TextStyle(
                     color: AP.onLime, fontWeight: FontWeight.w800)),
           ),
           const SizedBox(width: 12),

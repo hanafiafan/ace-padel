@@ -215,7 +215,7 @@ class _BookingCard extends StatelessWidget {
               backgroundColor: Colors.red.shade600,
               foregroundColor: Colors.white,
               elevation: 0,
-              shape: ChamferBorder(br: 10, tl: 10),
+              shape: const ChamferBorder(br: 10, tl: 10),
             ),
             child: const Text('Ya, Batalkan',
                 style: TextStyle(fontWeight: FontWeight.w700)),
@@ -428,7 +428,7 @@ c.image, fallbackUrl: c.imageUrl,
                     color: AP.lime,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child:  Row(
+                  child:  const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(LucideIcons.qrCode, size: 16, color: AP.onLime),
@@ -503,7 +503,7 @@ Future<void> showPendingPaymentDialog(BuildContext context, Booking b) async {
             }
           },
           style: ElevatedButton.styleFrom(backgroundColor: AP.lime, foregroundColor: AP.onLime, elevation: 0),
-          child: Text(doku ? 'Bayar sekarang' : 'Simulasikan Pembayaran', style: TextStyle(fontWeight: FontWeight.w800)),
+          child: Text(doku ? 'Bayar sekarang' : 'Simulasikan Pembayaran', style: const TextStyle(fontWeight: FontWeight.w800)),
         ),
       ],
     ),

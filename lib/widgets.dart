@@ -213,7 +213,7 @@ court.image, fallbackUrl: court.imageUrl,
                               ),
                             ],
                           ),
-                          child:  Icon(
+                          child:  const Icon(
                             LucideIcons.arrowRight,
                             color: AP.onLime,
                             size: 16,

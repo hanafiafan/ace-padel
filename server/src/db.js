@@ -104,6 +104,13 @@ CREATE TABLE IF NOT EXISTS payment_methods (
   id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT NOT NULL REFERENCES users(id),
   method TEXT NOT NULL, is_default INTEGER NOT NULL DEFAULT 0
 );
+CREATE TABLE IF NOT EXISTS device_tokens (
+  token TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  platform TEXT NOT NULL DEFAULT 'android',
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS ix_device_user ON device_tokens(user_id);
 `);
 
 const tx = (fn) => {

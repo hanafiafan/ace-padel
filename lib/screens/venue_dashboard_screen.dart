@@ -170,15 +170,15 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                 Navigator.pop(ctx);
                 try {
                   await _o.toggleSlot(slot, block: true, reason: selectedReason);
-                  if (mounted) showInfo(context, 'Slot $slot berhasil ditutup untuk $selectedReason.');
+                  if (context.mounted) showInfo(context, 'Slot $slot berhasil ditutup untuk $selectedReason.');
                 } on ApiException catch (e) {
-                  if (mounted) showError(context, e);
+                  if (context.mounted) showError(context, e);
                 }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange.shade800,
                 foregroundColor: Colors.white,
-                shape: ChamferBorder(br: 10, tl: 10),
+                shape: const ChamferBorder(br: 10, tl: 10),
               ),
               child: const Text('Tutup Slot',
                   style: TextStyle(fontWeight: FontWeight.w700)),
@@ -290,7 +290,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
               style: TextButton.styleFrom(
                 backgroundColor: Colors.white.withValues(alpha: 0.12),
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                shape: ChamferBorder(br: 10, tl: 10),
+                shape: const ChamferBorder(br: 10, tl: 10),
               ),
             ),
           ),
@@ -514,7 +514,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 18, vertical: 14),
-                      shape: ChamferBorder(br: 10, tl: 10),
+                      shape: const ChamferBorder(br: 10, tl: 10),
                     ),
                     child: _isVerifying
                         ? const SizedBox(
@@ -684,7 +684,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                     backgroundColor: const Color(0xFF16A34A),
                     foregroundColor: Colors.white,
                     elevation: 0,
-                    shape: ChamferBorder(br: 10, tl: 10),
+                    shape: const ChamferBorder(br: 10, tl: 10),
                   ),
                 ),
               ),
@@ -775,7 +775,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                 children: [
                   Icon(LucideIcons.clipboardCheck,
                       size: 36, color: AP.slate),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     'Belum ada pemain yang check-in hari ini.',
                     style: TextStyle(color: AP.slate, fontSize: 13),
@@ -1013,7 +1013,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                 foregroundColor: Colors.orange.shade800,
                 backgroundColor: Colors.orange.shade50,
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                shape: ChamferBorder(br: 10, tl: 10),
+                shape: const ChamferBorder(br: 10, tl: 10),
               ),
             )
           else if (isMaintenance)
@@ -1024,7 +1024,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                 foregroundColor: Colors.white,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                shape: ChamferBorder(br: 10, tl: 10),
+                shape: const ChamferBorder(br: 10, tl: 10),
               ),
               child: const Text('Buka Slot',
                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
@@ -1041,7 +1041,7 @@ class _VenueDashboardScreenState extends State<VenueDashboardScreen>
                 foregroundColor: Colors.white,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                shape: ChamferBorder(br: 10, tl: 10),
+                shape: const ChamferBorder(br: 10, tl: 10),
               ),
               child: const Text('Check-in',
                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),

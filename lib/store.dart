@@ -5,6 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'data.dart';
 import 'services/api_service.dart';
+import 'services/notification_service.dart';
 
 ApiService get _api => ApiService.instance;
 
@@ -187,6 +188,13 @@ class BookingStore extends ChangeNotifier with LoadState {
       _active = [b, ..._active];
       _slots[_k(court.id, day)]?[slot] = true;
       notifyListeners();
+      // Pengingat lokal 1 jam sebelum main.
+      unawaited(NotificationService.instance.scheduleBookingReminder(
+        bookingId: b.id,
+        courtName: court.name,
+        date: apiDate(day),
+        slot: slot,
+      ));
       return b;
     } on ApiException catch (e) {
       if (e.isConflict) await loadSlots(court, day);
@@ -229,6 +237,7 @@ class BookingStore extends ChangeNotifier with LoadState {
     _history = [nb, ..._history.where((x) => x.id != b.id)];
     _slots[_k(b.court.id, b.date)]?[b.slot] = false;
     notifyListeners();
+    unawaited(NotificationService.instance.cancelBookingReminder(b.id));
   }
 
   Booking? findBookingById(String id) {

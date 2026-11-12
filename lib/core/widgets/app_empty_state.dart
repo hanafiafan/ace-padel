@@ -29,12 +29,12 @@ class AppEmptyState extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(14),
-              child: SizedBox(
+              child: const SizedBox(
                 width: 220,
                 height: 130,
                 child: APPhoto(
                   asset: 'assets/images/court1.jpg',
-                  alignment: const Alignment(0, .55),
+                  alignment: Alignment(0, .55),
                   scrim: .25,
                 ),
               ),

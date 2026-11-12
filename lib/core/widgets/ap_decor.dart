@@ -138,7 +138,7 @@ class APHero extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [APColors.blueDark, Color(0xFF0F1A6B), APColors.blue],
+            colors: [APColors.blueDark, const Color(0xFF0F1A6B), APColors.blue],
           ),
         ),
         child: Stack(
@@ -286,7 +286,7 @@ class _RacketIconPainter extends CustomPainter {
       fill,
     );
     // 5 lubang, pola seperti ikon aplikasi
-    for (final o in [Offset(.38, .17), Offset(.62, .17), Offset(.5, .28), Offset(.4, .4), Offset(.6, .4)]) {
+    for (final o in [const Offset(.38, .17), const Offset(.62, .17), const Offset(.5, .28), const Offset(.4, .4), const Offset(.6, .4)]) {
       c.drawCircle(Offset(s * o.dx, s * o.dy), w * .42, fill);
     }
     c.restore();

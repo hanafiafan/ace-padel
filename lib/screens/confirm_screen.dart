@@ -234,7 +234,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AP.blue,
                     foregroundColor: Colors.white,
-                    shape: ChamferBorder(br: 10, tl: 10),
+                    shape: const ChamferBorder(br: 10, tl: 10),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 14),
                   ),
@@ -566,7 +566,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(LucideIcons.timer, size: 14, color: AP.ink),
-                  SizedBox(width: 6),
+                  const SizedBox(width: 6),
                   Text(
                     b.paymentExpiresAt != null
                         ? 'Selesaikan pembayaran sebelum ${DateFormat('HH:mm').format(b.paymentExpiresAt!)}'
@@ -610,7 +610,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AP.lime,
                   elevation: 0,
-                  shape: ChamferBorder(br: 10, tl: 10),
+                  shape: const ChamferBorder(br: 10, tl: 10),
                 ),
               ),
             ),
@@ -742,7 +742,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                           child:  Row(
                             children: [
                               Icon(LucideIcons.copy, size: 14, color: AP.blue),
-                              SizedBox(width: 4),
+                              const SizedBox(width: 4),
                               Text('Salin',
                                   style: TextStyle(
                                       color: AP.blue,
@@ -806,7 +806,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AP.lime,
                   elevation: 0,
-                  shape: ChamferBorder(br: 10, tl: 10),
+                  shape: const ChamferBorder(br: 10, tl: 10),
                 ),
               ),
             ),
@@ -988,7 +988,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              SizedBox(width: 4),
+                              const SizedBox(width: 4),
                               Icon(LucideIcons.chevronRight,
                                   size: 18, color: AP.slate),
                             ],
@@ -1026,12 +1026,12 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'Sewa Alat & Perlengkapan',
                                 style: TextStyle(
                                     fontWeight: FontWeight.w800, fontSize: 15),
                               ),
-                              SizedBox(height: 2),
+                              const SizedBox(height: 2),
                               Text(
                                 'Disediakan langsung di lapangan sebelum main',
                                 style:
@@ -1219,7 +1219,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                 ),
               ],
             ),
-            child:  Icon(LucideIcons.check, color: AP.onLime, size: 48),
+            child:  const Icon(LucideIcons.check, color: AP.onLime, size: 48),
           ),
         ),
         const SizedBox(height: 18),
@@ -1482,7 +1482,7 @@ c.image, fallbackUrl: c.imageUrl,
                   backgroundColor: AP.lime,
                   foregroundColor: AP.onLime,
                   elevation: 0,
-                  shape: ChamferBorder(br: 10, tl: 10),
+                  shape: const ChamferBorder(br: 10, tl: 10),
                 ),
                 child: Text(label,
                     style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
@@ -1493,7 +1493,7 @@ c.image, fallbackUrl: c.imageUrl,
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AP.blue,
                   side:  BorderSide(color: AP.blue),
-                  shape: ChamferBorder(br: 10, tl: 10),
+                  shape: const ChamferBorder(br: 10, tl: 10),
                 ),
                 child: Text(label,
                     style: const TextStyle(

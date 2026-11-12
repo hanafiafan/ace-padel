@@ -139,7 +139,7 @@ class ProfileScreen extends StatelessWidget {
                     backgroundColor: AP.lime,
                     foregroundColor: AP.onLime,
                     elevation: 0,
-                    shape: ChamferBorder(br: 10, tl: 10),
+                    shape: const ChamferBorder(br: 10, tl: 10),
                   ),
                   child: const Text('Simpan Perubahan',
                       style: TextStyle(fontWeight: FontWeight.w800)),
@@ -186,7 +186,7 @@ class ProfileScreen extends StatelessWidget {
               backgroundColor: Colors.red.shade600,
               foregroundColor: Colors.white,
               elevation: 0,
-              shape: ChamferBorder(br: 10, tl: 10),
+              shape: const ChamferBorder(br: 10, tl: 10),
             ),
             child: const Text('Ya, Keluar',
                 style: TextStyle(fontWeight: FontWeight.w700)),
@@ -226,7 +226,7 @@ class ProfileScreen extends StatelessWidget {
                       radius: 32,
                       backgroundColor: AP.lime,
                       backgroundImage: (user.photoUrl ?? '').isNotEmpty ? NetworkImage(user.photoUrl!) : null,
-                      child: (user.photoUrl ?? '').isNotEmpty ? null : Icon(LucideIcons.userRound, color: AP.onLime, size: 36),
+                      child: (user.photoUrl ?? '').isNotEmpty ? null : const Icon(LucideIcons.userRound, color: AP.onLime, size: 36),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -544,7 +544,7 @@ class ProfileScreen extends StatelessWidget {
                                 color: AP.lime,
                                 borderRadius: BorderRadius.circular(6),
                               ),
-                              child:  Text(
+                              child:  const Text(
                                 'PARTNER',
                                 style: TextStyle(
                                   color: AP.onLime,
@@ -581,7 +581,7 @@ class ProfileScreen extends StatelessWidget {
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 14, vertical: 8),
-                      shape: ChamferBorder(br: 10, tl: 10),
+                      shape: const ChamferBorder(br: 10, tl: 10),
                     ),
                     child: const Text(
                       'Buka',

@@ -80,7 +80,10 @@ const BOOKING_SELECT = `SELECT b.*, u.name user_name, u.email user_email,
   FROM bookings b JOIN courts c ON c.id = b.court_id LEFT JOIN users u ON u.id = b.user_id`;
 
 function notify(userId, title, body = '', type = 'info') {
-  if (userId) db.prepare('INSERT INTO notifications (user_id,title,body,type,created_at) VALUES (?,?,?,?,?)').run(userId, title, body, type, new Date().toISOString());
+  if (!userId) return;
+  db.prepare('INSERT INTO notifications (user_id,title,body,type,created_at) VALUES (?,?,?,?,?)').run(userId, title, body, type, new Date().toISOString());
+  // Juga kirim push FCM (fire-and-forget; no-op bila push belum dikonfigurasi).
+  try { require('./push').sendToUser(userId, { title, body, data: { type } }); } catch {}
 }
 
 function calcDiscount(v, price) {

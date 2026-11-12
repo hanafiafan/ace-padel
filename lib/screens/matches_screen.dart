@@ -166,7 +166,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                     backgroundColor: AP.lime,
                     foregroundColor: AP.onLime,
                     elevation: 0,
-                    shape: ChamferBorder(br: 10, tl: 10),
+                    shape: const ChamferBorder(br: 10, tl: 10),
                   ),
                   child: const Text('PUBLIKASIKAN MATCH',
                       style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontWeight: FontWeight.w800, fontSize: 18.4)),
@@ -227,9 +227,9 @@ class _MatchesScreenState extends State<MatchesScreen> {
                   ),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Row(
+                child: const Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -591,7 +591,7 @@ c.image, fallbackUrl: c.imageUrl,
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AP.blue,
                               side:  BorderSide(color: AP.blue),
-                              shape: ChamferBorder(br: 10, tl: 10),
+                              shape: const ChamferBorder(br: 10, tl: 10),
                             ),
                           )
                         : ElevatedButton(
@@ -616,7 +616,7 @@ c.image, fallbackUrl: c.imageUrl,
                               foregroundColor: AP.onLime,
                               disabledBackgroundColor: AP.line,
                               elevation: 0,
-                              shape: ChamferBorder(br: 10, tl: 10),
+                              shape: const ChamferBorder(br: 10, tl: 10),
                             ),
                             child: Text(
                               isFull ? 'Slot Penuh' : 'Gabung Slot Mabar',

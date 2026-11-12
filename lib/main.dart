@@ -12,6 +12,7 @@ import 'core/utils/haptics.dart';
 import 'core/widgets/responsive_container.dart';
 import 'core/utils/ui.dart';
 import 'store.dart';
+import 'services/notification_service.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/courts_screen.dart';
@@ -33,6 +34,7 @@ Future<void> main() async {
   UserStore.instance.restoring = true;
   runApp(const AcePadelApp());
   unawaited(UserStore.instance.restore()); // GET /auth/me, then load data
+  unawaited(NotificationService.instance.init()); // push + local notifications (guarded)
 }
 
 class AcePadelApp extends StatefulWidget {
@@ -169,7 +171,7 @@ class _RootNavState extends State<RootNav> {
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
                 border: Border(top: BorderSide(color: APTheme.isDark ? APColors.lineDark : Colors.transparent)),
                 
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: Color(0x220F143A),
                     blurRadius: 20,

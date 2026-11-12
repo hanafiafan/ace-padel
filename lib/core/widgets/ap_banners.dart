@@ -268,7 +268,7 @@ class APPhotoHero extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                         decoration: BoxDecoration(color: APColors.lime, borderRadius: BorderRadius.circular(12)),
-                        child: Text(cta, style:  TextStyle(color: AP.onLime, fontWeight: FontWeight.w800, fontSize: 13)),
+                        child: Text(cta, style:  const TextStyle(color: AP.onLime, fontWeight: FontWeight.w800, fontSize: 13)),
                       ),
                     ),
                   ]),

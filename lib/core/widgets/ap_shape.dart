@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class ChamferBorder extends OutlinedBorder {
   final double br;
   final double tl;
-  const ChamferBorder({this.br = 14, this.tl = 0, BorderSide side = BorderSide.none}) : super(side: side);
+  const ChamferBorder({this.br = 14, this.tl = 0, super.side});
 
   @override
   EdgeInsetsGeometry get dimensions => EdgeInsets.all(side.width);

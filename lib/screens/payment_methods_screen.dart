@@ -145,9 +145,9 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                 if (!requireLogin(context, 'menyimpan metode pembayaran')) return;
                 try {
                   await PaymentPrefStore.instance.save(m['id'] as String); // PUT /payment-method
-                  if (mounted) showInfo(context, 'Metode utama diubah ke "${m['title']}"');
+                  if (context.mounted) showInfo(context, 'Metode utama diubah ke "${m['title']}"');
                 } on ApiException catch (e) {
-                  if (mounted) showError(context, e);
+                  if (context.mounted) showError(context, e);
                 }
               },
               child: Container(
@@ -251,11 +251,11 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
             child:  Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Catatan Pembayaran',
                   style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   '• Pembayaran "Bayar di Venue" dapat diselesaikan saat tiba di lokasi sebelum jam main dimulai.\n'
                   '• Untuk pembayaran via QRIS dan Virtual Account, reservasi akan terverifikasi otomatis dalam 1 menit.\n'
