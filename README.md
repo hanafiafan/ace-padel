@@ -109,7 +109,7 @@ ace-padel/
 
 3. **APK / cara menjalankan**: `flutter build apk --debug` lalu `adb install -r build/app/outputs/flutter-apk/app-debug.apk`, dengan backend lokal aktif (lihat panduan di bawah).
 
-4. **Tautan**: video penjelasan **[ISI: tempel link video]**, repository <https://github.com/hanafiafan/ace-padel>.
+4. **Tautan**: video penjelasan <https://youtu.be/45QACTFLoJ4>, repository <https://github.com/hanafiafan/ace-padel>.
 
 ---
 
