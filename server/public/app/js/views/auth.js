@@ -23,6 +23,7 @@ async function googleButton(host, role, errEl) {
     errEl.hidden = true;
     try {
       const cfg = (await fetch('/api/auth/config').then((r) => r.json())).firebase;
+      if (!cfg) throw new Error('Login Google belum dikonfigurasi di server. Gunakan email dan kata sandi.');
       await loadFirebase(cfg);
       const cred = await firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());
       const idToken = await cred.user.getIdToken();

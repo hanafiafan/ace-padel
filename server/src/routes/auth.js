@@ -84,8 +84,11 @@ r.post('/firebase', limit, async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// Konfigurasi publik untuk klien web (Client ID bukan rahasia).
-const FB = { apiKey: process.env.FIREBASE_API_KEY || 'REDACTED-FIREBASE-API-KEY', authDomain: 'ace-padel-3f910.firebaseapp.com', projectId: 'ace-padel-3f910', appId: '1:198282293168:web:b45a79839c31b3f9bab075' };
+// Konfigurasi untuk klien web. API key Firebase dibaca dari env (tidak disimpan di repo);
+// tanpa FIREBASE_API_KEY, login Google lewat Firebase dinonaktifkan.
+const FB = process.env.FIREBASE_API_KEY
+  ? { apiKey: process.env.FIREBASE_API_KEY, authDomain: 'ace-padel-3f910.firebaseapp.com', projectId: 'ace-padel-3f910', appId: '1:198282293168:web:b45a79839c31b3f9bab075' }
+  : null;
 r.get('/config', (req, res) => res.json({ googleClientId: process.env.GOOGLE_CLIENT_ID || null, firebase: FB }));
 
 r.get('/me', auth(), (req, res) => ok(res, publicUser(req.user)));
