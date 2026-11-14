@@ -632,7 +632,7 @@ class TicketScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => MatchStoryShareScreen(court: booking.court),
+                    builder: (_) => MatchStoryShareScreen(court: booking.court, booking: booking),
                   ),
                 );
               },

@@ -9,19 +9,14 @@ import '../core/widgets/ap_decor.dart';
 import '../core/widgets/responsive_container.dart';
 import '../core/utils/ui.dart';
 import '../data.dart';
+import '../store.dart';
 import '../widgets.dart';
 
 class MatchStoryShareScreen extends StatefulWidget {
   final Court? court;
-  final String? opponent;
-  final String? score;
+  final Booking? booking;
 
-  const MatchStoryShareScreen({
-    super.key,
-    this.court,
-    this.opponent = 'Jack Hunter & Ale Galán',
-    this.score = '6-4, 3-6, 7-5',
-  });
+  const MatchStoryShareScreen({super.key, this.court, this.booking});
 
   @override
   State<MatchStoryShareScreen> createState() => _MatchStoryShareScreenState();
@@ -31,7 +26,39 @@ class _MatchStoryShareScreenState extends State<MatchStoryShareScreen> {
   bool _usePhotoBg = true;
   bool _showCalories = true;
   bool _showDupr = true;
-  int _selectedStyle = 0; // 0: Championship Volt, 1: Pure Obsidian, 2: Royal Cobalt
+  final int _selectedStyle = 0; // 0: Championship Volt, 1: Pure Obsidian, 2: Royal Cobalt
+  final _opponentCtl = TextEditingController();
+  final _scoreCtl = TextEditingController();
+  bool _won = true;
+
+  @override
+  void dispose() {
+    _opponentCtl.dispose();
+    _scoreCtl.dispose();
+    super.dispose();
+  }
+
+  String _dateLabel(DateTime d) => '${d.day}/${d.month}/${d.year}';
+
+  /// Baris info di bawah nama venue: hanya data yang benar-benar ada.
+  String _tagline() {
+    final b = widget.booking;
+    final parts = <String>[
+      if (b != null) '${_dateLabel(b.date)} ${b.slot}',
+      if (b != null) '${(b.durationMinutes / 60).toStringAsFixed(b.durationMinutes % 60 == 0 ? 0 : 1)} Jam',
+      if (_opponentCtl.text.trim().isNotEmpty) 'vs ${_opponentCtl.text.trim()}',
+    ];
+    return parts.isEmpty ? 'Match padel di Ace Padel' : parts.join(' • ');
+  }
+
+  String _shareText(Court court) {
+    final score = _scoreCtl.text.trim();
+    final opp = _opponentCtl.text.trim();
+    final head = _won ? 'MATCH VICTORY! 🎾 Menang' : 'GOOD GAME! 🎾 Main';
+    return '$head di ${court.name} (${court.venue})'
+        '${opp.isNotEmpty ? ' vs $opp' : ''}${score.isNotEmpty ? ', skor $score' : ''}. '
+        'Main padel seru bareng di Ace Padel: https://acepadel.app/court/${court.id}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +90,7 @@ class _MatchStoryShareScreenState extends State<MatchStoryShareScreen> {
               onPressed: () {
                 APHaptics.success();
                 Clipboard.setData(ClipboardData(
-                  text: 'MATCH VICTORY! 🎾 Menang 2-1 di ${court.name} (${court.venue}). DUPR Rating naik +0.18! Main padel seru bareng di Ace Padel: https://acepadel.app/court/${court.id}',
+                  text: _shareText(court),
                 ));
                 showInfo(context, 'Teks & link recap match berhasil disalin ke clipboard!');
               },
@@ -203,9 +230,9 @@ class _MatchStoryShareScreenState extends State<MatchStoryShareScreen> {
                                     color: APColors.lime,
                                     shape: ChamferBorder(br: 4, tl: 2),
                                   ),
-                                  child: const Text(
-                                    'VICTORY',
-                                    style: TextStyle(
+                                  child: Text(
+                                    _won ? 'VICTORY' : 'GOOD GAME',
+                                    style: const TextStyle(
                                       fontFamily: 'Display',
                                       fontStyle: FontStyle.italic,
                                       fontSize: 9,
@@ -237,7 +264,7 @@ class _MatchStoryShareScreenState extends State<MatchStoryShareScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'vs ${widget.opponent} • 2 Jam Match',
+                              _tagline(),
                               style: const TextStyle(
                                 color: Color(0xFF94A3B8),
                                 fontSize: 11,
@@ -247,6 +274,7 @@ class _MatchStoryShareScreenState extends State<MatchStoryShareScreen> {
 
                             const SizedBox(height: 16),
 
+                            if (_scoreCtl.text.trim().isNotEmpty) ...[
                             // Main Scoreboard Pill
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -261,11 +289,11 @@ class _MatchStoryShareScreenState extends State<MatchStoryShareScreen> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Column(
+                                  Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        'SET SCORE',
+                                      const Text(
+                                        'SKOR MATCH',
                                         style: TextStyle(
                                           fontFamily: 'Display',
                                           fontStyle: FontStyle.italic,
@@ -275,8 +303,8 @@ class _MatchStoryShareScreenState extends State<MatchStoryShareScreen> {
                                         ),
                                       ),
                                       Text(
-                                        '2 - 1 (WIN)',
-                                        style: TextStyle(
+                                        _won ? 'MENANG' : 'KALAH',
+                                        style: const TextStyle(
                                           fontFamily: 'Display',
                                           fontStyle: FontStyle.italic,
                                           fontSize: 16,
@@ -287,7 +315,7 @@ class _MatchStoryShareScreenState extends State<MatchStoryShareScreen> {
                                     ],
                                   ),
                                   Text(
-                                    widget.score!,
+                                    _scoreCtl.text.trim(),
                                     style: const TextStyle(
                                       fontFamily: 'Display',
                                       fontStyle: FontStyle.italic,
@@ -300,6 +328,7 @@ class _MatchStoryShareScreenState extends State<MatchStoryShareScreen> {
                                 ],
                               ),
                             ),
+                            ],
 
                             const Spacer(),
 
@@ -309,9 +338,9 @@ class _MatchStoryShareScreenState extends State<MatchStoryShareScreen> {
                                 if (_showDupr)
                                   Expanded(
                                     child: _storyStatBox(
-                                      label: 'DUPR RATING',
-                                      value: '3.60',
-                                      badge: '+0.18 ↑',
+                                      label: 'RANK',
+                                      value: StatsStore.instance.rank > 0 ? '#${StatsStore.instance.rank}' : '-',
+                                      badge: 'GLOBAL',
                                       badgeColor: APColors.lime,
                                       textColor: APColors.lime,
                                     ),
@@ -320,9 +349,9 @@ class _MatchStoryShareScreenState extends State<MatchStoryShareScreen> {
                                 if (_showCalories)
                                   Expanded(
                                     child: _storyStatBox(
-                                      label: 'CALORIES',
-                                      value: '742',
-                                      badge: 'KCAL',
+                                      label: 'SESI MAIN',
+                                      value: '${StatsStore.instance.activeBookings}',
+                                      badge: 'SESI',
                                       badgeColor: const Color(0xFFFF6B00),
                                       textColor: Colors.white,
                                     ),
@@ -330,9 +359,11 @@ class _MatchStoryShareScreenState extends State<MatchStoryShareScreen> {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: _storyStatBox(
-                                    label: 'AVG PACE',
-                                    value: '164',
-                                    badge: 'BPM',
+                                    label: widget.booking != null ? 'DURASI' : 'RATING VENUE',
+                                    value: widget.booking != null
+                                        ? (widget.booking!.durationMinutes / 60).toStringAsFixed(widget.booking!.durationMinutes % 60 == 0 ? 0 : 1)
+                                        : court.rating.toStringAsFixed(1),
+                                    badge: widget.booking != null ? 'JAM' : '★',
                                     badgeColor: const Color(0xFF38BDF8),
                                     textColor: Colors.white,
                                   ),
@@ -415,6 +446,53 @@ class _MatchStoryShareScreenState extends State<MatchStoryShareScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
+                  TextField(
+                    controller: _opponentCtl,
+                    onChanged: (_) => setState(() {}),
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                    decoration: const InputDecoration(
+                      labelText: 'Lawan (opsional)',
+                      labelStyle: TextStyle(color: Colors.white54, fontSize: 12),
+                      hintText: 'mis. Budi & Sari',
+                      hintStyle: TextStyle(color: Colors.white30, fontSize: 12),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _scoreCtl,
+                    onChanged: (_) => setState(() {}),
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                    decoration: const InputDecoration(
+                      labelText: 'Skor (opsional)',
+                      labelStyle: TextStyle(color: Colors.white54, fontSize: 12),
+                      hintText: 'mis. 6-4, 3-6, 7-5',
+                      hintStyle: TextStyle(color: Colors.white30, fontSize: 12),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      for (final win in [true, false])
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: ChoiceChip(
+                            label: Text(win ? 'Menang' : 'Kalah',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    color: _won == win ? APColors.onLime : AP.ink)),
+                            selectedColor: APColors.lime,
+                            checkmarkColor: APColors.onLime,
+                            selected: _won == win,
+                            onSelected: (_) {
+                              APHaptics.light();
+                              setState(() => _won = win);
+                            },
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  const Divider(color: Color(0xFF1E2A4A), height: 1),
                   SwitchListTile.adaptive(
                     contentPadding: EdgeInsets.zero,
                     value: _usePhotoBg,
@@ -435,8 +513,8 @@ class _MatchStoryShareScreenState extends State<MatchStoryShareScreen> {
                       APHaptics.light();
                       setState(() => _showDupr = v);
                     },
-                    title: const Text('Tampilkan Kenaikan Rating DUPR', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
-                    subtitle: const Text('Rating performa +0.18 dari kemenangan pertandingan', style: TextStyle(color: Colors.white54, fontSize: 11)),
+                    title: const Text('Tampilkan Peringkat Global', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
+                    subtitle: const Text('Posisi Anda di leaderboard Ace Padel', style: TextStyle(color: Colors.white54, fontSize: 11)),
                     activeThumbColor: APColors.onLime,
                     activeTrackColor: APColors.lime,
                   ),
@@ -448,8 +526,8 @@ class _MatchStoryShareScreenState extends State<MatchStoryShareScreen> {
                       APHaptics.light();
                       setState(() => _showCalories = v);
                     },
-                    title: const Text('Tampilkan Estimasi Kalori Terbakar (KCAL)', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
-                    subtitle: const Text('Telemetri sensor kebugaran fisik pemain padel', style: TextStyle(color: Colors.white54, fontSize: 11)),
+                    title: const Text('Tampilkan Jumlah Sesi Main', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
+                    subtitle: const Text('Total booking yang sudah Anda mainkan', style: TextStyle(color: Colors.white54, fontSize: 11)),
                     activeThumbColor: APColors.onLime,
                     activeTrackColor: APColors.lime,
                   ),
@@ -466,7 +544,7 @@ class _MatchStoryShareScreenState extends State<MatchStoryShareScreen> {
                 onPressed: () {
                   APHaptics.success();
                   Clipboard.setData(ClipboardData(
-                    text: 'MATCH VICTORY! 🎾 Menang di ${court.name}. DUPR: 3.60 (+0.18). Kalori: 742 KCAL. Cek & booking lapangan di Ace Padel!',
+                    text: _shareText(court),
                   ));
                   showInfo(context, 'Story Card siap dibagikan! Info disalin ke clipboard.');
                 },

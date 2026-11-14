@@ -62,8 +62,8 @@ Emulator aktif, backend lokal berjalan di port 3001, APK debug terpasang, data a
 * **Kriteria penerimaan**: layar "MATCH RECAP // STORY" tampil dengan kartu 9:16 dan opsi kustomisasi.
 * **Hasil aktual**: layar tampil tanpa error layout setelah perbaikan temuan T-03 (lihat bagian 6).
 * **Bukti**: screenshot `03_05_eticket.png`, `03_06_story.png`.
-* **Catatan**: isi kartu story (lawan, skor, DUPR 3.60, 742 kcal, 164 BPM) masih **data contoh tetap**, belum dari pertandingan nyata (lihat T-10).
-* **Status**: **LULUS (tampilan); data masih contoh**
+* **Catatan**: awalnya isi kartu story berupa data karangan (lawan, skor, DUPR 3.60, 742 kcal, 164 BPM); itu diganti (T-10). Kini kartu memuat data booking nyata (venue, tanggal, jam, durasi), peringkat dan jumlah sesi dari server; lawan dan skor diisi pengguna dan blok skor hanya tampil bila diisi. Diverifikasi manual di emulator dari booking hasil flow 03 (contoh: 15/11/2026 14:00, 1 jam, peringkat #13). Flow Maestro hanya memastikan layar story terbuka, belum menguji isian lawan/skor.
+* **Status**: **LULUS**
 
 ### UAT-05: Validasi input form daftar
 * **Persona**: Calon pengguna.
@@ -89,7 +89,7 @@ Emulator aktif, backend lokal berjalan di port 3001, APK debug terpasang, data a
 | 1 | UAT-01 Tamu dan beranda | Alur utama | Maestro (2 eksekusi) | LULUS |
 | 2 | UAT-02 Navigasi dan peta | Alur utama | Maestro (2 eksekusi) | LULUS |
 | 3 | UAT-03 Reservasi dan e-ticket | Transaksi | Maestro (2 eksekusi) + manual | LULUS, dengan keterbatasan |
-| 4 | UAT-04 E-ticket dan story | Fitur sosial | Maestro + manual | LULUS, data story contoh |
+| 4 | UAT-04 E-ticket dan story | Fitur sosial | Maestro + manual | LULUS |
 | 5 | UAT-05 Validasi form | Input tidak valid | Maestro (2 eksekusi) | LULUS |
 | 6 | UAT-06 Profil dan Pengaturan | Konsistensi data | Manual | GAGAL lalu LULUS setelah perbaikan |
 
@@ -110,7 +110,7 @@ Emulator aktif, backend lokal berjalan di port 3001, APK debug terpasang, data a
 | T-07 | Garis dekoratif pojok atas bertumpuk dengan status bar | Kosmetik | **Diperbaiki** |
 | T-08 | Tombol kembali gelap di atas foto gelap pada layar story dan detail venue, nyaris tak terlihat | Aksesibilitas | **Diperbaiki** (story: ikon putih; detail venue: panah putih dengan latar lingkaran gelap, dicek di emulator) |
 | T-09 | Layar login menampilkan tautan internal "Panduan & Credentials Google Console" | Teks pengembang terlihat pengguna | **Diperbaiki** (hanya tampil di build debug); belum diverifikasi pada build release |
-| T-10 | Isi kartu story masih data contoh tetap, bukan dari pertandingan | Fitur belum nyata | **Terbuka** |
+| T-10 | Isi kartu story berupa data karangan (lawan, skor, DUPR, kalori, BPM) | Fitur belum nyata | **Diperbaiki** (data booking/server nyata; lawan dan skor input pengguna) |
 | T-11 | Toggle "Sinkronisasi Apple Health / Health Connect" hanya menyimpan preferensi, belum ada integrasi | Fitur belum nyata | **Terbuka** |
 | T-12 | Flutter menggabungkan teks widget menjadi satu node aksesibilitas | Menyulitkan uji otomatis dan pembaca layar | **Terbuka** (disiasati dengan regex di Maestro) |
 
@@ -119,7 +119,8 @@ Emulator aktif, backend lokal berjalan di port 3001, APK debug terpasang, data a
 * Masuk dengan Google dan pembayaran DOKU tidak diuji (mode simulasi/lingkungan dev).
 * Pengujian beban dan keamanan mendalam tidak dilakukan.
 * Flow 03 belum menambah item sewa gear secara otomatis (lihat UAT-03).
+* Pada akun uji baru, peringkat dan jumlah sesi berasal dari server dan bisa nol.
 * Data seed bersifat contoh; angka ranking dan leaderboard berasal dari data seed server.
 
 ## 8. Kesimpulan
-Alur utama (tamu, navigasi, pendaftaran, reservasi, e-ticket, validasi) berjalan dan dapat diulang otomatis (4/4 flow, dua kali). Pengujian manual menemukan sembilan cacat nyata yang sudah diperbaiki, serta tiga temuan yang masih terbuka (T-10, T-11, T-12). Eksekusi Maestro ketiga dijalankan setelah perbaikan T-08 dan T-09 dan tetap 4/4 lulus. Aplikasi layak untuk demo end-to-end dengan catatan keterbatasan di atas, belum layak disebut siap produksi.
+Alur utama (tamu, navigasi, pendaftaran, reservasi, e-ticket, validasi) berjalan dan dapat diulang otomatis (4/4 flow, dua kali). Pengujian manual menemukan sepuluh cacat nyata yang sudah diperbaiki, serta dua temuan yang masih terbuka (T-11, T-12). Eksekusi Maestro ketiga dijalankan setelah perbaikan T-08 dan T-09 dan tetap 4/4 lulus; perbaikan T-10 dilakukan sesudahnya dan hanya diverifikasi lewat flow 03 sekali jalan (lulus) serta uji manual. Aplikasi layak untuk demo end-to-end dengan catatan keterbatasan di atas, belum layak disebut siap produksi.

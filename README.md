@@ -97,7 +97,7 @@ ace-padel/
 
 **Tujuan aplikasi**: reservasi lapangan padel, mabar (main bareng), dan komunitas pemain. **Target pengguna**: pemain padel di Jabodetabek dan Bali, serta pemilik lapangan (portal mitra). **Alur utama yang diuji**: tamu, navigasi, daftar akun, pesan lapangan, e-ticket, recap story, validasi form. **Batasan pengujian**: emulator Android 15 saja, Google Sign-In dan pembayaran DOKU tidak diuji (lihat bagian 7 `LAPORAN_UAT.md`).
 
-1. **User Acceptance Testing (UAT)**: [`LAPORAN_UAT.md`](LAPORAN_UAT.md) memuat 6 skenario (tujuan, persona/peran, kriteria penerimaan, prasyarat, langkah, hasil aktual, status, bukti), ringkasan hasil, dan 12 temuan beserta statusnya (9 diperbaiki). Hasil aktual berasal dari eksekusi nyata, termasuk satu skenario yang awalnya gagal lalu lulus setelah perbaikan.
+1. **User Acceptance Testing (UAT)**: [`LAPORAN_UAT.md`](LAPORAN_UAT.md) memuat 6 skenario (tujuan, persona/peran, kriteria penerimaan, prasyarat, langkah, hasil aktual, status, bukti), ringkasan hasil, dan 12 temuan beserta statusnya (10 diperbaiki). Hasil aktual berasal dari eksekusi nyata, termasuk satu skenario yang awalnya gagal lalu lulus setelah perbaikan.
 
 2. **Automated E2E dengan Maestro**: [`.maestro/`](.maestro/) berisi 4 flow YAML dengan assertion:
    - `01_launch_and_onboarding.yaml`: peluncuran dari state bersih dan mode tamu.
