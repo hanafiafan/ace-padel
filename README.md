@@ -93,7 +93,7 @@ ace-padel/
 
 | Nama | NIM | Kelas | Peran |
 |:--|:--|:--|:--|
-| [ISI] | [ISI] | TI23B | [ISI] |
+| Muhammad Hanafi Afan Firdaus | 2301032321 | 23TIB1 (TI23B) | Full Stack |
 
 **Tujuan aplikasi**: reservasi lapangan padel, mabar (main bareng), dan komunitas pemain. **Target pengguna**: pemain padel di Jabodetabek dan Bali, serta pemilik lapangan (portal mitra). **Alur utama yang diuji**: tamu, navigasi, daftar akun, pesan lapangan, e-ticket, recap story, validasi form. **Batasan pengujian**: emulator Android 15 saja, Google Sign-In dan pembayaran DOKU tidak diuji (lihat bagian 7 `LAPORAN_UAT.md`).
 
@@ -109,7 +109,7 @@ ace-padel/
 
 3. **APK / cara menjalankan**: `flutter build apk --debug` lalu `adb install -r build/app/outputs/flutter-apk/app-debug.apk`, dengan backend lokal aktif (lihat panduan di bawah).
 
-4. **Tautan** (isi): video penjelasan **[ISI]**, repository **[ISI]**.
+4. **Tautan**: video penjelasan **[ISI: tempel link video]**, repository <https://github.com/hanafiafan/ace-padel>.
 
 ---
 

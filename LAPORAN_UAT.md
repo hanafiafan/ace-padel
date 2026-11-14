@@ -4,7 +4,7 @@
 |:--|:--|
 | **Mata kuliah** | Mobile Testing, TI23B (UTS Ganjil 2026/2027) |
 | **Dosen pengampu** | Triyono M.Kom |
-| **Penyusun** | **[ISI: nama lengkap, NIM, peran]** |
+| **Penyusun** | Muhammad Hanafi Afan Firdaus, NIM 2301032321, kelas 23TIB1 (TI23B), peran: Full Stack |
 | **Aplikasi** | Ace Padel (`dev.hellens.ace_padel`), reservasi lapangan dan komunitas padel (Flutter + backend Node.js) |
 | **Versi diuji** | 1.0.0+1 (debug build) |
 | **Tanggal pengujian** | 14 November 2026 |
