@@ -197,6 +197,15 @@ class _BookingScreenState extends State<BookingScreen> {
             expandedHeight: 230,
             backgroundColor: c.gradient.first,
             foregroundColor: Colors.white,
+            leading: IconButton(
+              tooltip: 'Kembali',
+              icon: const CircleAvatar(
+                radius: 16,
+                backgroundColor: Colors.black45,
+                child: Icon(LucideIcons.arrowLeft, color: Colors.white, size: 18),
+              ),
+              onPressed: () => Navigator.maybePop(context),
+            ),
             actions: [
               AnimatedBuilder(
                 animation: FavoriteStore.instance,

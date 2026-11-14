@@ -51,6 +51,7 @@ Satu flow saja: `maestro test -e UAT_PASSWORD=... 03_booking_and_gear_rental.yam
 |---|---|---|---|
 | Run 1 | 4/4 flow lulus | 2m 36s | `results/run1/` (`run.log`, `hasil_maestro.xml`) |
 | Run 2 | 4/4 flow lulus | 2m 49s | `results/run2/` |
+| Run 3 (build terbaru) | 4/4 flow lulus | 2m 44s | `results/run3/` |
 
 Screenshot langkah penting (dari Run 2): `results/screenshots/`.
 

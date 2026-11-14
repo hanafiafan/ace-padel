@@ -93,7 +93,7 @@ Emulator aktif, backend lokal berjalan di port 3001, APK debug terpasang, data a
 | 5 | UAT-05 Validasi form | Input tidak valid | Maestro (2 eksekusi) | LULUS |
 | 6 | UAT-06 Profil dan Pengaturan | Konsistensi data | Manual | GAGAL lalu LULUS setelah perbaikan |
 
-**Otomasi Maestro**: 4 flow, 2 eksekusi penuh berturut-turut, **4/4 lulus pada keduanya** (2m36s dan 2m49s). Log dan XML ada di `.maestro/results/run1/` dan `run2/`.
+**Otomasi Maestro**: 4 flow, 3 eksekusi penuh, **4/4 lulus pada ketiganya** (2m36s, 2m49s, 2m44s). Eksekusi ke-3 memakai build terbaru setelah perbaikan T-08/T-09. Log dan XML ada di `.maestro/results/run1/`, `run2/`, `run3/`.
 
 ---
 
@@ -108,8 +108,8 @@ Emulator aktif, backend lokal berjalan di port 3001, APK debug terpasang, data a
 | T-05 | Pengaturan: status API selalu "ONLINE 18ms", ukuran cache selalu 28.4 MB, Bersihkan Cache tidak membersihkan | Fitur pura-pura | **Diperbaiki** |
 | T-06 | Ekspor data hanya menampilkan pesan sukses tanpa ekspor | Fitur pura-pura | **Diperbaiki** (salin JSON ke clipboard) |
 | T-07 | Garis dekoratif pojok atas bertumpuk dengan status bar | Kosmetik | **Diperbaiki** |
-| T-08 | Tombol kembali gelap di atas foto gelap pada layar story dan detail venue, nyaris tak terlihat | Aksesibilitas | Story **diperbaiki**; detail venue **masih terbuka** |
-| T-09 | Layar login menampilkan tautan internal "Panduan & Credentials Google Console" | Teks pengembang terlihat pengguna | **Terbuka** |
+| T-08 | Tombol kembali gelap di atas foto gelap pada layar story dan detail venue, nyaris tak terlihat | Aksesibilitas | **Diperbaiki** (story: ikon putih; detail venue: panah putih dengan latar lingkaran gelap, dicek di emulator) |
+| T-09 | Layar login menampilkan tautan internal "Panduan & Credentials Google Console" | Teks pengembang terlihat pengguna | **Diperbaiki** (hanya tampil di build debug); belum diverifikasi pada build release |
 | T-10 | Isi kartu story masih data contoh tetap, bukan dari pertandingan | Fitur belum nyata | **Terbuka** |
 | T-11 | Toggle "Sinkronisasi Apple Health / Health Connect" hanya menyimpan preferensi, belum ada integrasi | Fitur belum nyata | **Terbuka** |
 | T-12 | Flutter menggabungkan teks widget menjadi satu node aksesibilitas | Menyulitkan uji otomatis dan pembaca layar | **Terbuka** (disiasati dengan regex di Maestro) |
@@ -122,4 +122,4 @@ Emulator aktif, backend lokal berjalan di port 3001, APK debug terpasang, data a
 * Data seed bersifat contoh; angka ranking dan leaderboard berasal dari data seed server.
 
 ## 8. Kesimpulan
-Alur utama (tamu, navigasi, pendaftaran, reservasi, e-ticket, validasi) berjalan dan dapat diulang otomatis (4/4 flow, dua kali). Pengujian manual menemukan tujuh cacat nyata yang sudah diperbaiki dan diuji ulang, serta empat temuan yang masih terbuka (T-08 sebagian, T-09 sampai T-12). Aplikasi layak untuk demo end-to-end dengan catatan keterbatasan di atas, belum layak disebut siap produksi.
+Alur utama (tamu, navigasi, pendaftaran, reservasi, e-ticket, validasi) berjalan dan dapat diulang otomatis (4/4 flow, dua kali). Pengujian manual menemukan sembilan cacat nyata yang sudah diperbaiki, serta tiga temuan yang masih terbuka (T-10, T-11, T-12). Eksekusi Maestro ketiga dijalankan setelah perbaikan T-08 dan T-09 dan tetap 4/4 lulus. Aplikasi layak untuk demo end-to-end dengan catatan keterbatasan di atas, belum layak disebut siap produksi.

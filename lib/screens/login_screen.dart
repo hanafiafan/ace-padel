@@ -578,13 +578,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    TextButton.icon(
-                      onPressed: () => _showGoogleConfigModal(''),
-                      icon: Icon(LucideIcons.circleHelp, size: 14, color: AP.slate),
-                      label: Text('Panduan & Credentials Google Console',
-                          style: TextStyle(
-                              color: AP.slate, fontWeight: FontWeight.w600, fontSize: 12, decoration: TextDecoration.underline)),
-                    ),
+                    // Panduan setup untuk pengembang: tidak ditampilkan di build release.
+                    if (kDebugMode)
+                      TextButton.icon(
+                        onPressed: () => _showGoogleConfigModal(''),
+                        icon: Icon(LucideIcons.circleHelp, size: 14, color: AP.slate),
+                        label: Text('Panduan & Credentials Google Console',
+                            style: TextStyle(
+                                color: AP.slate, fontWeight: FontWeight.w600, fontSize: 12, decoration: TextDecoration.underline)),
+                      ),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 10, top: 4),
                       child: SafeArea(
