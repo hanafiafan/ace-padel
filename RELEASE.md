@@ -106,5 +106,5 @@ Deploy hasil `build/web` ke hosting statis atau lewat server yang sama.
 - **Backup DB** terjadwal + uji restore.
 - **Monitoring** uptime `/api/health` + log.
 - **Seed data asli**: onboard venue lewat Portal Mitra (owner dashboard) agar data bukan dummy.
-- Uji alur lengkap pakai `UAT_Ace_Padel.xlsx`.
+- Uji alur lengkap lewat flow Maestro di `.maestro/` dan skenario di `LAPORAN_UAT.md`.
 ```
