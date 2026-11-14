@@ -165,9 +165,6 @@ flutter build appbundle --release
 * Signing Keystore: `android/app/release-keystore.jks` (alias: `acepadel`)
 * Konfigurasi Signing: `android/key.properties`
 
-### 🔑 Fingerprint Release Keystore (Untuk Firebase Console):
-* **Release SHA-1**: `9E:83:CE:5E:8D:38:20:BD:88:B8:2D:FC:45:D8:61:09:E8:40:9C:0B`
-* **Release SHA-256**: `6A:35:E2:73:16:66:E3:38:BE:37:DE:D4:17:69:FB:B6:3D:2D:58:DB:56:A5:F6:45:5B:23:4F:96:6A:2E:94:36`
 
 ---
 
