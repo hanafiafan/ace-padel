@@ -1,0 +1,18 @@
+appId: dev.hellens.ace_padel
+---
+- launchApp
+- tapOn: "Courts"
+- assertVisible: "CARI LAPANGAN"
+- tapOn: "PETA"
+- assertVisible: "PETA CLUSTER VENUE"
+- assertVisible: "JAKARTA SELATAN (6 ARENA)"
+- back
+- tapOn: "Ranking"
+- assertVisible: "LEADERBOARD"
+- tapOn: "Bookings"
+- assertVisible: "BOOKING SAYA"
+- tapOn: "Profile"
+- assertVisible: "PROFIL SAYA"
+- assertVisible: "YOUR MOMENTUM"
+- tapOn: "Home"
+- assertVisible: "Tennis Action Now"

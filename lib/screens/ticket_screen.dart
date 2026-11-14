@@ -1,6 +1,7 @@
 import '../core/widgets/ap_shape.dart';
 import '../core/widgets/ap_banners.dart';
 import 'package:flutter/material.dart';
+import 'match_story_share_screen.dart';
 import '../core/utils/launch.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
@@ -620,6 +621,40 @@ class TicketScreen extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 12),
+          // Strava-Style Story Recap Share Button
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => MatchStoryShareScreen(court: booking.court),
+                  ),
+                );
+              },
+              icon: const Icon(LucideIcons.sparkles, size: 18, color: APColors.onLime),
+              label: const Text(
+                'BUAT MATCH RECAP STORY (STRAVA-STYLE)',
+                style: TextStyle(
+                  fontFamily: 'Display',
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 12.5,
+                  letterSpacing: 0.4,
+                  color: APColors.onLime,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: APColors.lime,
+                foregroundColor: APColors.onLime,
+                elevation: 3,
+                shape: const ChamferBorder(br: 12, tl: 6),
+              ),
+            ),
           ),
         ],
       ),

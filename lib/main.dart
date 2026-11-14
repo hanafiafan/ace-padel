@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/widgets/ap_decor.dart';
+import 'core/widgets/ap_shape.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -159,39 +160,50 @@ class _RootNavState extends State<RootNav> {
   Widget build(BuildContext context) {
     final index = tabIndex.value;
     return ResponsiveContainer(
-      child: Scaffold(
-        body: IndexedStack(index: index, children: _pages),
-        bottomNavigationBar: AnimatedBuilder(
+      child: SportyCourtBackdrop(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: IndexedStack(index: index, children: _pages),
+          bottomNavigationBar: AnimatedBuilder(
           animation: BookingStore.instance,
           builder: (context, _) {
             final activeCount = BookingStore.instance.activeBookings.length;
-            return Container(
-              decoration:  BoxDecoration(
-                color: APColors.blueDark,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
-                border: Border(top: BorderSide(color: APTheme.isDark ? APColors.lineDark : Colors.transparent)),
-                
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x220F143A),
-                    blurRadius: 20,
-                    offset: Offset(0, -4),
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Container(
+                decoration: ShapeDecoration(
+                  color: const Color(0xFF070B1F),
+                  shape: const ChamferBorder(
+                    br: 20,
+                    tl: 20,
+                    side: BorderSide(color: Color(0xFF1B2B50), width: 1.2),
                   ),
-                ],
-              ),
-              child: SafeArea(
-                top: false,
-                child: NavigationBarTheme(
-                  data: NavigationBarThemeData(
-                    backgroundColor: Colors.transparent,
-                    indicatorColor: APColors.lime,
-                    labelTextStyle: WidgetStateProperty.all(
-                      const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
+                  shadows: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.4),
+                      blurRadius: 20,
+                      offset: const Offset(0, 6),
                     ),
+                  ],
+                ),
+                child: SafeArea(
+                  top: false,
+                  child: NavigationBarTheme(
+                    data: NavigationBarThemeData(
+                      backgroundColor: Colors.transparent,
+                      indicatorColor: APColors.lime,
+                      indicatorShape: const ChamferBorder(br: 12, tl: 6),
+                    labelTextStyle: WidgetStateProperty.resolveWith((states) {
+                      final selected = states.contains(WidgetState.selected);
+                      return TextStyle(
+                        fontFamily: 'Display',
+                        fontStyle: FontStyle.italic,
+                        color: selected ? APColors.lime : Colors.white60,
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.6,
+                      );
+                    }),
                     iconTheme: WidgetStateProperty.resolveWith((states) {
                       final selected = states.contains(WidgetState.selected);
                       return IconThemeData(
@@ -258,10 +270,12 @@ class _RootNavState extends State<RootNav> {
                   ),
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
-    );
-  }
+      ),
+    ),
+  );
+}
 }

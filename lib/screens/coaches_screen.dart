@@ -329,20 +329,28 @@ class _CoachesScreenState extends State<CoachesScreen> {
   Widget build(BuildContext context) {
     final list = _filteredCoaches;
 
-    return Scaffold(
-      backgroundColor: AP.cloud,
-      appBar: AppBar(
-        backgroundColor: AP.cloud,
-        elevation: 0,
-        foregroundColor: AP.ink,
-        title: const Text(
-          'Pelatih & Coaching Padel',
-          style: TextStyle(fontWeight: FontWeight.w800),
-        ),
-      ),
-      body: ResponsiveContainer(
-        child: APList(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+    return ResponsiveContainer(
+      child: SportyCourtBackdrop(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            foregroundColor: AP.ink,
+            title: Text(
+              'Pelatih & Coaching Padel',
+              style: TextStyle(
+                fontFamily: 'Display',
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w900,
+                fontSize: 21,
+                color: AP.ink,
+              ),
+            ),
+          ),
+          body: APList(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         children: [
           // Banner Highlight Coaching
           Container(
@@ -511,6 +519,7 @@ class _CoachesScreenState extends State<CoachesScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 }
@@ -526,17 +535,10 @@ class _CoachCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: AP.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AP.line),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        shape: const ChamferBorder(br: 18, tl: 8),
+        shadows: APShadows.card,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -181,27 +181,35 @@ class _MatchesScreenState extends State<MatchesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AP.cloud,
-      appBar: AppBar(
-        backgroundColor: AP.cloud,
-        elevation: 0,
-        foregroundColor: AP.ink,
-        title: const Text(
-          'Mabar & Cari Lawan',
-          style: TextStyle(fontWeight: FontWeight.w800),
-        ),
-        actions: [
-          IconButton(
-            tooltip: 'Buat Match Mabar',
-            icon:  Icon(LucideIcons.plus, color: AP.blue, size: 26),
-            onPressed: () => _showCreateMatchDialog(context),
+    return ResponsiveContainer(
+      child: SportyCourtBackdrop(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            foregroundColor: AP.ink,
+            title: Text(
+              'MABAR & CARI LAWAN',
+              style: TextStyle(
+                fontFamily: 'Display',
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w900,
+                fontSize: 22,
+                color: AP.ink,
+              ),
+            ),
+            actions: [
+              IconButton(
+                tooltip: 'Buat Match Mabar',
+                icon: Icon(LucideIcons.plus, color: AP.blue, size: 26),
+                onPressed: () => _showCreateMatchDialog(context),
+              ),
+              const SizedBox(width: 8),
+            ],
           ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: ResponsiveContainer(
-        child: AnimatedBuilder(
+          body: AnimatedBuilder(
           animation: MatchStore.instance,
         builder: (context, _) {
           final allMatches = MatchStore.instance.matches;
@@ -348,7 +356,6 @@ class _MatchesScreenState extends State<MatchesScreen> {
           );
         },
       ),
-    ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showCreateMatchDialog(context),
         backgroundColor: AP.blue,
@@ -356,6 +363,8 @@ class _MatchesScreenState extends State<MatchesScreen> {
         icon: const Icon(LucideIcons.plus),
         label: const Text('Buat Mabar', style: TextStyle(fontWeight: FontWeight.w700)),
       ),
+    ),
+    ),
     );
   }
 }
@@ -372,25 +381,85 @@ class _MatchCard extends StatelessWidget {
     final joined = match.isJoined;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
+      margin: const EdgeInsets.only(bottom: 18),
+      decoration: ShapeDecoration(
         color: AP.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: joined ? AP.blue : AP.line,
-          width: joined ? 1.5 : 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+        shape: ChamferBorder(
+          br: 18,
+          tl: 8,
+          side: BorderSide(
+            color: joined ? APColors.blue : AP.line,
+            width: joined ? 1.8 : 1.0,
           ),
-        ],
+        ),
+        shadows: joined
+            ? [
+                BoxShadow(
+                  color: APColors.blue.withValues(alpha: 0.18),
+                  blurRadius: 16,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : APShadows.card,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Tournament Header Bar (Inspired by Reference 1 Screen 2 Scorecard Header)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: ShapeDecoration(
+              color: joined
+                  ? APColors.blue.withValues(alpha: 0.1)
+                  : const Color(0xFFF1F4FA),
+              shape: const ChamferBorder(tl: 8, br: 0),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 4,
+                  height: 14,
+                  decoration: const ShapeDecoration(
+                    color: APColors.lime,
+                    shape: ChamferBorder(br: 2, tl: 2),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'DOUBLES MATCH // DUPR ${match.skillLevel.toUpperCase()}',
+                  style: TextStyle(
+                    fontFamily: 'Display',
+                    fontStyle: FontStyle.italic,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                    color: APColors.ink,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  decoration: ShapeDecoration(
+                    color: isFull ? const Color(0xFFFEE2E2) : APColors.lime,
+                    shape: const ChamferBorder(br: 4, tl: 2),
+                  ),
+                  child: Text(
+                    isFull
+                        ? 'FULL (4/4)'
+                        : '${match.maxPlayers - match.currentPlayers} SLOTS LEFT',
+                    style: TextStyle(
+                      fontFamily: 'Display',
+                      fontStyle: FontStyle.italic,
+                      color: isFull ? const Color(0xFF991B1B) : APColors.onLime,
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           // Top court bar
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
@@ -479,42 +548,66 @@ c.image, fallbackUrl: c.imageUrl,
               children: [
                 Row(
                   children: [
-                     Icon(LucideIcons.calendar, size: 15, color: AP.slate),
-                    const SizedBox(width: 6),
-                    Text(match.dateString,
-                        style: const TextStyle(
-                            fontSize: 13, fontWeight: FontWeight.w600)),
-                    const SizedBox(width: 14),
-                     Icon(LucideIcons.clock, size: 15, color: AP.slate),
-                    const SizedBox(width: 6),
-                    Text(match.time,
-                        style: const TextStyle(
-                            fontSize: 13, fontWeight: FontWeight.w600)),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
                     Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AP.blue.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: ShapeDecoration(
+                        color: AP.cloud,
+                        shape: const ChamferBorder(br: 6, tl: 3),
                       ),
-                      child: Text(
-                        match.skillLevel,
-                        style:  TextStyle(
-                          color: AP.blue,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(LucideIcons.calendar, size: 13, color: APColors.blue),
+                          const SizedBox(width: 5),
+                          Text(
+                            match.dateString.toUpperCase(),
+                            style: TextStyle(
+                              fontFamily: 'Display',
+                              fontStyle: FontStyle.italic,
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w900,
+                              color: APColors.ink,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: ShapeDecoration(
+                        color: AP.cloud,
+                        shape: const ChamferBorder(br: 6, tl: 3),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(LucideIcons.clock, size: 13, color: APColors.blue),
+                          const SizedBox(width: 5),
+                          Text(
+                            match.time,
+                            style: TextStyle(
+                              fontFamily: 'Display',
+                              fontStyle: FontStyle.italic,
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w900,
+                              color: APColors.ink,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Spacer(),
                     Text(
-                      'Host: ${match.hostName}',
-                      style:  TextStyle(color: AP.slate, fontSize: 12),
+                      'HOST: ${match.hostName.toUpperCase()}',
+                      style: TextStyle(
+                        fontFamily: 'Display',
+                        fontStyle: FontStyle.italic,
+                        color: AP.slate,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.3,
+                      ),
                     ),
                   ],
                 ),
@@ -522,111 +615,124 @@ c.image, fallbackUrl: c.imageUrl,
 
                 // Interactive Mini Doubles Court Schematic
                 _MiniDoublesCourt(match: match),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
-                // Player slot progress & Price
+                // Price & Action Button Row
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: isFull ? Colors.orange.shade50 : AP.blueSurface,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        isFull
-                            ? 'Slot Penuh (4/4)'
-                            : 'Tersisa ${match.maxPlayers - match.currentPlayers} slot (${match.currentPlayers}/${match.maxPlayers})',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: isFull ? Colors.orange.shade800 : AP.blue,
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Rp${match.pricePerPlayer}k',
-                          style:  TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
-                            fontSize: 18.4,
+                          'ENTRY // PLAYER',
+                          style: TextStyle(
+                            fontFamily: 'Display',
+                            fontStyle: FontStyle.italic,
+                            fontSize: 9.5,
                             fontWeight: FontWeight.w800,
-                            color: AP.blue,
+                            color: AP.slate,
+                            letterSpacing: 0.4,
                           ),
                         ),
-                         Text(
-                          '/ orang',
-                          style: TextStyle(fontSize: 11, color: AP.slate),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Text(
+                              'Rp${match.pricePerPlayer}k',
+                              style: TextStyle(
+                                fontFamily: 'Display',
+                                fontStyle: FontStyle.italic,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w900,
+                                color: APColors.blue,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '/ orang',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: AP.slate,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-
-                const SizedBox(height: 14),
-
-                // Action button
-                SizedBox(
-                  width: double.infinity,
-                  height: 44,
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 250),
-                    child: joined
-                        ? OutlinedButton.icon(
-                            key: const ValueKey('joined_btn'),
-                            onPressed: () async {
-                              APHaptics.light();
-                              try {
-                                await MatchStore.instance.toggleJoin(match.id);
-                                if (context.mounted) showInfo(context, 'Anda keluar dari slot match ini.');
-                              } on ApiException catch (e) {
-                                if (context.mounted) showError(context, e);
-                              }
-                            },
-                            icon:  Icon(LucideIcons.circleCheck,
-                                color: AP.blue, size: 18),
-                            label: const Text('Sudah Bergabung (Batalkan)'),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: AP.blue,
-                              side:  BorderSide(color: AP.blue),
-                              shape: const ChamferBorder(br: 10, tl: 10),
-                            ),
-                          )
-                        : ElevatedButton(
-                            key: const ValueKey('join_btn'),
-                            onPressed: isFull
-                                ? null
-                                : () async {
-                                    if (!requireLogin(context, 'bergabung ke match')) return;
-                                    APHaptics.success();
-                                    try {
-                                      final ok = await MatchStore.instance.toggleJoin(match.id);
-                                      if (ok && context.mounted) {
-                                        showInfo(context,
-                                            'Berhasil bergabung dengan match ${match.title}! Sampai jumpa di lapangan.');
+                    const Spacer(),
+                    SizedBox(
+                      height: 44,
+                      child: joined
+                          ? OutlinedButton.icon(
+                              key: const ValueKey('joined_btn'),
+                              onPressed: () async {
+                                APHaptics.light();
+                                try {
+                                  await MatchStore.instance.toggleJoin(match.id);
+                                  if (context.mounted) showInfo(context, 'Anda keluar dari slot match ini.');
+                                } on ApiException catch (e) {
+                                  if (context.mounted) showError(context, e);
+                                }
+                              },
+                              icon: Icon(LucideIcons.circleCheck, color: APColors.blue, size: 16),
+                              label: const Text(
+                                'SUDAH JOIN',
+                                style: TextStyle(
+                                  fontFamily: 'Display',
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 12.5,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: APColors.blue,
+                                side: BorderSide(color: APColors.blue, width: 1.5),
+                                shape: const ChamferBorder(br: 10, tl: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 14),
+                              ),
+                            )
+                          : ElevatedButton(
+                              key: const ValueKey('join_btn'),
+                              onPressed: isFull
+                                  ? null
+                                  : () async {
+                                      if (!requireLogin(context, 'bergabung ke match')) return;
+                                      APHaptics.success();
+                                      try {
+                                        final ok = await MatchStore.instance.toggleJoin(match.id);
+                                        if (ok && context.mounted) {
+                                          showInfo(context,
+                                              'Berhasil bergabung dengan match ${match.title}! Sampai jumpa di lapangan.');
+                                        }
+                                      } on ApiException catch (e) {
+                                        if (context.mounted) showError(context, e);
                                       }
-                                    } on ApiException catch (e) {
-                                      if (context.mounted) showError(context, e);
-                                    }
-                                  },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AP.lime,
-                              foregroundColor: AP.onLime,
-                              disabledBackgroundColor: AP.line,
-                              elevation: 0,
-                              shape: const ChamferBorder(br: 10, tl: 10),
-                            ),
-                            child: Text(
-                              isFull ? 'Slot Penuh' : 'Gabung Slot Mabar',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w800,
-                                fontSize: 14,
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: APColors.lime,
+                                foregroundColor: APColors.onLime,
+                                disabledBackgroundColor: AP.line,
+                                elevation: 0,
+                                shape: const ChamferBorder(br: 10, tl: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                              ),
+                              child: Text(
+                                isFull ? 'SLOT PENUH' : 'GABUNG MATCH →',
+                                style: TextStyle(
+                                  fontFamily: 'Display',
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 13,
+                                  color: isFull ? AP.slate : APColors.onLime,
+                                  letterSpacing: 0.4,
+                                ),
                               ),
                             ),
-                          ),
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),

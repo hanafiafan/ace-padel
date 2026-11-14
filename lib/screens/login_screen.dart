@@ -257,42 +257,127 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return ResponsiveContainer(
-      child: Scaffold(
-        backgroundColor: AP.cloud,
-        body: Column(
+      child: SportyCourtBackdrop(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Column(
           children: [
             ClipRRect(
               borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
               child: SizedBox(
-              height: 230,
+              height: 250,
               child: APPhoto(
               asset: 'assets/images/banner.jpg',
-              scrim: .78,
+              scrim: .82,
               child: SafeArea(
                 bottom: false,
                 child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                  child: Stack(
+                    alignment: Alignment.center,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const AceLogoEmblem(size: 60, withGlow: true).popIn(),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text(
+                                'ACE',
+                                style: TextStyle(
+                                  fontFamily: 'Display',
+                                  fontStyle: FontStyle.italic,
+                                  fontSize: 34,
+                                  fontWeight: FontWeight.w900,
+                                  color: APColors.lime,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              const Text(
+                                'PADEL',
+                                style: TextStyle(
+                                  fontFamily: 'Display',
+                                  fontStyle: FontStyle.italic,
+                                  fontSize: 34,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: const ShapeDecoration(
+                                  color: APColors.lime,
+                                  shape: ChamferBorder(br: 4, tl: 4),
+                                ),
+                                child: const Text(
+                                  'PRO',
+                                  style: TextStyle(
+                                    fontFamily: 'Display',
+                                    fontStyle: FontStyle.italic,
+                                    color: APColors.onLime,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 0.8,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ).reveal(1),
+                          const SizedBox(height: 4),
+                          Text(
+                            'MATCH ZONE // WPT ARENA',
+                            style: TextStyle(
+                              fontFamily: 'Display',
+                              fontStyle: FontStyle.italic,
+                              color: Colors.white.withValues(alpha: .75),
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.2,
+                            ),
+                          ).reveal(2),
+                        ],
+                      ),
+                      // Floating vertical capsule badge (Inspired by Reference 1 Screen 1)
+                      Positioned(
+                        right: 14,
+                        top: 20,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                          decoration: ShapeDecoration(
+                            color: APColors.lime,
+                            shape: const ChamferBorder(br: 8, tl: 4),
+                            shadows: [
+                              BoxShadow(
+                                color: APColors.lime.withValues(alpha: 0.4),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(LucideIcons.activity, size: 12, color: APColors.onLime),
+                              SizedBox(width: 4),
+                              Text(
+                                'SERVE & SCORE',
+                                style: TextStyle(
+                                  fontFamily: 'Display',
+                                  fontStyle: FontStyle.italic,
+                                  color: APColors.onLime,
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.4,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(18),
-                          child: Image.asset('assets/images/logo.png', width: 52, height: 52, fit: BoxFit.cover),
-                        ),
-                      ).popIn(),
-                      const SizedBox(height: 12),
-                      const Text('ACE PADEL',
-                          style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.8))
-                          .reveal(1),
-                      const SizedBox(height: 4),
-                      Text('Booking lapangan padel, tanpa ribet.',
-                          style: TextStyle(color: Colors.white.withValues(alpha: .75), fontSize: 14))
-                          .reveal(2),
+                      ),
                     ],
                   ),
                 ),
@@ -443,6 +528,56 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Text('Lihat-lihat dulu sebagai Tamu',
                             style: TextStyle(color: AP.slate, fontWeight: FontWeight.w700, fontSize: 14)),
                       ).reveal(7),
+                    const SizedBox(height: 12),
+                    // High-Voltage Feature Card (Inspired by Reference 1 Screen 1)
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: const ShapeDecoration(
+                        color: APColors.lime,
+                        shape: ChamferBorder(br: 14, tl: 6),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                              color: APColors.onLime,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const APRacketIcon(color: APColors.lime, size: 18),
+                          ),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'GAME INSIGHTS & HIGHLIGHTS',
+                                  style: TextStyle(
+                                    fontFamily: 'Display',
+                                    fontStyle: FontStyle.italic,
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w900,
+                                    color: APColors.onLime,
+                                    letterSpacing: 0.3,
+                                  ),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  'Pesan lapangan, mabar turnamen, & sewa gear resmi',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Color(0xFF1E2805),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     TextButton.icon(
                       onPressed: () => _showGoogleConfigModal(''),
                       icon: Icon(LucideIcons.circleHelp, size: 14, color: AP.slate),
@@ -472,8 +607,9 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _field(TextEditingController c, String hint, IconData icon,
       {TextInputType? type, bool obscure = false, Widget? suffix, String? autofill, ValueChanged<String>? onSubmit}) {

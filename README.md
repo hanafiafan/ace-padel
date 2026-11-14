@@ -87,6 +87,22 @@ ace-padel/
     └── widget_test.dart        # Automated UI widget & navigation integration tests
 ```
 
+## 🧪 Pengujian Otomatis & UAT (UTS Mobile Testing TI23B)
+
+Proyek ini telah dilengkapi dengan artefak pengujian lengkap sesuai silabus UTS Mobile Testing:
+
+1. **User Acceptance Testing (UAT)**:
+   - Dokumen lengkap di [`LAPORAN_UAT.md`](LAPORAN_UAT.md) mencakup 5 skenario berorientasi persona pengguna (Casual Player, Competitive Host, Equipment Enthusiast), kriteria penerimaan, data uji, dan status hasil pengujian (100% PASS).
+   - Lembar kerja UAT Excel di [`generate_uat_excel.py`](generate_uat_excel.py).
+
+2. **Automated E2E Testing dengan Maestro**:
+   - Direktori [`.maestro/`](.maestro/) berisi 4 skenario alur YAML otomatis:
+     - `01_launch_and_onboarding.yaml`: Pengujian peluncuran aplikasi & mode tamu.
+     - `02_navigation_and_explore.yaml`: Navigasi multi-tab & modal Peta Cluster Venue.
+     - `03_booking_and_gear_rental.yaml`: Alur transaksi inti reservasi lapangan & sewa gear resmi turnamen.
+     - `04_validation_and_error_handling.yaml`: Pengujian kondisi gagal & validasi form input.
+   - Panduan eksekusi pengujian Maestro di [`.maestro/README.md`](.maestro/README.md).
+
 ---
 
 ## 🛠️ Panduan Menjalankan Sistem

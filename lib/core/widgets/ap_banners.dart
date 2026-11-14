@@ -1,4 +1,5 @@
 import 'ap_shape.dart';
+import 'ap_decor.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -190,10 +191,12 @@ class APQuickAction {
   final Widget icon;
   final String label;
   final VoidCallback onTap;
-  const APQuickAction(this.icon, this.label, this.onTap);
+  final String? tag;
+  final Color? color;
+  const APQuickAction(this.icon, this.label, this.onTap, {this.tag, this.color});
 }
 
-/// Four equal monochrome actions — icon in a white tile, label below.
+/// Four equal actions — sporty chamfered cards with dynamic accents and micro tags.
 class APQuickActions extends StatelessWidget {
   final List<APQuickAction> actions;
   const APQuickActions({super.key, required this.actions});
@@ -202,34 +205,132 @@ class APQuickActions extends StatelessWidget {
   Widget build(BuildContext context) => Row(children: [
         for (final a in actions)
           Expanded(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                APHaptics.light();
-                a.onTap();
-              },
-              child: Column(children: [
-                Container(
-                  width: 56,
-                  height: 56,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  APHaptics.light();
+                  a.onTap();
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 4),
                   decoration: ShapeDecoration(
-                    color: AP.surface,
-                    shape: ChamferBorder(br: 12, side: BorderSide(color: APColors.line)),
+                    color: const Color(0xFF070B1F),
+                    shape: ChamferBorder(
+                      br: 16,
+                      tl: 6,
+                      side: BorderSide(
+                        color: (a.color ?? APColors.blue).withValues(alpha: 0.5),
+                        width: 1.3,
+                      ),
+                    ),
+                    shadows: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.25),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
-                  child: IconTheme(
-                    data:  IconThemeData(color: APColors.ink, size: 24),
-                    child: Center(child: a.icon),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 52,
+                            height: 52,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  (a.color ?? APColors.blue).withValues(alpha: 0.22),
+                                  (a.color ?? APColors.blue).withValues(alpha: 0.08),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: (a.color ?? APColors.blue).withValues(alpha: 0.45),
+                                width: 1.4,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: (a.color ?? APColors.blue).withValues(alpha: 0.25),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: IconTheme(
+                              data: IconThemeData(
+                                color: a.color ?? APColors.blue,
+                                size: 24,
+                              ),
+                              child: Center(child: a.icon),
+                            ),
+                          ),
+                          if (a.tag != null)
+                            Positioned(
+                              top: -7,
+                              right: -9,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: ShapeDecoration(
+                                  color: a.color ?? APColors.blue,
+                                  shape: const ChamferBorder(br: 5, tl: 3),
+                                  shadows: [
+                                    BoxShadow(
+                                      color: (a.color ?? APColors.blue).withValues(alpha: 0.5),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Text(
+                                  a.tag!,
+                                  style: TextStyle(
+                                    fontFamily: _kDisplay,
+                                    fontStyle: FontStyle.italic,
+                                    color: (a.color ?? APColors.blue) == APColors.lime
+                                        ? APColors.onLime
+                                        : Colors.white,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${a.label.toUpperCase()} →',
+                        style: const TextStyle(
+                          fontFamily: _kDisplay,
+                          fontStyle: FontStyle.italic,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                          letterSpacing: 0.3,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(a.label, style:  TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: APColors.inkSecondary)),
-              ]),
+              ),
             ),
           ),
       ]);
 }
 
-/// Home header: real court photo, greeting, one primary action.
+/// Home header: real court photo, tournament radar badge, greeting, athletic primary action.
 class APPhotoHero extends StatelessWidget {
   final String name;
   final String line;
@@ -239,41 +340,164 @@ class APPhotoHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ClipRRect(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(18),
         child: SizedBox(
-          height: 208,
+          height: 220,
           child: APPhoto(
             asset: 'assets/images/banner.jpg',
             alignment: const Alignment(0, .2),
-            scrim: .8,
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text('HALO, ${name.toUpperCase()}',
-                      style: TextStyle(color: Colors.white.withValues(alpha: .8), fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.6)),
-                  const SizedBox(height: 4),
-                  const Text('Siap main\nhari ini?',
-                      style: TextStyle(fontFamily: _kDisplay, color: Colors.white, fontSize: 38, fontWeight: FontWeight.w800, height: .95)),
-                  const SizedBox(height: 12),
-                  Row(children: [
-                    Expanded(child: Text(line, style: TextStyle(color: Colors.white.withValues(alpha: .78), fontSize: 12.5))),
-                    GestureDetector(
-                      onTap: () {
-                        APHaptics.medium();
-                        onCta();
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        decoration: BoxDecoration(color: APColors.lime, borderRadius: BorderRadius.circular(12)),
-                        child: Text(cta, style:  const TextStyle(color: AP.onLime, fontWeight: FontWeight.w800, fontSize: 13)),
-                      ),
+            scrim: .82,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: Opacity(
+                    opacity: 0.08,
+                    child: CustomPaint(
+                      painter: CourtLinesPainter(color: Colors.white, stroke: 2),
                     ),
-                  ]),
-                ],
-              ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.55),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                width: 0.8,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 6,
+                                  height: 6,
+                                  decoration: const BoxDecoration(
+                                    color: APColors.lime,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(color: APColors.lime, blurRadius: 6),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                const Text(
+                                  'RADAR ARENA • LIVE',
+                                  style: TextStyle(
+                                    fontFamily: _kDisplay,
+                                    fontStyle: FontStyle.italic,
+                                    color: Colors.white,
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 1.1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            'HALO, ${name.toUpperCase()}',
+                            style: TextStyle(
+                              fontFamily: _kDisplay,
+                              fontStyle: FontStyle.italic,
+                              color: Colors.white.withValues(alpha: .85),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'SIAP MAIN\nHARI INI?',
+                        style: TextStyle(
+                          fontFamily: _kDisplay,
+                          fontStyle: FontStyle.italic,
+                          color: Colors.white,
+                          fontSize: 40,
+                          fontWeight: FontWeight.w900,
+                          height: .92,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                const Icon(LucideIcons.mapPin, color: APColors.lime, size: 14),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    line,
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(alpha: .9),
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              APHaptics.medium();
+                              onCta();
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+                              decoration: ShapeDecoration(
+                                color: APColors.lime,
+                                shape: const ChamferBorder(br: 10, tl: 8),
+                                shadows: const [
+                                  BoxShadow(
+                                    color: Color(0x66D4FF00),
+                                    blurRadius: 14,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    cta.toUpperCase(),
+                                    style: const TextStyle(
+                                      fontFamily: _kDisplay,
+                                      fontStyle: FontStyle.italic,
+                                      color: APColors.onLime,
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 13,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  const Icon(LucideIcons.arrowRight, size: 15, color: APColors.onLime),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),

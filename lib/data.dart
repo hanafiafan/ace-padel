@@ -1767,6 +1767,12 @@ class EquipmentAddOn {
   final int price; // in thousands (e.g. 30 -> Rp30.000)
   final String description;
   final IconData icon;
+  final String category; // 'racket', 'balls', 'refreshment'
+  final String brand; // 'Bullpadel', 'Babolat', 'Adidas', 'Wilson', 'Head', 'Nox'
+  final String model;
+  final String image;
+  final String specTag;
+  final Color accentColor;
 
   const EquipmentAddOn({
     required this.id,
@@ -1774,30 +1780,149 @@ class EquipmentAddOn {
     required this.price,
     required this.description,
     required this.icon,
+    this.category = 'racket',
+    this.brand = 'Ace',
+    this.model = '',
+    this.image = '',
+    this.specTag = '',
+    this.accentColor = const Color(0xFF1632E6),
   });
 }
 
 const equipmentAddOns = <EquipmentAddOn>[
+  // ---- Rackets: Top Pro Tier Models with Real Assets ----
   EquipmentAddOn(
     id: 'racket',
     name: 'Sewa Raket Bullpadel Pro',
+    brand: 'Bullpadel',
+    model: 'Vertex 04 Diamond',
     price: 30,
-    description: 'Sweet-spot lebar & grip anti-slip',
+    description: 'Topspin Curvativ 12K & Diamond Frame (Juan Tello)',
     icon: kRacketIcon,
+    category: 'racket',
+    image: 'assets/images/racket_bullpadel_vertex.webp',
+    specTag: 'DIAMOND // MAXIMUM POWER',
+    accentColor: Color(0xFFEF4444),
   ),
+  EquipmentAddOn(
+    id: 'racket_babolat',
+    name: 'Sewa Raket Babolat Technical Viper',
+    brand: 'Babolat',
+    model: 'Technical Viper 3.0',
+    price: 35,
+    description: 'Full Carbon 12K & 3D Spin+ (Juan Lebrón)',
+    icon: kRacketIcon,
+    category: 'racket',
+    image: 'assets/images/racket_babolat_viper.webp',
+    specTag: 'EXPLOSIVE POWER // 12K',
+    accentColor: Color(0xFFF59E0B),
+  ),
+  EquipmentAddOn(
+    id: 'racket_adidas',
+    name: 'Sewa Raket Adidas Metalbone 3.3',
+    brand: 'Adidas',
+    model: 'Metalbone 3.3 H.R',
+    price: 40,
+    description: 'Custom Weight & Balance System (Ale Galán)',
+    icon: kRacketIcon,
+    category: 'racket',
+    image: 'assets/images/racket_adidas_metalbone.webp',
+    specTag: 'CUSTOM BALANCE // PRO LINE',
+    accentColor: Color(0xFFD4FF00),
+  ),
+  EquipmentAddOn(
+    id: 'racket_wilson',
+    name: 'Sewa Raket Wilson Bela Pro V2.5',
+    brand: 'Wilson',
+    model: 'Bela Pro Carbon',
+    price: 35,
+    description: 'Primero Carbon Face (Fernando Belasteguín)',
+    icon: kRacketIcon,
+    category: 'racket',
+    image: 'assets/images/racket_wilson_bela.webp',
+    specTag: 'LEGEND CONTROL // CARBON',
+    accentColor: Color(0xFFDC2626),
+  ),
+  EquipmentAddOn(
+    id: 'racket_head',
+    name: 'Sewa Raket Head Extreme Pro',
+    brand: 'Head',
+    model: 'Extreme Pro Auxetic',
+    price: 30,
+    description: 'Auxetic 2.0 Power & Hybrid Touch (Arturo Coello)',
+    icon: kRacketIcon,
+    category: 'racket',
+    image: 'assets/images/racket_head_extreme.webp',
+    specTag: 'AUXETIC 2.0 // HIGH SPIN',
+    accentColor: Color(0xFF10B981),
+  ),
+  EquipmentAddOn(
+    id: 'racket_nox',
+    name: 'Sewa Raket Nox AT10 Genius 18K',
+    brand: 'Nox',
+    model: 'AT10 Luxury 18K',
+    price: 35,
+    description: 'Alum Carbon 18K Teardrop (Agustín Tapia)',
+    icon: kRacketIcon,
+    category: 'racket',
+    image: 'assets/images/racket_nox_at10.webp',
+    specTag: 'TEARDROP // SURGICAL PRECISION',
+    accentColor: Color(0xFF6366F1),
+  ),
+
+  // ---- Balls: Official Tournament Cans with Real Assets ----
   EquipmentAddOn(
     id: 'balls',
     name: '1 Can Bola Baru (3 Pcs)',
+    brand: 'Head',
+    model: 'Head Padel Pro+',
     price: 75,
-    description: 'Bola padel bertekanan standar turnamen',
+    description: 'Bola resmi FIP & Premier Padel bertekanan tinggi',
     icon: kBallIcon,
+    category: 'balls',
+    image: 'assets/images/balls_head_pro.webp',
+    specTag: 'FIP OFFICIAL // SPEED+',
+    accentColor: Color(0xFF3B82F6),
   ),
+  EquipmentAddOn(
+    id: 'balls_bullpadel',
+    name: '1 Can Bullpadel Next Pro (3 Pcs)',
+    brand: 'Bullpadel',
+    model: 'Next Pro Speed',
+    price: 70,
+    description: 'Felt sintetis tahan aus untuk rally cepat dan konsisten',
+    icon: kBallIcon,
+    category: 'balls',
+    image: 'assets/images/balls_bullpadel_next.webp',
+    specTag: 'FAST REBOUND // TOUR',
+    accentColor: Color(0xFFEF4444),
+  ),
+  EquipmentAddOn(
+    id: 'balls_wilson',
+    name: '1 Can Wilson Padel X3 Speed (3 Pcs)',
+    brand: 'Wilson',
+    model: 'X3 Speed Dura',
+    price: 75,
+    description: 'Dura-Weave felt berdaya tahan maksimal untuk outdoor',
+    icon: kBallIcon,
+    category: 'balls',
+    image: 'assets/images/balls_wilson_x3.webp',
+    specTag: 'DURA-WEAVE // MAXIMUM DURABILITY',
+    accentColor: Color(0xFFDC2626),
+  ),
+
+  // ---- Refreshment & Amenities ----
   EquipmentAddOn(
     id: 'refreshment',
     name: 'Paket Handuk & 2 Air Mineral',
+    brand: 'Ace Padel',
+    model: 'Hydration Kit',
     price: 15,
-    description: 'Handuk katun bersih + air mineral dingin',
+    description: 'Handuk katun bersih dingin + 2 botol air mineral',
     icon: LucideIcons.droplet,
+    category: 'refreshment',
+    specTag: 'ESSENTIAL HYDRATION',
+    accentColor: Color(0xFF06B6D4),
   ),
 ];
 

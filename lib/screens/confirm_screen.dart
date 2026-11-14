@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../core/widgets/ap_banners.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
+import '../core/widgets/responsive_container.dart';
+import '../core/utils/haptics.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../core/utils/ui.dart';
@@ -37,6 +39,7 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
   Voucher? _appliedVoucher;
   Booking? _createdBooking;
   final Map<String, int> _selectedAddOns = {};
+  String _gearCategory = 'Semua';
 
   int get _addOnsTotal {
     int total = 0;
@@ -831,27 +834,38 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AP.cloud,
-      appBar: AppBar(
-        backgroundColor: AP.cloud,
-        elevation: 0,
-        foregroundColor: AP.ink,
-        title: Text(
-          _done ? 'Booking Berhasil' : 'Konfirmasi Reservasi',
-          style: const TextStyle(fontWeight: FontWeight.w800),
-        ),
-        automaticallyImplyLeading: !_done,
-      ),
-      body: _done ? _success() : _summary(),
-      bottomNavigationBar: _done
-          ? null
-          : _bottom(
-              label: _selectedPayment == 'Bayar di tempat'
-                  ? 'Konfirmasi Booking Sekarang'
-                  : 'Lanjut ke Pembayaran ($_selectedPayment)',
-              onTap: _submitting ? () {} : _handlePaymentFlow,
+    return ResponsiveContainer(
+      child: SportyCourtBackdrop(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            foregroundColor: AP.ink,
+            title: Text(
+              _done ? 'Booking Berhasil' : 'Konfirmasi Reservasi',
+              style: TextStyle(
+                fontFamily: 'Display',
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w900,
+                fontSize: 22,
+                color: AP.ink,
+              ),
             ),
+            automaticallyImplyLeading: !_done,
+          ),
+          body: _done ? _success() : _summary(),
+          bottomNavigationBar: _done
+              ? null
+              : _bottom(
+                  label: _selectedPayment == 'Bayar di tempat'
+                      ? 'Konfirmasi Booking Sekarang'
+                      : 'Lanjut ke Pembayaran ($_selectedPayment)',
+                  onTap: _submitting ? () {} : _handlePaymentFlow,
+                ),
+        ),
+      ),
     );
   }
 
@@ -1002,12 +1016,12 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
 
               // Card Sewa Alat & Perlengkapan Tambahan (Opsional)
               Container(
-                decoration: BoxDecoration(
+                decoration: ShapeDecoration(
                   color: AP.surface,
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: AP.line),
+                  shape: const ChamferBorder(br: 18, tl: 8),
+                  shadows: APShadows.card,
                 ),
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(18),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1015,149 +1029,334 @@ class _ConfirmScreenState extends State<ConfirmScreen> {
                       children: [
                         Container(
                           padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AP.blue.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(10),
+                          decoration: ShapeDecoration(
+                            color: APColors.blue,
+                            shape: const ChamferBorder(br: 6, tl: 4),
                           ),
-                          child:  APRacketIcon(color: AP.blue, size: 20),
+                          child: const APRacketIcon(color: Colors.white, size: 20),
                         ),
-                        const SizedBox(width: 10),
-                         Expanded(
+                        const SizedBox(width: 12),
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Sewa Alat & Perlengkapan',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w800, fontSize: 15),
+                              Row(
+                                children: [
+                                  Text(
+                                    'PRO RENTAL GEAR',
+                                    style: TextStyle(
+                                      fontFamily: 'Display',
+                                      fontStyle: FontStyle.italic,
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 16,
+                                      color: APColors.ink,
+                                      letterSpacing: 0.3,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                    decoration: const ShapeDecoration(
+                                      color: APColors.lime,
+                                      shape: ChamferBorder(br: 4, tl: 2),
+                                    ),
+                                    child: const Text(
+                                      'ASLI 100%',
+                                      style: TextStyle(
+                                        fontFamily: 'Display',
+                                        fontStyle: FontStyle.italic,
+                                        color: APColors.onLime,
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'Disediakan langsung di lapangan sebelum main',
-                                style:
-                                    TextStyle(color: AP.slate, fontSize: 11),
+                                'Pilihan sewa raket top brand & bola resmi turnamen WPT/FIP',
+                                style: TextStyle(color: AP.slate, fontSize: 11.5, height: 1.3),
                               ),
                             ],
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: AP.cloud,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child:  Text(
-                            'Opsional',
-                            style: TextStyle(
-                              color: AP.slate,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                            ),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 14),
-                     Divider(color: AP.line, height: 1),
-                    ...equipmentAddOns.map((item) {
+
+                    // Category Filter Segmented Chips (Semua, Raket Pro, Bola Resmi, Refreshment)
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          {'id': 'Semua', 'label': 'SEMUA GEAR'},
+                          {'id': 'racket', 'label': 'RAKET PRO (6)'},
+                          {'id': 'balls', 'label': 'BOLA RESMI (3)'},
+                          {'id': 'refreshment', 'label': 'REFRESHMENT'},
+                        ].map((cat) {
+                          final isSel = _gearCategory == cat['id'];
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: GestureDetector(
+                              onTap: () {
+                                APHaptics.light();
+                                setState(() => _gearCategory = cat['id']!);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: ShapeDecoration(
+                                  color: isSel ? APColors.blue : AP.cloud,
+                                  shape: const ChamferBorder(br: 8, tl: 4),
+                                  shadows: isSel ? APShadows.primaryButton : null,
+                                ),
+                                child: Text(
+                                  cat['label']!,
+                                  style: TextStyle(
+                                    fontFamily: 'Display',
+                                    fontStyle: FontStyle.italic,
+                                    color: isSel ? Colors.white : AP.ink,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 0.4,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Divider(color: AP.line, height: 1),
+                    const SizedBox(height: 10),
+
+                    // Filtered Gear List with Real Image Cards
+                    ...equipmentAddOns.where((item) {
+                      if (_gearCategory == 'Semua') return true;
+                      return item.category == _gearCategory;
+                    }).map((item) {
                       final count = _selectedAddOns[item.id] ?? 0;
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
+                      final isSelected = count > 0;
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 6),
+                        padding: const EdgeInsets.all(10),
+                        decoration: ShapeDecoration(
+                          color: isSelected
+                              ? item.accentColor.withValues(alpha: 0.08)
+                              : AP.cloud,
+                          shape: ChamferBorder(
+                            br: 14,
+                            tl: 6,
+                            side: BorderSide(
+                              color: isSelected
+                                  ? item.accentColor.withValues(alpha: 0.6)
+                                  : AP.line,
+                              width: isSelected ? 1.4 : 1.0,
+                            ),
+                          ),
+                          shadows: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: item.accentColor.withValues(alpha: 0.15),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ]
+                              : null,
+                        ),
                         child: Row(
                           children: [
+                            // Real Product Asset Container
                             Container(
-                              padding: const EdgeInsets.all(8),
+                              width: 66,
+                              height: 66,
                               decoration: BoxDecoration(
-                                color: AP.cloud,
-                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: item.accentColor.withValues(alpha: 0.25),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.06),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
-                              child: APGlyph(item.icon, size: 20, color: AP.ink),
+                              child: item.image.isNotEmpty
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(4),
+                                        child: Image.asset(
+                                          item.image,
+                                          fit: BoxFit.contain,
+                                          errorBuilder: (_, __, ___) => Center(
+                                            child: APGlyph(item.icon, size: 26, color: item.accentColor),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : Center(
+                                      child: APGlyph(item.icon, size: 26, color: item.accentColor),
+                                    ),
                             ),
                             const SizedBox(width: 12),
+
+                            // Details (Brand, Model, Specs, Price)
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                        decoration: ShapeDecoration(
+                                          color: item.accentColor,
+                                          shape: const ChamferBorder(br: 4, tl: 2),
+                                        ),
+                                        child: Text(
+                                          item.brand.toUpperCase(),
+                                          style: const TextStyle(
+                                            fontFamily: 'Display',
+                                            fontStyle: FontStyle.italic,
+                                            color: Colors.white,
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.w900,
+                                            letterSpacing: 0.4,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 5),
+                                      if (item.specTag.isNotEmpty)
+                                        Expanded(
+                                          child: Text(
+                                            item.specTag,
+                                            style: TextStyle(
+                                              fontFamily: 'Display',
+                                              fontStyle: FontStyle.italic,
+                                              fontSize: 9.5,
+                                              fontWeight: FontWeight.w800,
+                                              color: AP.slate,
+                                              letterSpacing: 0.3,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 3),
                                   Text(
                                     item.name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 13,
+                                    style: TextStyle(
+                                      fontFamily: 'Display',
+                                      fontStyle: FontStyle.italic,
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 14.5,
+                                      color: APColors.ink,
+                                      letterSpacing: 0.2,
                                     ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    '+Rp${item.price}k • ${item.description}',
-                                    style:  TextStyle(
+                                    item.description,
+                                    style: TextStyle(
                                       color: AP.slate,
                                       fontSize: 11,
+                                      height: 1.25,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '+Rp${item.price}.000',
+                                    style: TextStyle(
+                                      fontFamily: 'Display',
+                                      fontStyle: FontStyle.italic,
+                                      color: APColors.blue,
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 13,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            // Stepper counter [-] qty [+]
+                            const SizedBox(width: 8),
+
+                            // Sporty Athletic Stepper Controls
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 InkWell(
                                   onTap: count > 0
                                       ? () {
+                                          APHaptics.light();
                                           setState(() {
-                                            _selectedAddOns[item.id] =
-                                                count - 1;
+                                            _selectedAddOns[item.id] = count - 1;
                                           });
                                         }
                                       : null,
-                                  borderRadius: BorderRadius.circular(14),
+                                  borderRadius: BorderRadius.circular(8),
                                   child: Container(
-                                    width: 30,
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: count > 0 ? AP.blue : AP.line,
+                                    width: 28,
+                                    height: 28,
+                                    decoration: ShapeDecoration(
+                                      color: count > 0 ? AP.surface : Colors.transparent,
+                                      shape: ChamferBorder(
+                                        br: 6,
+                                        tl: 4,
+                                        side: BorderSide(
+                                          color: count > 0 ? APColors.blue : AP.line,
+                                          width: 1.2,
+                                        ),
                                       ),
-                                      color:
-                                          count > 0 ? AP.surface : AP.cloud,
                                     ),
                                     child: Icon(
                                       LucideIcons.minus,
-                                      size: 16,
-                                      color: count > 0 ? AP.blue : AP.slate,
+                                      size: 14,
+                                      color: count > 0 ? APColors.blue : AP.slate,
                                     ),
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
                                   child: Text(
                                     '$count',
                                     style: TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 14,
+                                      fontFamily: 'Display',
+                                      fontStyle: FontStyle.italic,
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 15,
                                       color: count > 0 ? AP.ink : AP.slate,
                                     ),
                                   ),
                                 ),
                                 InkWell(
                                   onTap: () {
+                                    APHaptics.light();
                                     setState(() {
                                       _selectedAddOns[item.id] = count + 1;
                                     });
                                   },
-                                  borderRadius: BorderRadius.circular(14),
+                                  borderRadius: BorderRadius.circular(8),
                                   child: Container(
-                                    width: 30,
-                                    height: 30,
-                                    decoration:  BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AP.blue,
+                                    width: 28,
+                                    height: 28,
+                                    decoration: ShapeDecoration(
+                                      color: APColors.blue,
+                                      shape: const ChamferBorder(br: 6, tl: 4),
+                                      shadows: APShadows.primaryButton,
                                     ),
                                     child: const Icon(
                                       LucideIcons.plus,
-                                      size: 16,
+                                      size: 14,
                                       color: Colors.white,
                                     ),
                                   ),
@@ -1410,10 +1609,10 @@ c.image, fallbackUrl: c.imageUrl,
 
   // ---- helpers ----
   Widget _card(List<Widget> children) => Container(
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: AP.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AP.line),
+          shape: const ChamferBorder(br: 18, tl: 8),
+          shadows: APShadows.card,
         ),
         child: Column(children: children),
       );
@@ -1422,14 +1621,21 @@ c.image, fallbackUrl: c.imageUrl,
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: AP.blue),
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: ShapeDecoration(
+                color: APColors.blue.withValues(alpha: 0.12),
+                shape: const ChamferBorder(br: 6, tl: 3),
+              ),
+              child: Icon(icon, size: 18, color: APColors.blue),
+            ),
             const SizedBox(width: 12),
-            Text(label, style:  TextStyle(color: AP.slate)),
+            Text(label, style: TextStyle(color: AP.slate, fontWeight: FontWeight.w600)),
             const Spacer(),
             Flexible(
               child: Text(value,
                   textAlign: TextAlign.right,
-                  style: const TextStyle(fontWeight: FontWeight.w600)),
+                  style: const TextStyle(fontWeight: FontWeight.w700)),
             ),
           ],
         ),
@@ -1444,26 +1650,41 @@ c.image, fallbackUrl: c.imageUrl,
           children: [
             Text(label,
                 style: TextStyle(
+                    fontFamily: bold ? 'Display' : null,
+                    fontStyle: bold ? FontStyle.italic : null,
                     color: bold ? AP.ink : AP.slate,
-                    fontWeight: bold ? FontWeight.w800 : FontWeight.w400,
+                    fontWeight: bold ? FontWeight.w900 : FontWeight.w600,
                     fontSize: bold ? 16 : 14)),
             Text(value,
                 style: TextStyle(
+                    fontFamily: 'Display',
+                    fontStyle: FontStyle.italic,
                     color: valueColor ?? (bold ? AP.blue : AP.ink),
-                    fontWeight: bold ? FontWeight.w800 : FontWeight.w600,
-                    fontSize: bold ? 18 : 14)),
+                    fontWeight: bold ? FontWeight.w900 : FontWeight.w700,
+                    fontSize: bold ? 20 : 14)),
           ],
         ),
       );
 
-  Widget _divider() =>  Divider(height: 1, color: AP.line);
+  Widget _divider() => Divider(height: 1, color: AP.line);
 
   Widget _bottom({required String label, required VoidCallback onTap}) =>
       Container(
-        padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
-        decoration:  BoxDecoration(
-          color: AP.surface,
-          border: Border(top: BorderSide(color: AP.line)),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        decoration: const ShapeDecoration(
+          color: Color(0xFF070B1F),
+          shape: ChamferBorder(
+            br: 14,
+            tl: 14,
+            side: BorderSide(color: Color(0xFF1B2B50), width: 1.2),
+          ),
+          shadows: [
+            BoxShadow(
+              color: Colors.black45,
+              blurRadius: 16,
+              offset: Offset(0, -4),
+            ),
+          ],
         ),
         child: _bottomButton(label: label, filled: true, onTap: onTap),
       );
@@ -1474,26 +1695,34 @@ c.image, fallbackUrl: c.imageUrl,
     required VoidCallback onTap,
   }) =>
       SizedBox(
-        height: 54,
+        height: 52,
         child: filled
             ? ElevatedButton(
                 onPressed: onTap,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AP.lime,
-                  foregroundColor: AP.onLime,
-                  elevation: 0,
-                  shape: const ChamferBorder(br: 10, tl: 10),
+                  backgroundColor: APColors.lime,
+                  foregroundColor: APColors.onLime,
+                  elevation: 4,
+                  shadowColor: APColors.lime.withValues(alpha: 0.4),
+                  shape: const ChamferBorder(br: 12, tl: 6),
                 ),
-                child: Text(label,
-                    style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
-                        fontSize: 18.4, fontWeight: FontWeight.w800)),
+                child: Text(
+                  label.toUpperCase(),
+                  style: const TextStyle(
+                    fontFamily: 'Display',
+                    fontStyle: FontStyle.italic,
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.4,
+                  ),
+                ),
               )
             : OutlinedButton(
                 onPressed: onTap,
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AP.blue,
-                  side:  BorderSide(color: AP.blue),
-                  shape: const ChamferBorder(br: 10, tl: 10),
+                  side: BorderSide(color: AP.blue),
+                  shape: const ChamferBorder(br: 12, tl: 6),
                 ),
                 child: Text(label,
                     style: const TextStyle(

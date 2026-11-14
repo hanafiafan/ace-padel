@@ -1,0 +1,15 @@
+appId: dev.hellens.ace_padel
+---
+- launchApp
+- tapOn: "Profile"
+- scroll
+- tapOn: "Masuk / Daftar"
+- assertVisible: "Selamat Datang"
+- tapOn: "Daftar"
+- assertVisible: "Buat Akun Baru"
+- tapOn: "Daftar"
+- assertVisible: "Nama minimal 2 karakter."
+- inputText: "Afan"
+- tapOn: "Daftar"
+- assertVisible: "Format email tidak valid."
+- back

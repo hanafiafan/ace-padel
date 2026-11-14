@@ -1,6 +1,7 @@
 import '../core/widgets/ap_shape.dart';
 import '../core/widgets/app_skeleton.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
 import '../core/utils/haptics.dart';
@@ -26,6 +27,152 @@ class _CourtsScreenState extends State<CourtsScreen> {
   final _controller = TextEditingController();
   String _query = '';
   bool _isGridView = false;
+  int _selectedDayIndex = 0;
+
+  void _showVenueMapModal() {
+    APHaptics.medium();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AP.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 44,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AP.line,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: ShapeDecoration(
+                    color: APColors.blue,
+                    shape: const ChamferBorder(br: 6, tl: 4),
+                  ),
+                  child: const Icon(LucideIcons.mapPin, color: Colors.white, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'PETA CLUSTER VENUE',
+                      style: TextStyle(
+                        fontFamily: 'Display',
+                        fontStyle: FontStyle.italic,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    Text(
+                      'Lokasi arena padel aktif di Jakarta & Bali',
+                      style: TextStyle(color: APColors.slate, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ...[
+              {
+                'cluster': 'JAKARTA SELATAN (6 ARENA)',
+                'area': 'Setiabudi • Kemang • Senayan',
+                'courts': 'Center Glass, Signature Pink, Menteng Pro',
+                'city': 'Jakarta',
+                'color': APColors.blue,
+              },
+              {
+                'cluster': 'BALI COASTAL (4 ARENA)',
+                'area': 'Canggu • Seminyak • Badung',
+                'courts': 'Beachfront Sunset, Tropical Oasis, Uluwatu Cliff',
+                'city': 'Badung',
+                'color': APColors.lime,
+              },
+              {
+                'cluster': 'TANGERANG & BSD (6 ARENA)',
+                'area': 'BSD City • Gading Serpong • Alam Sutera',
+                'courts': 'Grand Arena Hall, Verde Championship',
+                'city': 'Tangerang',
+                'color': const Color(0xFF10B981),
+              },
+            ].map((c) => Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.all(12),
+                  decoration: ShapeDecoration(
+                    color: AP.cloud,
+                    shape: const ChamferBorder(br: 12, tl: 6),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 4,
+                        height: 38,
+                        decoration: ShapeDecoration(
+                          color: c['color'] as Color,
+                          shape: const ChamferBorder(br: 2, tl: 2),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              c['cluster'] as String,
+                              style: const TextStyle(
+                                fontFamily: 'Display',
+                                fontStyle: FontStyle.italic,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 13,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              c['courts'] as String,
+                              style: TextStyle(color: APColors.slate, fontSize: 11),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() => _city = c['city'] as String);
+                          Navigator.pop(ctx);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: APColors.blue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          shape: const ChamferBorder(br: 6, tl: 3),
+                        ),
+                        child: const Text('Pilih', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
+                      ),
+                    ],
+                  ),
+                )),
+          ],
+        ),
+      ),
+    );
+  }
 
   void _rebuild() {
     if (mounted) setState(() {});
@@ -265,10 +412,47 @@ class _CourtsScreenState extends State<CourtsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('CARI LAPANGAN',
-                      style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 24.64, fontWeight: FontWeight.w800)),
+                  const Expanded(
+                    child: Text(
+                      'CARI LAPANGAN',
+                      style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 22, fontWeight: FontWeight.w800),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   Row(
                     children: [
+                      GestureDetector(
+                        onTap: _showVenueMapModal,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: ShapeDecoration(
+                            color: APColors.blue,
+                            shape: const ChamferBorder(br: 8, tl: 4),
+                            shadows: APShadows.subtle,
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(LucideIcons.map, size: 14, color: Colors.white),
+                              SizedBox(width: 5),
+                              Text(
+                                'PETA',
+                                style: TextStyle(
+                                  fontFamily: 'Display',
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.4,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
                       IconButton(
                         tooltip: _isGridView ? 'Tampilan List' : 'Tampilan Grid',
                         icon: Icon(
@@ -361,6 +545,67 @@ class _CourtsScreenState extends State<CourtsScreen> {
               ),
             ),
             const SizedBox(height: 12),
+            // Weekly Day Strip (Inspired by Reference 2 Screen 2)
+            SizedBox(
+              height: 48,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: 7,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (_, i) {
+                  final day = DateTime.now().add(Duration(days: i));
+                  final isSel = _selectedDayIndex == i;
+                  return GestureDetector(
+                    onTap: () {
+                      APHaptics.light();
+                      setState(() => _selectedDayIndex = i);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: ShapeDecoration(
+                        color: isSel ? APColors.lime : AP.surface,
+                        shape: const ChamferBorder(br: 8, tl: 4),
+                        shadows: isSel
+                            ? [
+                                BoxShadow(
+                                  color: APColors.lime.withValues(alpha: 0.35),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            DateFormat('EEE').format(day).toUpperCase(),
+                            style: TextStyle(
+                              fontFamily: 'Display',
+                              fontStyle: FontStyle.italic,
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w800,
+                              color: isSel ? APColors.onLime : AP.slate,
+                            ),
+                          ),
+                          Text(
+                            '${day.day}',
+                            style: TextStyle(
+                              fontFamily: 'Display',
+                              fontStyle: FontStyle.italic,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w900,
+                              color: isSel ? APColors.onLime : AP.ink,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
             // Indoor/Outdoor Row
             Row(
               children: [
@@ -379,7 +624,7 @@ class _CourtsScreenState extends State<CourtsScreen> {
                     ),
                     child: Text(
                       _sortBy,
-                      style:  TextStyle(
+                      style: TextStyle(
                           color: AP.blue,
                           fontSize: 11,
                           fontWeight: FontWeight.w700),
@@ -389,7 +634,7 @@ class _CourtsScreenState extends State<CourtsScreen> {
             ),
             const SizedBox(height: 10),
             Text('${list.length} lapangan ditemukan',
-                style:  TextStyle(color: AP.slate, fontSize: 13)),
+                style: TextStyle(color: AP.slate, fontSize: 13)),
             const SizedBox(height: 10),
             Expanded(
               child: list.isEmpty
@@ -407,7 +652,7 @@ class _CourtsScreenState extends State<CourtsScreen> {
                           final useGrid = _isGridView || constraints.maxWidth > 600;
                           if (useGrid) {
                             return GridView.builder(
-                              padding: const EdgeInsets.only(bottom: 24),
+                              padding: const EdgeInsets.only(bottom: 80),
                               gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                                 maxCrossAxisExtent: 380,
                                 crossAxisSpacing: 14,
@@ -437,8 +682,8 @@ class _CourtsScreenState extends State<CourtsScreen> {
         ),
       ),
     ),
-  );
-}
+    );
+  }
 
   Widget _empty() => Center(
         child: Column(

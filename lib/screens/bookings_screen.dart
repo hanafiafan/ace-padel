@@ -1,5 +1,6 @@
 import '../core/widgets/ap_shape.dart';
 import '../core/widgets/app_skeleton.dart';
+import '../core/widgets/responsive_container.dart';
 import '../core/widgets/ap_banners.dart';
 import 'package:flutter/material.dart';
 import '../core/widgets/app_empty_state.dart';
@@ -41,47 +42,52 @@ class _BookingsScreenState extends State<BookingsScreen>
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'BOOKING SAYA',
-              style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 24.64, fontWeight: FontWeight.w800),
-            ).reveal(),
-            const SizedBox(height: 14),
+    return ResponsiveContainer(
+      child: SportyCourtBackdrop(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'BOOKING SAYA',
+                  style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 24.64, fontWeight: FontWeight.w800),
+                ).reveal(),
+                const SizedBox(height: 14),
 
-            // Tab bar
-            Container(
-              height: 46,
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: AP.surface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AP.line),
-              ),
-              child: TabBar(
-                controller: _tabController,
-                indicator: BoxDecoration(
-                  color: AP.blue,
-                  borderRadius: BorderRadius.circular(12),
+                // Tab bar
+                Container(
+                  height: 46,
+                  padding: const EdgeInsets.all(4),
+                  decoration: ShapeDecoration(
+                    color: AP.surface,
+                    shape: const ChamferBorder(br: 14, tl: 6),
+                    shadows: APShadows.subtle,
+                  ),
+                  child: TabBar(
+                    controller: _tabController,
+                    indicator: ShapeDecoration(
+                      color: APColors.blue,
+                      shape: const ChamferBorder(br: 10, tl: 4),
+                    ),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    labelColor: Colors.white,
+                    unselectedLabelColor: AP.slate,
+                    labelStyle: const TextStyle(
+                      fontFamily: 'Display',
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 13,
+                      letterSpacing: 0.3,
+                    ),
+                    dividerColor: Colors.transparent,
+                    tabs: const [
+                      Tab(text: 'MENDATANG'),
+                      Tab(text: 'RIWAYAT'),
+                    ],
+                  ),
                 ),
-                indicatorSize: TabBarIndicatorSize.tab,
-                labelColor: Colors.white,
-                unselectedLabelColor: AP.slate,
-                labelStyle: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 13,
-                ),
-                dividerColor: Colors.transparent,
-                tabs: const [
-                  Tab(text: 'Mendatang'),
-                  Tab(text: 'Riwayat'),
-                ],
-              ),
-            ),
 
             const SizedBox(height: 16),
 
@@ -157,6 +163,8 @@ class _BookingsScreenState extends State<BookingsScreen>
           ],
         ),
       ),
+    ),
+    ),
     );
   }
 
@@ -243,17 +251,10 @@ class _BookingCard extends StatelessWidget {
       },
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: AP.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AP.line),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          shape: const ChamferBorder(br: 18, tl: 8),
+          shadows: APShadows.card,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

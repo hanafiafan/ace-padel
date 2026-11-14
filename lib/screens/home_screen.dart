@@ -31,6 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String _query = '';
   String _cat = 'Semua';
   bool? _indoorFilter;
+  int _selectedDayIndex = 0;
+  String _tournamentCategory = 'SEMUA';
 
   void _rebuild() {
     if (mounted) setState(() {});
@@ -249,86 +251,367 @@ class _HomeScreenState extends State<HomeScreen> {
           onRefresh: _refreshAll,
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
           children: [
-            // Executive Brand & Action Header
-            Row(
-              children: [
-                const AceLogo(size: 34),
-                const Spacer(),
-                GestureDetector(
-                  onTap: () {
-                    APHaptics.light();
-                    ThemeController.instance.set(APTheme.isDark ? ThemeMode.light : ThemeMode.dark);
-                  },
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AP.surface,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AP.line),
-                    ),
-                    child: Icon(APTheme.isDark ? LucideIcons.sun : LucideIcons.moon, color: AP.ink, size: 20),
+            // SOLID ROYAL BLUE ACTION HEADER (Reference 1 Screen 2 & Reference 2 Screen 2)
+            Container(
+              decoration: const ShapeDecoration(
+                color: Color(0xFF1632E6),
+                shape: ChamferBorder(br: 24, tl: 8),
+                shadows: [
+                  BoxShadow(
+                    color: Color(0x401632E6),
+                    blurRadius: 20,
+                    offset: Offset(0, 6),
                   ),
-                ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () {
-                    APHaptics.light();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const NotificationsScreen()),
-                    );
-                  },
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AP.surface,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AP.line),
-                      boxShadow: APShadows.subtle,
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                         Icon(LucideIcons.bell, color: AP.ink, size: 21),
-                        Positioned(
-                          top: 8,
-                          right: 9,
+                ],
+              ),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Top Row: Avatar + Location + Theme + Bell
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          APHaptics.light();
+                          tabIndex.value = 4; // Profil
+                        },
+                        child: Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: APColors.lime, width: 2),
+                          ),
+                          child: const Center(
+                            child: Icon(LucideIcons.userRound, color: Colors.white, size: 18),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      // Location Dropdown Selector (Reference 2 Screen 1: "London ⌄")
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: ShapeDecoration(
+                          color: Colors.white.withValues(alpha: 0.18),
+                          shape: const ChamferBorder(br: 8, tl: 4),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(LucideIcons.mapPin, color: APColors.lime, size: 13),
+                            SizedBox(width: 5),
+                            Text(
+                              'Jakarta Selatan',
+                              style: TextStyle(
+                                fontFamily: 'Display',
+                                fontStyle: FontStyle.italic,
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            SizedBox(width: 3),
+                            Icon(LucideIcons.chevronDown, color: Colors.white70, size: 14),
+                          ],
+                        ),
+                      ),
+                      const Spacer(),
+                      // Frosted Theme Toggle
+                      GestureDetector(
+                        onTap: () {
+                          APHaptics.light();
+                          ThemeController.instance.set(APTheme.isDark ? ThemeMode.light : ThemeMode.dark);
+                        },
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.18),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(APTheme.isDark ? LucideIcons.sun : LucideIcons.moon, color: Colors.white, size: 18),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // Frosted Bell Button
+                      GestureDetector(
+                        onTap: () {
+                          APHaptics.light();
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen()));
+                        },
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.18),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Icon(LucideIcons.bell, color: Colors.white, size: 18),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Title & Month Selector Row (Reference 1 Screen 2)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'PADEL ARENA ZONE',
+                              style: TextStyle(
+                                fontFamily: 'Display',
+                                fontStyle: FontStyle.italic,
+                                color: APColors.lime,
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'Padel Action Now',
+                              style: TextStyle(
+                                fontFamily: 'Display',
+                                fontStyle: FontStyle.italic,
+                                color: Colors.white,
+                                fontSize: 23,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -0.3,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // Month Selector Capsule "< November >"
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: ShapeDecoration(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          shape: const ChamferBorder(br: 8, tl: 4),
+                        ),
+                        child: const Text(
+                          '‹ Nov 2026 ›',
+                          style: TextStyle(
+                            fontFamily: 'Display',
+                            fontStyle: FontStyle.italic,
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Horizontal Date Strip on Royal Blue (Reference 1 Screen 2)
+                  SizedBox(
+                    height: 52,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 7,
+                      separatorBuilder: (_, __) => const SizedBox(width: 8),
+                      itemBuilder: (_, i) {
+                        final day = DateTime.now().add(Duration(days: i));
+                        final isSel = _selectedDayIndex == i;
+                        return GestureDetector(
+                          onTap: () {
+                            APHaptics.light();
+                            setState(() => _selectedDayIndex = i);
+                          },
                           child: Container(
-                            width: 7,
-                            height: 7,
-                            decoration: const BoxDecoration(
-                              color: Colors.redAccent,
-                              shape: BoxShape.circle,
+                            width: 50,
+                            decoration: ShapeDecoration(
+                              color: isSel ? APColors.lime : Colors.white.withValues(alpha: 0.12),
+                              shape: const ChamferBorder(br: 12, tl: 4),
+                              shadows: isSel
+                                  ? [
+                                      BoxShadow(
+                                        color: APColors.lime.withValues(alpha: 0.4),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  DateFormat('EEE').format(day).toUpperCase(),
+                                  style: TextStyle(
+                                    fontFamily: 'Display',
+                                    fontStyle: FontStyle.italic,
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.w800,
+                                    color: isSel ? APColors.onLime : Colors.white70,
+                                  ),
+                                ),
+                                const SizedBox(height: 1),
+                                Text(
+                                  '${day.day}',
+                                  style: TextStyle(
+                                    fontFamily: 'Display',
+                                    fontStyle: FontStyle.italic,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w900,
+                                    color: isSel ? APColors.onLime : Colors.white,
+                                  ),
+                                ),
+                                if (isSel)
+                                  Container(
+                                    width: 4,
+                                    height: 4,
+                                    margin: const EdgeInsets.only(top: 2),
+                                    decoration: const BoxDecoration(
+                                      color: APColors.onLime,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Tournament Category Filter Chips (Reference 1 Screen 2)
+            SizedBox(
+              height: 38,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  Container(
+                    width: 38,
+                    height: 38,
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: const ShapeDecoration(
+                      color: APColors.lime,
+                      shape: ChamferBorder(br: 8, tl: 4),
+                    ),
+                    child: const Icon(LucideIcons.slidersHorizontal, size: 18, color: APColors.onLime),
+                  ),
+                  for (final cat in ['SEMUA', 'TURNAMEN', 'LIGA', 'FUN GAME', 'OPEN MABAR'])
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: GestureDetector(
+                        onTap: () {
+                          APHaptics.light();
+                          setState(() => _tournamentCategory = cat);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: ShapeDecoration(
+                            color: _tournamentCategory == cat ? APColors.blue : AP.surface,
+                            shape: const ChamferBorder(br: 10, tl: 4),
+                            shadows: _tournamentCategory == cat ? APShadows.primaryButton : null,
+                          ),
+                          child: Text(
+                            cat,
+                            style: TextStyle(
+                              fontFamily: 'Display',
+                              fontStyle: FontStyle.italic,
+                              color: _tournamentCategory == cat ? Colors.white : AP.ink,
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.4,
                             ),
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () {
-                    APHaptics.light();
-                    tabIndex.value = 4; // Ke Profil
-                  },
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      gradient:  LinearGradient(colors: [AP.blue, AP.blueDark]),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AP.lime, width: 2),
-                      boxShadow: APShadows.subtle,
-                    ),
-                    child: const Icon(LucideIcons.userRound, color: Colors.white, size: 20),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-            const SizedBox(height: 18),
+
+            const SizedBox(height: 16),
+
+            // QUICK START CARD (Inspired by Reference 4 Screen 1)
+            GestureDetector(
+              onTap: () {
+                APHaptics.medium();
+                tabIndex.value = 1; // Ke Courts
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: ShapeDecoration(
+                  color: APColors.lime,
+                  shape: const ChamferBorder(br: 18, tl: 6),
+                  shadows: [
+                    BoxShadow(
+                      color: APColors.lime.withValues(alpha: 0.35),
+                      blurRadius: 14,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(9),
+                      decoration: const BoxDecoration(
+                        color: APColors.onLime,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(LucideIcons.play, color: APColors.lime, size: 18),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'QUICK START // PESAN LAPANGAN',
+                            style: TextStyle(
+                              fontFamily: 'Display',
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 14.5,
+                              color: APColors.onLime,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                          SizedBox(height: 1),
+                          Text(
+                            '16 arena siap tanding • Konfirmasi instan',
+                            style: TextStyle(
+                              color: Color(0xFF1E2805),
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(LucideIcons.arrowRight, color: APColors.onLime, size: 20),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             AnimatedBuilder(
               animation: UserStore.instance,
               builder: (context, _) {
@@ -481,31 +764,46 @@ next.court.image, fallbackUrl: next.court.imageUrl,
             ),
 
             const SizedBox(height: 18),
-            // Upgraded Search & Filter Bar
+            // Sporty Tactical Search & Filter Bar
             Row(
               children: [
                 Expanded(
                   child: Container(
-                    height: 50,
+                    height: 52,
                     padding: const EdgeInsets.symmetric(horizontal: 14),
-                    decoration: BoxDecoration(
+                    decoration: ShapeDecoration(
                       color: AP.surface,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AP.line),
-                      boxShadow: APShadows.subtle,
+                      shape: const ChamferBorder(br: 14, tl: 6),
+                      shadows: APShadows.subtle,
                     ),
                     child: Row(
                       children: [
-                         Icon(LucideIcons.search, color: AP.slate, size: 22),
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AP.blue.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(LucideIcons.search, color: AP.blue, size: 18),
+                        ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: TextField(
                             controller: _controller,
                             onChanged: (v) => setState(() => _query = v),
                             textInputAction: TextInputAction.search,
-                            decoration:  InputDecoration(
+                            style: TextStyle(
+                              color: AP.ink,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            decoration: InputDecoration(
                               hintText: 'Cari lapangan atau venue...',
-                              hintStyle: TextStyle(color: AP.slate, fontSize: 14),
+                              hintStyle: TextStyle(
+                                color: AP.slate,
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w500,
+                              ),
                               border: InputBorder.none,
                               isDense: true,
                             ),
@@ -520,7 +818,7 @@ next.court.image, fallbackUrl: next.court.imageUrl,
                                 _query = '';
                               });
                             },
-                            child:  Icon(LucideIcons.x, color: AP.slate, size: 20),
+                            child: Icon(LucideIcons.x, color: AP.slate, size: 20),
                           ),
                       ],
                     ),
@@ -530,20 +828,21 @@ next.court.image, fallbackUrl: next.court.imageUrl,
                 GestureDetector(
                   onTap: _showAdvancedFilterSheet,
                   child: Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
+                    width: 52,
+                    height: 52,
+                    decoration: ShapeDecoration(
                       color: _indoorFilter != null ? AP.blue : AP.surface,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: _indoorFilter != null ? AP.blue : AP.line,
-                      ),
-                      boxShadow: APShadows.subtle,
+                      shape: const ChamferBorder(br: 14, tl: 6),
+                      shadows: _indoorFilter != null
+                          ? APShadows.primaryButton
+                          : APShadows.subtle,
                     ),
-                    child: Icon(
-                      LucideIcons.slidersHorizontal,
-                      color: _indoorFilter != null ? Colors.white : AP.ink,
-                      size: 22,
+                    child: Center(
+                      child: Icon(
+                        LucideIcons.slidersHorizontal,
+                        color: _indoorFilter != null ? Colors.white : AP.ink,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ),
@@ -561,10 +860,34 @@ next.court.image, fallbackUrl: next.court.imageUrl,
                   .map((c) => CourtRow(court: c, onTap: () => _openCourt(c))),
           ] else ...[
             APQuickActions(actions: [
-              APQuickAction(const APRacketIcon(), 'Sewa Court', () => tabIndex.value = 1),
-              APQuickAction(const Icon(LucideIcons.users), 'Mabar', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MatchesScreen()))),
-              APQuickAction(const Icon(LucideIcons.graduationCap), 'Coach', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CoachesScreen()))),
-              APQuickAction(const Icon(LucideIcons.tag), 'Promo', _copyPromoCode),
+              APQuickAction(
+                const APRacketIcon(),
+                'Sewa Court',
+                () => tabIndex.value = 1,
+                tag: 'BOOK',
+                color: AP.blue,
+              ),
+              APQuickAction(
+                const Icon(LucideIcons.swords),
+                'Mabar',
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MatchesScreen())),
+                tag: 'MATCH',
+                color: const Color(0xFF6366F1),
+              ),
+              APQuickAction(
+                const Icon(LucideIcons.medal),
+                'Coach',
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CoachesScreen())),
+                tag: 'PRO',
+                color: const Color(0xFF10B981),
+              ),
+              APQuickAction(
+                const Icon(LucideIcons.zap),
+                'Promo',
+                _copyPromoCode,
+                tag: 'SALE',
+                color: const Color(0xFFF59E0B),
+              ),
             ]),
             const SizedBox(height: 22),
             APBannerCarousel(banners: [
@@ -616,90 +939,280 @@ next.court.image, fallbackUrl: next.court.imageUrl,
                 final m = matches.first;
 
                 return Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AP.surface,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AP.line),
-                  ),
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: apImg(
-m.court.image, fallbackUrl: m.court.imageUrl,
-                          width: 52,
-                          height: 52,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
-                            width: 52,
-                            height: 52,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(colors: m.court.gradient),
-                            ),
-                            child: const APRacketIcon(color: Colors.white, size: 24),
-                          ),
-                        ),
+                  padding: const EdgeInsets.all(10),
+                  decoration: const ShapeDecoration(
+                    color: APColors.lime, // Outer neon-lime container from Reference 1 Screen 2!
+                    shape: ChamferBorder(br: 20, tl: 8),
+                    shadows: [
+                      BoxShadow(
+                        color: Color(0x40D4FF00),
+                        blurRadius: 14,
+                        offset: Offset(0, 4),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
+                    ],
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: const ShapeDecoration(
+                      color: Colors.white, // Inner white score panel from Reference 1 Screen 2!
+                      shape: ChamferBorder(br: 16, tl: 6),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Header Row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              m.title,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w800, fontSize: 13),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                            const Row(
+                              children: [
+                                Text(
+                                  "GENTLEMEN'S DOUBLES",
+                                  style: TextStyle(
+                                    fontFamily: 'Display',
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 12,
+                                    color: Color(0xFF1E3A2B),
+                                    letterSpacing: 0.4,
+                                  ),
+                                ),
+                                SizedBox(width: 6),
+                                Text(
+                                  '// ROUND OF 8',
+                                  style: TextStyle(
+                                    fontFamily: 'Display',
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 10.5,
+                                    color: Color(0xFF6B7280),
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '${m.court.name} • ${m.time}',
-                              style:  TextStyle(
-                                  color: AP.slate, fontSize: 11),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${m.currentPlayers}/${m.maxPlayers} Pemain • Rp${m.pricePerPlayer}k',
-                              style:  TextStyle(
-                                  color: AP.blue,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 11),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFD1FAE5),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                '${m.maxPlayers - m.currentPlayers} SLOTS LEFT',
+                                style: const TextStyle(
+                                  fontFamily: 'Display',
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 9.5,
+                                  color: Color(0xFF065F46),
+                                  letterSpacing: 0.4,
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(width: 6),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const MatchesScreen(),
+                        const SizedBox(height: 12),
+
+                        // Teams Lineup
+                        Row(
+                          children: [
+                            // Team 1 (French flag / Team Baseline)
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 22,
+                                        height: 22,
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                            image: NetworkImage('https://flagcdn.com/w40/fr.png'),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      const Flexible(
+                                        child: Text(
+                                          'Team Baseline',
+                                          style: TextStyle(
+                                            fontFamily: 'Display',
+                                            fontStyle: FontStyle.italic,
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 13.5,
+                                            color: Color(0xFF0F172A),
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    '${m.hostName.split(' ').first} • Juan Lebrón',
+                                    style: const TextStyle(color: Color(0xFF64748B), fontSize: 10.5, fontWeight: FontWeight.w600),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
                             ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AP.lime,
-                          foregroundColor: AP.onLime,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 6),
-                          elevation: 0,
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          shape: const ChamferBorder(br: 10, tl: 10),
+
+                            // Center ball
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              child: Container(
+                                width: 22,
+                                height: 22,
+                                decoration: const BoxDecoration(
+                                  color: APColors.lime,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    'vs',
+                                    style: TextStyle(
+                                      fontSize: 9.5,
+                                      fontWeight: FontWeight.w900,
+                                      color: APColors.onLime,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            // Team 2 (USA flag / Team Smashers)
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          'Team Smashers',
+                                          style: TextStyle(
+                                            fontFamily: 'Display',
+                                            fontStyle: FontStyle.italic,
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 13.5,
+                                            color: Color(0xFF0F172A),
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      SizedBox(width: 6),
+                                      CircleAvatar(
+                                        radius: 11,
+                                        backgroundImage: NetworkImage('https://flagcdn.com/w40/us.png'),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 3),
+                                  Text(
+                                    'Jack Hunter • Ale Galán',
+                                    style: TextStyle(color: Color(0xFF64748B), fontSize: 10.5, fontWeight: FontWeight.w600),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        child: const Text('Gabung',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w800, fontSize: 12)),
-                      ),
-                    ],
+
+                        const SizedBox(height: 12),
+
+                        // Score Tiles Row (Reference 1 Screen 2: [ 6 ] [ 4 ] [ 5 ] vs [ 1 ] [ 6 ] [ 5 ])
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF8FAFC),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'VENUE: ${m.court.name.toUpperCase()}',
+                                    style: const TextStyle(
+                                      fontFamily: 'Display',
+                                      fontStyle: FontStyle.italic,
+                                      fontSize: 9.5,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFF64748B),
+                                    ),
+                                  ),
+                                  Text(
+                                    'JAM: ${m.time} WIB • Rp${m.pricePerPlayer}k',
+                                    style: const TextStyle(
+                                      fontFamily: 'Display',
+                                      fontStyle: FontStyle.italic,
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w900,
+                                      color: APColors.blueDark,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  _homeScoreTile('6', '1', false),
+                                  const SizedBox(width: 5),
+                                  _homeScoreTile('4', '6', false),
+                                  const SizedBox(width: 5),
+                                  _homeScoreTile('5', '5', true),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        // Action Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 40,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const MatchesScreen(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(LucideIcons.swords, size: 15),
+                            label: Text(
+                              'GABUNG OPEN MATCH // TERSISA ${m.maxPlayers - m.currentPlayers} SLOT',
+                              style: const TextStyle(
+                                fontFamily: 'Display',
+                                fontStyle: FontStyle.italic,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 11.5,
+                                letterSpacing: 0.4,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: APColors.blueDark,
+                              foregroundColor: APColors.lime,
+                              elevation: 0,
+                              shape: const ChamferBorder(br: 8, tl: 4),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -715,36 +1228,90 @@ m.court.image, fallbackUrl: m.court.imageUrl,
               ),
             ),
             Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
+              padding: const EdgeInsets.all(14),
+              decoration: ShapeDecoration(
                 color: AP.surface,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AP.line),
+                shape: ChamferBorder(
+                  br: 16,
+                  tl: 6,
+                  side: BorderSide(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.35),
+                    width: 1.2,
+                  ),
+                ),
+                shadows: [
+                  BoxShadow(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
                   Container(
-                    width: 48,
-                    height: 48,
+                    width: 50,
+                    height: 50,
                     decoration: BoxDecoration(
-                      color: AP.blue.withValues(alpha: 0.1),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          const Color(0xFF10B981).withValues(alpha: 0.22),
+                          const Color(0xFF10B981).withValues(alpha: 0.08),
+                        ],
+                      ),
                       borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: const Color(0xFF10B981).withValues(alpha: 0.45),
+                        width: 1.2,
+                      ),
                     ),
-                    child:  Icon(LucideIcons.graduationCap, color: AP.blue, size: 26),
+                    child: const Icon(LucideIcons.graduationCap, color: Color(0xFF10B981), size: 24),
                   ),
-                  const SizedBox(width: 14),
-                   Expanded(
+                  const SizedBox(width: 12),
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Private Coaching & Clinic',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 14,
-                          ),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                              decoration: ShapeDecoration(
+                                color: const Color(0xFF10B981),
+                                shape: const ChamferBorder(br: 4, tl: 2),
+                              ),
+                              child: const Text(
+                                'FIP PRO',
+                                style: TextStyle(
+                                  fontFamily: 'Display',
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.white,
+                                  fontSize: 8.5,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                'PRIVATE CLINIC & COACH',
+                                style: TextStyle(
+                                  fontFamily: 'Display',
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 13.5,
+                                  color: APColors.ink,
+                                  letterSpacing: 0.3,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 3),
                         Text(
                           'Kuasai teknik dinding & smash bersama pelatih FIP',
                           style: TextStyle(color: AP.slate, fontSize: 11),
@@ -752,6 +1319,7 @@ m.court.image, fallbackUrl: m.court.imageUrl,
                       ],
                     ),
                   ),
+                  const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: () => Navigator.push(
                       context,
@@ -759,18 +1327,25 @@ m.court.image, fallbackUrl: m.court.imageUrl,
                           builder: (_) => const CoachesScreen()),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AP.lime,
-                      foregroundColor: AP.onLime,
+                      backgroundColor: APColors.lime,
+                      foregroundColor: APColors.onLime,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 8),
+                          horizontal: 12, vertical: 8),
                       elevation: 0,
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      shape: const ChamferBorder(br: 10, tl: 10),
+                      shape: const ChamferBorder(br: 8, tl: 6),
                     ),
-                    child: const Text('Lihat',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w800, fontSize: 12)),
+                    child: const Text(
+                      'BOOK',
+                      style: TextStyle(
+                        fontFamily: 'Display',
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 12,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -798,20 +1373,45 @@ m.court.image, fallbackUrl: m.court.imageUrl,
                   final sel = _cat == cat;
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(cat),
-                      selected: sel,
-                      onSelected: (val) {
-                        if (val) {
-                          APHaptics.light();
-                          setState(() => _cat = cat);
-                        }
+                    child: GestureDetector(
+                      onTap: () {
+                        APHaptics.light();
+                        setState(() => _cat = cat);
                       },
-                      selectedColor: AP.blue,
-                      labelStyle: TextStyle(
-                        color: sel ? Colors.white : AP.ink,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: ShapeDecoration(
+                          color: sel ? AP.blue : AP.surface,
+                          shape: const ChamferBorder(br: 10, tl: 6),
+                          shadows: sel ? APShadows.primaryButton : APShadows.subtle,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (sel) ...[
+                              Container(
+                                width: 5,
+                                height: 5,
+                                decoration: const BoxDecoration(
+                                  color: APColors.lime,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                            ],
+                            Text(
+                              cat.toUpperCase(),
+                              style: TextStyle(
+                                fontFamily: 'Display',
+                                fontStyle: FontStyle.italic,
+                                color: sel ? Colors.white : APColors.ink,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 13,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -835,6 +1435,42 @@ m.court.image, fallbackUrl: m.court.imageUrl,
     ),
   );
 }
+
+  Widget _homeScoreTile(String s1, String s2, bool isCurrent) {
+    return Container(
+      width: 36,
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      decoration: ShapeDecoration(
+        color: isCurrent ? APColors.lime : const Color(0xFFE2E8F0),
+        shape: const ChamferBorder(br: 5, tl: 2),
+      ),
+      child: Column(
+        children: [
+          Text(
+            s1,
+            style: const TextStyle(
+              fontFamily: 'Display',
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.w900,
+              fontSize: 13,
+              color: Color(0xFF0F172A),
+            ),
+          ),
+          Container(height: 1, width: 16, color: Colors.black26),
+          Text(
+            s2,
+            style: const TextStyle(
+              fontFamily: 'Display',
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.w900,
+              fontSize: 13,
+              color: Color(0xFF0F172A),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _emptyResults() =>  Padding(
         padding: const EdgeInsets.only(top: 40),

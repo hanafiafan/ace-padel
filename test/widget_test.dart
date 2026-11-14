@@ -55,6 +55,8 @@ void main() {
     await tester.tap(find.text('Profile'));
     await tester.pumpAndSettle();
     expect(find.text('PROFIL SAYA'), findsOneWidget);
+    await tester.drag(find.byType(ListView).last, const Offset(0, -500));
+    await tester.pumpAndSettle();
     expect(find.text('Masuk / Daftar'), findsOneWidget);
     // Owner portal is only offered to server-confirmed owners
     expect(find.text('Portal Mitra'), findsNothing);

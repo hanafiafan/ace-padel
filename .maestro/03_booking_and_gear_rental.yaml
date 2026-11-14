@@ -1,0 +1,24 @@
+appId: dev.hellens.ace_padel
+---
+- launchApp
+- tapOn: "Courts"
+- assertVisible: "CARI LAPANGAN"
+- tapOn: "Center Glass Court"
+- assertVisible: "TENTANG VENUE"
+- assertVisible: "VISUALISASI SPESIFIKASI LAPANGAN"
+- scroll
+- tapOn: "Sab"
+- tapOn: "09:00"
+- assertVisible: "LANJUT KONFIRMASI"
+- tapOn: "LANJUT KONFIRMASI"
+- assertVisible: "Konfirmasi Reservasi"
+- assertVisible: "PRO RENTAL GEAR"
+- tapOn: "BOLA RESMI (3)"
+- tapOn: "KONFIRMASI BOOKING SEKARANG"
+- assertVisible: "Booking Berhasil"
+- assertVisible: "Lihat E-Tiket"
+- tapOn: "Lihat E-Tiket"
+- assertVisible: "E-TIKET DIGITAL"
+- tapOn: "BUAT MATCH RECAP STORY (STRAVA-STYLE)"
+- assertVisible: "MATCH RECAP // STORY"
+- assertVisible: "OFFICIAL MATCH RECAP"

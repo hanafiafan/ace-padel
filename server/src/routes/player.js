@@ -14,8 +14,17 @@ const r = express.Router();
 // ---------- Booking ----------
 const ADDONS = [
   { id: 'racket', name: 'Sewa Raket Bullpadel Pro', price: 30 },
-  { id: 'balls', name: '1 Can Bola Baru (3 Pcs)', price: 75 },
+  { id: 'racket_bullpadel', name: 'Sewa Raket Bullpadel Vertex 04', price: 30 },
+  { id: 'racket_babolat', name: 'Sewa Raket Babolat Technical Viper', price: 35 },
+  { id: 'racket_adidas', name: 'Sewa Raket Adidas Metalbone 3.3', price: 40 },
+  { id: 'racket_wilson', name: 'Sewa Raket Wilson Bela Pro V2.5', price: 35 },
+  { id: 'racket_head', name: 'Sewa Raket Head Extreme Pro', price: 30 },
+  { id: 'racket_nox', name: 'Sewa Raket Nox AT10 Genius 18K', price: 35 },
+  { id: 'balls', name: 'Head Padel Pro+ (Can 3 Pcs)', price: 75 },
+  { id: 'balls_bullpadel', name: 'Bullpadel Next Pro (Can 3 Pcs)', price: 70 },
+  { id: 'balls_wilson', name: 'Wilson Padel X3 (Can 3 Pcs)', price: 75 },
   { id: 'refreshment', name: 'Paket Handuk & 2 Air Mineral', price: 15 },
+  { id: 'balls_legacy', name: '1 Can Bola Baru (3 Pcs)', price: 75 },
 ];
 const ONLINE = ['QRIS Instant', 'BCA Virtual Account', 'Mandiri Virtual Account'];
 const METHODS = ['Bayar di tempat', ...ONLINE];

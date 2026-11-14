@@ -187,9 +187,10 @@ class _BookingScreenState extends State<BookingScreen> {
   Widget build(BuildContext context) {
     final c = widget.court;
     return ResponsiveContainer(
-      child: Scaffold(
-        backgroundColor: AP.cloud,
-        body: CustomScrollView(
+      child: SportyCourtBackdrop(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: CustomScrollView(
         slivers: [
           SliverAppBar(
             pinned: true,
@@ -323,33 +324,89 @@ c.image, fallbackUrl: c.imageUrl,
                 children: [
                   // About section
                   Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.all(18),
+                    decoration: ShapeDecoration(
                       color: AP.surface,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AP.line),
+                      shape: const ChamferBorder(br: 18, tl: 8),
+                      shadows: APShadows.card,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'TENTANG VENUE',
-                          style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
-                              fontSize: 18.4, fontWeight: FontWeight.w800),
+                        Row(
+                          children: [
+                            Container(
+                              width: 4,
+                              height: 16,
+                              decoration: const ShapeDecoration(
+                                color: APColors.lime,
+                                shape: ChamferBorder(br: 2, tl: 2),
+                              ),
+                            ),
+                            const SizedBox(width: 3),
+                            Container(
+                              width: 3,
+                              height: 16,
+                              decoration: ShapeDecoration(
+                                color: APColors.blue,
+                                shape: const ChamferBorder(br: 2, tl: 2),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'TENTANG VENUE',
+                              style: TextStyle(
+                                fontFamily: 'Display',
+                                fontStyle: FontStyle.italic,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w900,
+                                color: APColors.ink,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 8),
                         Text(
                           c.description,
-                          style:  TextStyle(
-                              color: AP.slate, fontSize: 13, height: 1.5),
+                          style: TextStyle(
+                              color: AP.slate, fontSize: 12.5, height: 1.5),
                         ),
                         const SizedBox(height: 14),
-                         Divider(color: AP.line, height: 1),
+                        Divider(color: AP.line, height: 1),
                         const SizedBox(height: 12),
-                        const Text(
-                          'Fasilitas Tersedia',
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w700),
+                        Row(
+                          children: [
+                            Text(
+                              'FASILITAS LAPANGAN',
+                              style: TextStyle(
+                                fontFamily: 'Display',
+                                fontStyle: FontStyle.italic,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w900,
+                                color: APColors.ink,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                              decoration: const ShapeDecoration(
+                                color: APColors.lime,
+                                shape: ChamferBorder(br: 4, tl: 2),
+                              ),
+                              child: const Text(
+                                'READY',
+                                style: TextStyle(
+                                  fontFamily: 'Display',
+                                  fontStyle: FontStyle.italic,
+                                  color: APColors.onLime,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 10),
                         Wrap(
@@ -360,23 +417,35 @@ c.image, fallbackUrl: c.imageUrl,
                                 (f) => Container(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 10, vertical: 6),
-                                  decoration: BoxDecoration(
+                                  decoration: ShapeDecoration(
                                     color: AP.cloud,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: AP.line),
+                                    shape: ChamferBorder(
+                                      br: 8,
+                                      tl: 4,
+                                      side: BorderSide(
+                                        color: APColors.blue.withValues(alpha: 0.15),
+                                      ),
+                                    ),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      APGlyph(_facilityIcon(f),
-                                          size: 14, color: AP.blue),
-                                      const SizedBox(width: 6),
+                                      Container(
+                                        padding: const EdgeInsets.all(4),
+                                        decoration: ShapeDecoration(
+                                          color: APColors.blue.withValues(alpha: 0.12),
+                                          shape: const ChamferBorder(br: 4, tl: 2),
+                                        ),
+                                        child: APGlyph(_facilityIcon(f),
+                                            size: 13, color: APColors.blue),
+                                      ),
+                                      const SizedBox(width: 7),
                                       Text(
                                         f,
-                                        style:  TextStyle(
-                                            color: AP.ink,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600),
+                                        style: TextStyle(
+                                            color: APColors.ink,
+                                            fontSize: 11.5,
+                                            fontWeight: FontWeight.w700),
                                       ),
                                     ],
                                   ),
@@ -385,6 +454,184 @@ c.image, fallbackUrl: c.imageUrl,
                               .toList(),
                         ),
                       ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Showcase Pro Rental Gear Tersedia di Venue
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 4.5,
+                            height: 18,
+                            decoration: const ShapeDecoration(
+                              color: APColors.lime,
+                              shape: ChamferBorder(br: 3, tl: 3),
+                            ),
+                          ),
+                          const SizedBox(width: 3),
+                          Container(
+                            width: 3.0,
+                            height: 18,
+                            decoration: ShapeDecoration(
+                              color: APColors.blue,
+                              shape: const ChamferBorder(br: 2, tl: 2),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'SEWA RAKET & BOLA PRO RESMI',
+                            style: TextStyle(
+                              fontFamily: 'Display',
+                              fontStyle: FontStyle.italic,
+                              fontSize: 18.5,
+                              fontWeight: FontWeight.w900,
+                              color: APColors.ink,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: const ShapeDecoration(
+                          color: APColors.lime,
+                          shape: ChamferBorder(br: 4, tl: 2),
+                        ),
+                        child: const Text(
+                          'READY DI VENUE',
+                          style: TextStyle(
+                            fontFamily: 'Display',
+                            fontStyle: FontStyle.italic,
+                            color: APColors.onLime,
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 175,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: equipmentAddOns.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 12),
+                      itemBuilder: (_, i) {
+                        final item = equipmentAddOns[i];
+                        return Container(
+                          width: 155,
+                          padding: const EdgeInsets.all(10),
+                          decoration: ShapeDecoration(
+                            color: AP.surface,
+                            shape: ChamferBorder(
+                              br: 14,
+                              tl: 6,
+                              side: BorderSide(
+                                color: item.accentColor.withValues(alpha: 0.3),
+                                width: 1.1,
+                              ),
+                            ),
+                            shadows: [
+                              BoxShadow(
+                                color: item.accentColor.withValues(alpha: 0.08),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                height: 75,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: item.accentColor.withValues(alpha: 0.2),
+                                  ),
+                                ),
+                                child: item.image.isNotEmpty
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(4),
+                                          child: Image.asset(
+                                            item.image,
+                                            fit: BoxFit.contain,
+                                            errorBuilder: (_, __, ___) => Center(
+                                              child: APGlyph(item.icon, size: 28, color: item.accentColor),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : Center(
+                                        child: APGlyph(item.icon, size: 28, color: item.accentColor),
+                                      ),
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                    decoration: ShapeDecoration(
+                                      color: item.accentColor,
+                                      shape: const ChamferBorder(br: 3, tl: 2),
+                                    ),
+                                    child: Text(
+                                      item.brand.toUpperCase(),
+                                      style: const TextStyle(
+                                        fontFamily: 'Display',
+                                        fontStyle: FontStyle.italic,
+                                        color: Colors.white,
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Text(
+                                    '+Rp${item.price}k',
+                                    style: TextStyle(
+                                      fontFamily: 'Display',
+                                      fontStyle: FontStyle.italic,
+                                      color: APColors.blue,
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                item.name,
+                                style: TextStyle(
+                                  fontFamily: 'Display',
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 12.5,
+                                  color: APColors.ink,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 1),
+                              Text(
+                                item.model.isNotEmpty ? item.model : item.description,
+                                style: TextStyle(color: AP.slate, fontSize: 10),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ),
 
@@ -562,6 +809,7 @@ c.image, fallbackUrl: c.imageUrl,
         ],
       ),
       bottomNavigationBar: _bottomBar(),
+        ),
       ),
     );
   }
@@ -569,55 +817,141 @@ c.image, fallbackUrl: c.imageUrl,
   Widget _reviewCard(CourtReview r) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.all(16),
+      decoration: ShapeDecoration(
         color: AP.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AP.line),
+        shape: ChamferBorder(
+          br: 16,
+          tl: 6,
+          side: BorderSide(
+            color: APColors.blue.withValues(alpha: 0.18),
+            width: 1.1,
+          ),
+        ),
+        shadows: APShadows.card,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: AP.blue.withValues(alpha: 0.1),
-                child: Text(
-                  r.userName.isNotEmpty ? r.userName[0].toUpperCase() : 'P',
-                  style:  TextStyle(
-                      fontWeight: FontWeight.w800,
-                      color: AP.blue,
-                      fontSize: 14),
+              Container(
+                width: 38,
+                height: 38,
+                decoration: ShapeDecoration(
+                  color: APColors.blue,
+                  shape: const ChamferBorder(br: 8, tl: 4),
+                  shadows: APShadows.primaryButton,
+                ),
+                child: Center(
+                  child: Text(
+                    r.userName.isNotEmpty ? r.userName[0].toUpperCase() : 'P',
+                    style: const TextStyle(
+                      fontFamily: 'Display',
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(r.userName,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w700, fontSize: 14)),
-                    Text('${r.skillLevel} • ${r.date}',
-                        style:  TextStyle(color: AP.slate, fontSize: 11)),
+                    Row(
+                      children: [
+                        Text(
+                          r.userName,
+                          style: TextStyle(
+                            fontFamily: 'Display',
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 15,
+                            color: APColors.ink,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                          decoration: const ShapeDecoration(
+                            color: APColors.lime,
+                            shape: ChamferBorder(br: 4, tl: 2),
+                          ),
+                          child: const Text(
+                            'VERIFIED',
+                            style: TextStyle(
+                              fontFamily: 'Display',
+                              fontStyle: FontStyle.italic,
+                              fontSize: 8,
+                              fontWeight: FontWeight.w900,
+                              color: APColors.onLime,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${r.skillLevel.toUpperCase()} • ${r.date}',
+                      style: TextStyle(
+                        fontFamily: 'Display',
+                        fontStyle: FontStyle.italic,
+                        color: AP.slate,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
                   ],
                 ),
               ),
-              Row(
-                children: [
-                  const Icon(LucideIcons.star, color: Color(0xFFF5B301), size: 14),
-                  const SizedBox(width: 2),
-                  Text('${r.rating}',
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: ShapeDecoration(
+                  color: const Color(0xFFFEF3C7),
+                  shape: const ChamferBorder(br: 6, tl: 3),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(LucideIcons.star, color: Color(0xFFD97706), size: 13),
+                    const SizedBox(width: 3),
+                    Text(
+                      '${r.rating}',
                       style: const TextStyle(
-                          fontWeight: FontWeight.w700, fontSize: 13)),
-                ],
+                        fontFamily: 'Display',
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 13,
+                        color: Color(0xFF92400E),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(r.comment,
-              style:  TextStyle(color: AP.ink, fontSize: 13, height: 1.4)),
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: ShapeDecoration(
+              color: AP.cloud,
+              shape: const ChamferBorder(br: 8, tl: 4),
+            ),
+            child: Text(
+              r.comment,
+              style: TextStyle(
+                color: APColors.ink,
+                fontSize: 12.5,
+                height: 1.4,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -647,37 +981,62 @@ c.image, fallbackUrl: c.imageUrl,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
         curve: Curves.easeOutCubic,
-        width: 58,
-        decoration: BoxDecoration(
-          color: selected ? AP.blue : AP.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: selected ? AP.blue : AP.line,
-            width: selected ? 1.5 : 1.0,
+        width: 60,
+        decoration: ShapeDecoration(
+          color: selected ? APColors.lime : AP.surface,
+          shape: ChamferBorder(
+            br: 16,
+            tl: 6,
+            side: BorderSide(
+              color: selected ? APColors.lime : AP.line,
+              width: selected ? 1.6 : 1.0,
+            ),
           ),
-          boxShadow: selected
+          shadows: selected
               ? [
                   BoxShadow(
-                    color: AP.blue.withValues(alpha: 0.28),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+                    color: APColors.lime.withValues(alpha: 0.38),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
                   ),
                 ]
-              : null,
+              : APShadows.subtle,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(DateFormat('E').format(d),
-                style: TextStyle(
-                    color: selected ? Colors.white70 : AP.slate,
-                    fontSize: 12)),
-            const SizedBox(height: 4),
-            Text('${d.day}',
-                style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
-                    color: selected ? Colors.white : AP.ink,
-                    fontSize: 20.7,
-                    fontWeight: FontWeight.w800)),
+            Text(
+              DateFormat('EEE').format(d).toUpperCase(),
+              style: TextStyle(
+                fontFamily: 'Display',
+                fontStyle: FontStyle.italic,
+                color: selected ? APColors.onLime : AP.slate,
+                fontSize: 11,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0.4,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              '${d.day}',
+              style: TextStyle(
+                fontFamily: 'Display',
+                fontStyle: FontStyle.italic,
+                color: selected ? APColors.onLime : AP.ink,
+                fontSize: 22,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 3),
+            // Reference active indicator dot below date
+            Container(
+              width: 5,
+              height: 5,
+              decoration: BoxDecoration(
+                color: selected ? APColors.onLime : Colors.transparent,
+                shape: BoxShape.circle,
+              ),
+            ),
           ],
         ),
       ),
@@ -687,28 +1046,42 @@ c.image, fallbackUrl: c.imageUrl,
   Widget _timeHeader(String title, String range, {bool isPeak = false}) {
     return Row(
       children: [
+        Container(
+          width: 3.5,
+          height: 14,
+          decoration: const ShapeDecoration(
+            color: APColors.lime,
+            shape: ChamferBorder(br: 2, tl: 2),
+          ),
+        ),
+        const SizedBox(width: 6),
         Text(
-          title,
-          style:  TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
+          title.toUpperCase(),
+          style: TextStyle(
+            fontFamily: 'Display',
+            fontStyle: FontStyle.italic,
+            fontSize: 14.5,
+            fontWeight: FontWeight.w900,
             color: AP.ink,
+            letterSpacing: 0.3,
           ),
         ),
         if (isPeak) ...[
-          const SizedBox(width: 6),
+          const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFEF3C7),
-              borderRadius: BorderRadius.circular(6),
+            decoration: const ShapeDecoration(
+              color: Color(0xFFFEF3C7),
+              shape: ChamferBorder(br: 4, tl: 2),
             ),
             child: const Text(
-              'Populer',
+              'PEAK HOURS',
               style: TextStyle(
+                fontFamily: 'Display',
+                fontStyle: FontStyle.italic,
                 color: Color(0xFF92400E),
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
+                fontSize: 9,
+                fontWeight: FontWeight.w900,
               ),
             ),
           ),
@@ -716,10 +1089,12 @@ c.image, fallbackUrl: c.imageUrl,
         const Spacer(),
         Text(
           range,
-          style:  TextStyle(
+          style: TextStyle(
+            fontFamily: 'Display',
+            fontStyle: FontStyle.italic,
             color: AP.slate,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
+            fontSize: 11.5,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ],
@@ -730,18 +1105,6 @@ c.image, fallbackUrl: c.imageUrl,
     final taken =
         BookingStore.instance.isTaken(widget.court, _selectedDay, slot);
     final selected = slot == _slot;
-    Color bg;
-    Color fg;
-    if (taken) {
-      bg = AP.line;
-      fg = AP.slate;
-    } else if (selected) {
-      bg = AP.blue;
-      fg = Colors.white;
-    } else {
-      bg = AP.surface;
-      fg = AP.ink;
-    }
     return GestureDetector(
       onTap: taken
           ? null
@@ -753,29 +1116,60 @@ c.image, fallbackUrl: c.imageUrl,
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic,
         alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: selected ? AP.blue : (taken ? Colors.transparent : AP.line),
-            width: selected ? 1.5 : 1.0,
+        decoration: ShapeDecoration(
+          color: taken
+              ? AP.line.withValues(alpha: 0.5)
+              : (selected ? APColors.blue : AP.surface),
+          shape: ChamferBorder(
+            br: 12,
+            tl: 4,
+            side: BorderSide(
+              color: selected
+                  ? APColors.lime
+                  : (taken ? Colors.transparent : APColors.blue.withValues(alpha: 0.2)),
+              width: selected ? 1.8 : 1.0,
+            ),
           ),
-          boxShadow: selected
+          shadows: selected
               ? [
                   BoxShadow(
-                    color: AP.blue.withValues(alpha: 0.28),
-                    blurRadius: 8,
+                    color: APColors.blue.withValues(alpha: 0.35),
+                    blurRadius: 10,
                     offset: const Offset(0, 3),
                   ),
                 ]
               : null,
         ),
-        child: Text(slot,
-            style: TextStyle(
-                color: fg,
-                fontWeight: FontWeight.w700,
-                decoration:
-                    taken ? TextDecoration.lineThrough : TextDecoration.none)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (!taken && !selected) ...[
+              Container(
+                width: 5,
+                height: 5,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF10B981),
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 5),
+            ],
+            Text(
+              slot,
+              style: TextStyle(
+                fontFamily: 'Display',
+                fontStyle: FontStyle.italic,
+                color: taken
+                    ? AP.slate
+                    : (selected ? Colors.white : AP.ink),
+                fontWeight: FontWeight.w900,
+                fontSize: 14,
+                letterSpacing: 0.3,
+                decoration: taken ? TextDecoration.lineThrough : TextDecoration.none,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -873,11 +1267,10 @@ c.image, fallbackUrl: c.imageUrl,
 
     return Container(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: AP.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AP.line),
-        boxShadow: APShadows.subtle,
+        shape: const ChamferBorder(br: 18, tl: 8),
+        shadows: APShadows.card,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -885,20 +1278,22 @@ c.image, fallbackUrl: c.imageUrl,
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AP.lime,
-                  borderRadius: BorderRadius.circular(8),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: const ShapeDecoration(
+                  color: APColors.lime,
+                  shape: ChamferBorder(br: 6, tl: 3),
                 ),
-                child:  const Row(
+                child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(LucideIcons.badgeCheck, size: 13, color: AP.onLime),
+                    Icon(LucideIcons.badgeCheck, size: 13, color: APColors.onLime),
                     SizedBox(width: 4),
                     Text(
                       'STANDAR FIP INTERNASIONAL',
                       style: TextStyle(
-                        color: AP.onLime,
+                        fontFamily: 'Display',
+                        fontStyle: FontStyle.italic,
+                        color: APColors.onLime,
                         fontSize: 10,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.5,
@@ -910,116 +1305,206 @@ c.image, fallbackUrl: c.imageUrl,
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: AP.blueSurface,
-                  borderRadius: BorderRadius.circular(8),
+                decoration: ShapeDecoration(
+                  color: APColors.blue.withValues(alpha: 0.12),
+                  shape: const ChamferBorder(br: 6, tl: 3),
                 ),
-                child:  Text(
-                  'Inspeksi FIP Grade A',
-                  style: TextStyle(
-                    color: AP.blue,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 11,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: APColors.blue,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      'INSPEKSI GRADE A',
+                      style: TextStyle(
+                        fontFamily: 'Display',
+                        fontStyle: FontStyle.italic,
+                        color: APColors.blue,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 10,
+                        letterSpacing: 0.4,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          const Text(
-            'VISUALISASI SPESIFIKASI LAPANGAN',
-            style: TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, fontSize: 18.4, fontWeight: FontWeight.w800),
+          Row(
+            children: [
+              Container(
+                width: 4,
+                height: 16,
+                decoration: const ShapeDecoration(
+                  color: APColors.lime,
+                  shape: ChamferBorder(br: 2, tl: 2),
+                ),
+              ),
+              const SizedBox(width: 3),
+              Container(
+                width: 3,
+                height: 16,
+                decoration: ShapeDecoration(
+                  color: APColors.blue,
+                  shape: const ChamferBorder(br: 2, tl: 2),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'VISUALISASI SPESIFIKASI LAPANGAN',
+                style: TextStyle(
+                  fontFamily: 'Display',
+                  fontStyle: FontStyle.italic,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w900,
+                  color: APColors.ink,
+                  letterSpacing: 0.3,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 12),
 
-          // Interactive Court Visualizer Canvas
+          // High-Octane Stadium Arena Visualizer Canvas
           Container(
-            height: 125,
+            height: 135,
             width: double.infinity,
-            decoration: BoxDecoration(
-              color: const Color(0xFF0F5A38), // Turf
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: _selectedSpecIndex == 2 ? AP.lime : Colors.white30,
-                width: _selectedSpecIndex == 2 ? 2.5 : 1.5,
+            decoration: ShapeDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF070C20), Color(0xFF041A12)],
               ),
-              boxShadow: _selectedSpecIndex == 2
-                  ? [
-                      BoxShadow(
-                        color: AP.lime.withValues(alpha: 0.4),
-                        blurRadius: 10,
-                        spreadRadius: 1,
-                      ),
-                    ]
-                  : null,
+              shape: ChamferBorder(
+                br: 16,
+                tl: 8,
+                side: BorderSide(
+                  color: _selectedSpecIndex == 2
+                      ? APColors.lime
+                      : const Color(0xFF132B25),
+                  width: _selectedSpecIndex == 2 ? 2.0 : 1.2,
+                ),
+              ),
+              shadows: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.35),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Stack(
               children: [
-                // Top-down court lines
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: _selectedSpecIndex == 0 ? AP.lime : Colors.white30,
-                            width: _selectedSpecIndex == 0 ? 2 : 1,
-                          ),
+                // Tournament Turf Floor
+                Positioned.fill(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(0xFF0F5A38),
+                            _selectedSpecIndex == 1
+                                ? const Color(0xFF00A86B)
+                                : const Color(0xFF083C25),
+                          ],
                         ),
-                        child: Center(
-                          child: Container(
-                            height: 1,
-                            color: Colors.white24,
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Net in center
-                    Container(
-                      width: 4,
-                      color: AP.surface,
-                    ),
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: _selectedSpecIndex == 0 ? AP.lime : Colors.white30,
-                            width: _selectedSpecIndex == 0 ? 2 : 1,
-                          ),
-                        ),
-                        child: Center(
-                          child: Container(
-                            height: 1,
-                            color: Colors.white24,
-                          ),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: _selectedSpecIndex == 0
+                              ? APColors.lime
+                              : Colors.white.withValues(alpha: 0.5),
+                          width: _selectedSpecIndex == 0 ? 2 : 1,
                         ),
                       ),
+                      child: Stack(
+                        children: [
+                          // Court boundary lines & service boxes
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      right: BorderSide(
+                                        color: Colors.white.withValues(alpha: 0.5),
+                                        width: 1,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Container(
+                                      height: 1,
+                                      color: Colors.white.withValues(alpha: 0.35),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // Net line
+                              Container(
+                                width: 3,
+                                color: Colors.white,
+                              ),
+                              Expanded(
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      left: BorderSide(
+                                        color: Colors.white.withValues(alpha: 0.5),
+                                        width: 1,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Container(
+                                      height: 1,
+                                      color: Colors.white.withValues(alpha: 0.35),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
+                  ),
                 ),
 
-                // Corner Lighting Pins
+                // Corner Lighting Spot Beams
                 if (_selectedSpecIndex == 3) ...[
                   for (final pos in [
-                    const Alignment(-0.95, -0.9),
-                    const Alignment(0.95, -0.9),
-                    const Alignment(-0.95, 0.9),
-                    const Alignment(0.95, 0.9),
+                    const Alignment(-0.92, -0.85),
+                    const Alignment(0.92, -0.85),
+                    const Alignment(-0.92, 0.85),
+                    const Alignment(0.92, 0.85),
+                    const Alignment(-0.30, -0.92),
+                    const Alignment(0.30, -0.92),
+                    const Alignment(-0.30, 0.92),
+                    const Alignment(0.30, 0.92),
                   ])
                     Align(
                       alignment: pos,
                       child: Container(
-                        width: 12,
-                        height: 12,
+                        width: 10,
+                        height: 10,
                         decoration: const BoxDecoration(
-                          color: Colors.amber,
+                          color: APColors.lime,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.amber,
-                              blurRadius: 8,
+                              color: APColors.lime,
+                              blurRadius: 10,
                               spreadRadius: 2,
                             ),
                           ],
@@ -1028,22 +1513,41 @@ c.image, fallbackUrl: c.imageUrl,
                     ),
                 ],
 
-                // Center court callout overlay
+                // Center court callout overlay badge
                 Center(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.75),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AP.lime),
-                    ),
-                    child: Text(
-                      current['title'] as String,
-                      style: const TextStyle(
-                        color: AP.lime,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                    decoration: const ShapeDecoration(
+                      color: Color(0xEE060A18),
+                      shape: ChamferBorder(
+                        br: 8,
+                        tl: 4,
+                        side: BorderSide(color: APColors.lime, width: 1.2),
                       ),
+                      shadows: [
+                        BoxShadow(
+                          color: Colors.black54,
+                          blurRadius: 8,
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(LucideIcons.activity, size: 12, color: APColors.lime),
+                        const SizedBox(width: 5),
+                        Text(
+                          current['title'] as String,
+                          style: const TextStyle(
+                            fontFamily: 'Display',
+                            fontStyle: FontStyle.italic,
+                            color: APColors.lime,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -1053,7 +1557,7 @@ c.image, fallbackUrl: c.imageUrl,
 
           const SizedBox(height: 14),
 
-          // Interactive Spec Selection Tabs
+          // Interactive Spec Selection Tabs (Chamfered sporty tabs)
           Row(
             children: [
               _specTab(0, LucideIcons.ruler, 'Dimensi'),
@@ -1068,65 +1572,80 @@ c.image, fallbackUrl: c.imageUrl,
 
           const SizedBox(height: 12),
 
-          // Description Card for selected spec
+          // Description Card for selected spec - Using Wrap to PREVENT ANY OVERFLOW BUG!
           Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
+            padding: const EdgeInsets.all(14),
+            decoration: ShapeDecoration(
               color: AP.cloud,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AP.line),
+              shape: ChamferBorder(
+                br: 12,
+                tl: 6,
+                side: BorderSide(
+                  color: APColors.blue.withValues(alpha: 0.25),
+                  width: 1,
+                ),
+              ),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AP.blue.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
+                  decoration: ShapeDecoration(
+                    color: APColors.blue,
+                    shape: const ChamferBorder(br: 8, tl: 4),
+                    shadows: APShadows.primaryButton,
                   ),
-                  child: Icon(current['icon'] as IconData, size: 18, color: AP.blue),
+                  child: Icon(current['icon'] as IconData, size: 18, color: Colors.white),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 6,
+                        runSpacing: 4,
                         children: [
                           Text(
                             current['title'] as String,
-                            style:  TextStyle(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 13,
-                              color: AP.ink,
+                            style: TextStyle(
+                              fontFamily: 'Display',
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 13.5,
+                              color: APColors.ink,
+                              letterSpacing: 0.2,
                             ),
                           ),
-                          const SizedBox(width: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                            decoration: BoxDecoration(
-                              color: AP.lime,
-                              borderRadius: BorderRadius.circular(4),
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                            decoration: const ShapeDecoration(
+                              color: APColors.lime,
+                              shape: ChamferBorder(br: 4, tl: 2),
                             ),
                             child: Text(
                               current['badge'] as String,
-                              style:  const TextStyle(
-                                fontSize: 8,
+                              style: const TextStyle(
+                                fontFamily: 'Display',
+                                fontStyle: FontStyle.italic,
+                                fontSize: 8.5,
                                 fontWeight: FontWeight.w900,
-                                color: AP.onLime,
+                                color: APColors.onLime,
+                                letterSpacing: 0.3,
                               ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 4),
                       Text(
                         current['desc'] as String,
-                        style:  TextStyle(
+                        style: TextStyle(
                           color: AP.slate,
-                          fontSize: 11,
-                          height: 1.4,
+                          fontSize: 11.5,
+                          height: 1.35,
                         ),
                       ),
                     ],
@@ -1151,33 +1670,30 @@ c.image, fallbackUrl: c.imageUrl,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: sel ? AP.blue : AP.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: sel ? AP.blue : AP.line,
-              width: sel ? 1.5 : 1,
+          decoration: ShapeDecoration(
+            color: sel ? APColors.blue : AP.surface,
+            shape: ChamferBorder(
+              br: 10,
+              tl: 4,
+              side: BorderSide(
+                color: sel ? APColors.blue : AP.line,
+                width: sel ? 1.5 : 1,
+              ),
             ),
-            boxShadow: sel
-                ? [
-                    BoxShadow(
-                      color: AP.blue.withValues(alpha: 0.25),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                : null,
+            shadows: sel ? APShadows.primaryButton : null,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(icon, size: 16, color: sel ? Colors.white : AP.ink),
-              const SizedBox(height: 2),
+              const SizedBox(height: 3),
               Text(
                 label,
                 style: TextStyle(
+                  fontFamily: 'Display',
+                  fontStyle: FontStyle.italic,
                   fontSize: 10,
-                  fontWeight: sel ? FontWeight.w800 : FontWeight.w600,
+                  fontWeight: sel ? FontWeight.w900 : FontWeight.w700,
                   color: sel ? Colors.white : AP.ink,
                 ),
                 maxLines: 1,
@@ -1193,10 +1709,21 @@ c.image, fallbackUrl: c.imageUrl,
   Widget _bottomBar() {
     final ready = _slot != null;
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
-      decoration:  BoxDecoration(
-        color: AP.surface,
-        border: Border(top: BorderSide(color: AP.line)),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+      decoration: const ShapeDecoration(
+        color: Color(0xFF070B1F),
+        shape: ChamferBorder(
+          br: 14,
+          tl: 14,
+          side: BorderSide(color: Color(0xFF1B2B50), width: 1.2),
+        ),
+        shadows: [
+          BoxShadow(
+            color: Colors.black45,
+            blurRadius: 16,
+            offset: Offset(0, -4),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -1204,17 +1731,52 @@ c.image, fallbackUrl: c.imageUrl,
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Total ($_selectedDurationMinutes Menit)',
-                  style:  TextStyle(color: AP.slate, fontSize: 12)),
-              Text('Rp${_calculatedPrice}k',
-                  style: const TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
-                      fontSize: 22.4, fontWeight: FontWeight.w800)),
+              Text(
+                'TOTAL // $_selectedDurationMinutes MIN',
+                style: const TextStyle(
+                  fontFamily: 'Display',
+                  fontStyle: FontStyle.italic,
+                  color: Color(0xFF8A99AD),
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 1),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    'Rp${_calculatedPrice}k',
+                    style: const TextStyle(
+                      fontFamily: 'Display',
+                      fontStyle: FontStyle.italic,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w900,
+                      color: APColors.lime,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Text(
+                    '/ MATCH',
+                    style: TextStyle(
+                      fontFamily: 'Display',
+                      fontStyle: FontStyle.italic,
+                      color: Colors.white54,
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
           const SizedBox(width: 16),
           Expanded(
             child: SizedBox(
-              height: 54,
+              height: 52,
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 250),
                 transitionBuilder: (child, animation) => FadeTransition(
@@ -1225,31 +1787,46 @@ c.image, fallbackUrl: c.imageUrl,
                     ? ElevatedButton.icon(
                         key: const ValueKey('ready_btn'),
                         onPressed: _confirm,
-                        icon: const Icon(LucideIcons.arrowRight, size: 20),
-                        label: const Text('Lanjut ke Konfirmasi',
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w800)),
+                        icon: const Icon(LucideIcons.arrowRight, size: 18),
+                        label: const Text(
+                          'LANJUT KONFIRMASI',
+                          style: TextStyle(
+                            fontFamily: 'Display',
+                            fontStyle: FontStyle.italic,
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.4,
+                          ),
+                        ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AP.lime,
-                          foregroundColor: AP.onLime,
-                          elevation: 0,
-                          minimumSize: const Size.fromHeight(54),
-                          shape: const ChamferBorder(br: 10, tl: 10),
+                          backgroundColor: APColors.lime,
+                          foregroundColor: APColors.onLime,
+                          elevation: 4,
+                          shadowColor: APColors.lime.withValues(alpha: 0.4),
+                          minimumSize: const Size.fromHeight(52),
+                          shape: const ChamferBorder(br: 12, tl: 6),
                         ),
                       )
                     : ElevatedButton.icon(
                         key: const ValueKey('not_ready_btn'),
                         onPressed: null,
-                        icon: const Icon(LucideIcons.clock, size: 18),
-                        label: const Text('Pilih jam dulu',
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w800)),
+                        icon: const Icon(LucideIcons.clock, size: 16),
+                        label: const Text(
+                          'PILIH JAM MAIN',
+                          style: TextStyle(
+                            fontFamily: 'Display',
+                            fontStyle: FontStyle.italic,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
                         style: ElevatedButton.styleFrom(
-                          disabledBackgroundColor: AP.line,
-                          disabledForegroundColor: AP.slate,
+                          disabledBackgroundColor: const Color(0xFF141C33),
+                          disabledForegroundColor: const Color(0xFF5A6882),
                           elevation: 0,
-                          minimumSize: const Size.fromHeight(54),
-                          shape: const ChamferBorder(br: 10, tl: 10),
+                          minimumSize: const Size.fromHeight(52),
+                          shape: const ChamferBorder(br: 12, tl: 6),
                         ),
                       ),
               ),

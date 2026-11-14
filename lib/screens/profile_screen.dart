@@ -1,6 +1,8 @@
 import '../core/widgets/ap_shape.dart';
 import 'package:flutter/material.dart';
+import '../core/utils/haptics.dart';
 import 'settings_screen.dart';
+import 'match_story_share_screen.dart';
 import '../core/widgets/ap_banners.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../core/widgets/ap_decor.dart';
@@ -18,6 +20,17 @@ import 'venue_dashboard_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
+  /// Tanggal (hari saja) dengan sesi main, 28 hari terakhir.
+  Set<DateTime> _playedDays() {
+    final now = DateTime.now();
+    final cutoff = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 28));
+    return {
+      for (final b in BookingStore.instance.bookings)
+        if (b.status == 'Terkonfirmasi' || b.status == 'Check-in Selesai')
+          if (!b.date.isBefore(cutoff)) DateTime(b.date.year, b.date.month, b.date.day)
+    };
+  }
 
   void _showEditProfile(BuildContext context) {
     if (!requireLogin(context, 'mengubah profil')) return;
@@ -282,15 +295,24 @@ class ProfileScreen extends StatelessWidget {
             },
           ),
 
-          // Level progress bar
+          // YOUR MOMENTUM & ACTIVITY GRID (Inspired by Reference 4)
           Container(
             margin: const EdgeInsets.only(top: 14),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AP.surface,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AP.line),
-              boxShadow: APShadows.subtle,
+            padding: const EdgeInsets.all(18),
+            decoration: const ShapeDecoration(
+              color: Color(0xFF070B1F),
+              shape: ChamferBorder(
+                br: 20,
+                tl: 8,
+                side: BorderSide(color: Color(0xFF1B2B50), width: 1.2),
+              ),
+              shadows: [
+                BoxShadow(
+                  color: Colors.black45,
+                  blurRadius: 16,
+                  offset: Offset(0, 4),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -298,56 +320,172 @@ class ProfileScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Expanded(
-                      child: Row(
-                        children: [
-                          Icon(LucideIcons.medal, color: Color(0xFFF59E0B), size: 18),
-                          SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              'Padel Skill: 3.4 / 5.0',
-                              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                    const Row(
+                      children: [
+                        Icon(LucideIcons.flame, color: Color(0xFFFF6B00), size: 22),
+                        SizedBox(width: 8),
+                        Text(
+                          'YOUR MOMENTUM',
+                          style: TextStyle(
+                            fontFamily: 'Display',
+                            fontStyle: FontStyle.italic,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            letterSpacing: 0.4,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: APColors.blueSurface,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child:  Text(
-                        'Silver Pro',
-                        style: TextStyle(
-                          color: APColors.blue,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    ListenableBuilder(
+                      listenable: BookingStore.instance,
+                      builder: (_, __) => Text(
+                        '${_playedDays().length}',
+                        style: const TextStyle(
+                          fontFamily: 'Display',
+                          fontStyle: FontStyle.italic,
+                          fontSize: 38,
+                          fontWeight: FontWeight.w900,
+                          color: APColors.lime,
+                          height: 0.9,
                         ),
                       ),
                     ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'HARI MAIN // 28 HARI TERAKHIR',
+                        style: TextStyle(
+                          fontFamily: 'Display',
+                          fontStyle: FontStyle.italic,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white.withValues(alpha: 0.8),
+                          letterSpacing: 0.4,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child:  LinearProgressIndicator(
-                    value: 0.68,
-                    minHeight: 8,
-                    backgroundColor: AP.line,
-                    valueColor: AlwaysStoppedAnimation<Color>(APColors.blue),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                const SizedBox(height: 14),
+
+                // 7x5 Activity Grid Dot Matrix
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Menengah (Intermediate)', style: TextStyle(color: AP.slate, fontSize: 11)),
-                    Text('80 XP menuju Mahir', style: TextStyle(color: AP.blue, fontSize: 11, fontWeight: FontWeight.w700)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'ACTIVITY LOG',
+                          style: TextStyle(
+                            fontFamily: 'Display',
+                            fontStyle: FontStyle.italic,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white54,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                        Text(
+                          'M  T  W  T  F  S  S',
+                          style: TextStyle(
+                            fontFamily: 'Display',
+                            fontStyle: FontStyle.italic,
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white.withValues(alpha: 0.7),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // 4 minggu x 7 hari, Senin-Minggu; menyala = ada sesi main
+                    ListenableBuilder(
+                      listenable: BookingStore.instance,
+                      builder: (_, __) {
+                        final played = _playedDays();
+                        final now = DateTime.now();
+                        final today = DateTime(now.year, now.month, now.day);
+                        final start = today.add(Duration(days: 7 - today.weekday - 27));
+                        return Column(
+                          children: [
+                            for (int row = 0; row < 4; row++)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 6),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    for (int col = 0; col < 7; col++)
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 6),
+                                        child: Container(
+                                          width: 14,
+                                          height: 14,
+                                          decoration: ShapeDecoration(
+                                            color: played.contains(start.add(Duration(days: row * 7 + col)))
+                                                ? APColors.lime
+                                                : const Color(0xFF1E2842),
+                                            shape: const ChamferBorder(br: 3, tl: 1),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
                   ],
+                ),
+                const SizedBox(height: 12),
+                // Story share action button
+                GestureDetector(
+                  onTap: () {
+                    APHaptics.light();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const MatchStoryShareScreen(),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    decoration: const ShapeDecoration(
+                      color: APColors.lime,
+                      shape: ChamferBorder(br: 8, tl: 4),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(LucideIcons.sparkles, size: 14, color: APColors.onLime),
+                        SizedBox(width: 6),
+                        Text(
+                          'BUAT RECAP STORY (STRAVA-STYLE) →',
+                          style: TextStyle(
+                            fontFamily: 'Display',
+                            fontStyle: FontStyle.italic,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                            color: APColors.onLime,
+                            letterSpacing: 0.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -355,18 +493,36 @@ class ProfileScreen extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // Stats row (GET /me/stats)
+          // High-Octane Metric Cards (Inspired by Reference 3 & 4)
           AnimatedBuilder(
             animation: Listenable.merge([StatsStore.instance, BookingStore.instance]),
             builder: (_, __) {
               final st = StatsStore.instance;
               return Row(
                 children: [
-                  _stat('${BookingStore.instance.bookings.length}', 'Booking Aktif'),
-                  const SizedBox(width: 12),
-                  _stat('${st.hoursPlayed}', 'Jam Main'),
-                  const SizedBox(width: 12),
-                  _stat(st.rank > 0 ? '#${st.rank}' : '-', 'Peringkat'),
+                  _statCard(
+                    icon: LucideIcons.flame,
+                    iconColor: const Color(0xFFFF6B00),
+                    value: '${st.hoursPlayed * 500}',
+                    unit: 'KCAL',
+                    label: 'EST. KALORI',
+                  ),
+                  const SizedBox(width: 10),
+                  _statCard(
+                    icon: LucideIcons.clock,
+                    iconColor: APColors.blue,
+                    value: '${st.hoursPlayed}',
+                    unit: 'JAM',
+                    label: 'MATCH TIME',
+                  ),
+                  const SizedBox(width: 10),
+                  _statCard(
+                    icon: LucideIcons.trophy,
+                    iconColor: APColors.lime,
+                    value: st.rank > 0 ? '#${st.rank}' : '-',
+                    unit: 'DUPR',
+                    label: 'RANKING',
+                  ),
                 ],
               );
             },
@@ -593,37 +749,83 @@ class ProfileScreen extends StatelessWidget {
             ),
           );
 
-  Widget _stat(String value, String label) => Expanded(
+  Widget _statCard({
+    required IconData icon,
+    required Color iconColor,
+    required String value,
+    required String unit,
+    required String label,
+  }) =>
+      Expanded(
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 18),
-          decoration: BoxDecoration(
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+          decoration: ShapeDecoration(
             color: AP.surface,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: AP.line),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            shape: const ChamferBorder(br: 14, tl: 6),
+            shadows: APShadows.card,
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: ShapeDecoration(
+                      color: iconColor.withValues(alpha: 0.12),
+                      shape: const ChamferBorder(br: 6, tl: 3),
+                    ),
+                    child: Icon(icon, color: iconColor, size: 16),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: AP.cloud,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      unit,
+                      style: TextStyle(
+                        fontFamily: 'Display',
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 8.5,
+                        color: APColors.slate,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 250),
                 child: Text(
                   value,
                   key: ValueKey(value),
-                  style:  TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
-                      fontSize: 22.4,
-                      fontWeight: FontWeight.w800,
-                      color: AP.blue),
+                  style: TextStyle(
+                    fontFamily: 'Display',
+                    fontStyle: FontStyle.italic,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: APColors.ink,
+                  ),
                 ),
               ),
               const SizedBox(height: 2),
-              Text(label,
-                  style:  TextStyle(color: AP.slate, fontSize: 12)),
+              Text(
+                label,
+                style: TextStyle(
+                  fontFamily: 'Display',
+                  fontStyle: FontStyle.italic,
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
+                  color: APColors.slate,
+                  letterSpacing: 0.3,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ],
           ),
         ),
@@ -635,19 +837,50 @@ class ProfileScreen extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 10),
         child: Material(
           color: AP.surface,
-          borderRadius: BorderRadius.circular(16),
-          child: ListTile(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side:  BorderSide(color: AP.line),
-            ),
-            leading: Icon(icon, color: danger ? Colors.red : AP.blue),
-            title: Text(label,
-                style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: danger ? Colors.red : AP.ink)),
-            trailing:  Icon(LucideIcons.chevronRight, color: AP.slate),
+          shape: const ChamferBorder(br: 14, tl: 6),
+          child: InkWell(
+            customBorder: const ChamferBorder(br: 14, tl: 6),
             onTap: onTap,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: ShapeDecoration(
+                shape: ChamferBorder(
+                  br: 14,
+                  tl: 6,
+                  side: BorderSide(
+                    color: danger ? Colors.red.withValues(alpha: 0.3) : AP.line,
+                    width: 1.1,
+                  ),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(7),
+                    decoration: ShapeDecoration(
+                      color: (danger ? Colors.red : APColors.blue).withValues(alpha: 0.1),
+                      shape: const ChamferBorder(br: 6, tl: 3),
+                    ),
+                    child: Icon(icon, color: danger ? Colors.red : APColors.blue, size: 18),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Text(
+                      label,
+                      style: TextStyle(
+                        fontFamily: 'Display',
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 14,
+                        color: danger ? Colors.red : AP.ink,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ),
+                  Icon(LucideIcons.chevronRight, color: AP.slate, size: 18),
+                ],
+              ),
+            ),
           ),
         ),
       );

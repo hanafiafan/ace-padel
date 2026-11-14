@@ -293,8 +293,21 @@ class CourtRow extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 14),
       decoration: ShapeDecoration(
         color: AP.surface,
-        shape: ChamferBorder(br: 18, side: BorderSide(color: APColors.line)),
-        shadows: APShadows.subtle,
+        shape: ChamferBorder(
+          br: 18,
+          tl: 8,
+          side: BorderSide(
+            color: APTheme.isDark ? const Color(0xFF1E2A55) : const Color(0xFFE0E5F5),
+            width: 1.2,
+          ),
+        ),
+        shadows: [
+          BoxShadow(
+            color: APColors.blue.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -303,27 +316,53 @@ class CourtRow extends StatelessWidget {
             APHaptics.light();
             onTap();
           },
-          customBorder: const ChamferBorder(br: 18),
+          customBorder: const ChamferBorder(br: 18, tl: 8),
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: apImg(
-court.image, fallbackUrl: court.imageUrl,
-                    width: 72,
-                    height: 72,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      width: 72,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: court.gradient),
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: apImg(
+                        court.image,
+                        fallbackUrl: court.imageUrl,
+                        width: 76,
+                        height: 76,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          width: 76,
+                          height: 76,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(colors: court.gradient),
+                          ),
+                          child: const APRacketIcon(color: Colors.white, size: 28),
+                        ),
                       ),
-                      child: const APRacketIcon(color: Colors.white, size: 28),
                     ),
-                  ),
+                    Positioned(
+                      top: 4,
+                      left: 4,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                        decoration: ShapeDecoration(
+                          color: APColors.lime,
+                          shape: const ChamferBorder(br: 4, tl: 2),
+                        ),
+                        child: Text(
+                          court.indoor ? 'INDOOR' : 'OUTDOOR',
+                          style: const TextStyle(
+                            fontFamily: 'Display',
+                            fontStyle: FontStyle.italic,
+                            color: APColors.onLime,
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -335,11 +374,13 @@ court.image, fallbackUrl: court.imageUrl,
                           Expanded(
                             child: Text(
                               court.name,
-                              style:  TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
-                                fontSize: 18.4,
-                                fontWeight: FontWeight.w800,
+                              style: TextStyle(
+                                fontFamily: 'Display',
+                                fontStyle: FontStyle.italic,
+                                fontSize: 19,
+                                fontWeight: FontWeight.w900,
                                 color: APColors.ink,
-                                letterSpacing: -0.3,
+                                letterSpacing: -0.2,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -370,37 +411,49 @@ court.image, fallbackUrl: court.imageUrl,
                       const SizedBox(height: 3),
                       Row(
                         children: [
-                           Icon(LucideIcons.mapPin, size: 13, color: APColors.slate),
-                          const SizedBox(width: 2),
-                          Expanded(
-                            child: Text(
-                              '${court.area} • 1.8 km',
-                              style:  TextStyle(color: APColors.slate, fontSize: 12),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                          Icon(LucideIcons.footprints, size: 12, color: APColors.slate),
+                          const SizedBox(width: 3),
+                          Text(
+                            '10 min',
+                            style: TextStyle(
+                              fontFamily: 'Display',
+                              fontStyle: FontStyle.italic,
+                              color: APColors.slate,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
                             ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '•  ${court.area}',
+                            style: TextStyle(color: APColors.slate, fontSize: 11.5, fontWeight: FontWeight.w500),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
                       Row(
                         children: [
+                          // Star Rating Pill
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFFBEB),
-                              borderRadius: BorderRadius.circular(6),
+                            decoration: const ShapeDecoration(
+                              color: Color(0xFFFEF3C7),
+                              shape: ChamferBorder(br: 4, tl: 2),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(LucideIcons.star, size: 14, color: Color(0xFFF59E0B)),
+                                const Icon(LucideIcons.star, size: 11, color: Color(0xFFD97706)),
                                 const SizedBox(width: 2),
                                 Text(
                                   '${court.rating}',
                                   style: const TextStyle(
+                                    fontFamily: 'Display',
+                                    fontStyle: FontStyle.italic,
                                     fontSize: 11,
-                                    fontWeight: FontWeight.w700,
+                                    fontWeight: FontWeight.w900,
                                     color: Color(0xFF92400E),
                                   ),
                                 ),
@@ -408,49 +461,42 @@ court.image, fallbackUrl: court.imageUrl,
                             ),
                           ),
                           const SizedBox(width: 6),
+                          // Availability slot badge (inspired by Reference 2)
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: court.indoor ? APColors.blueSurface : const Color(0xFFECFDF5),
-                              borderRadius: BorderRadius.circular(6),
+                            decoration: const ShapeDecoration(
+                              color: Color(0xFFE0F2FE),
+                              shape: ChamferBorder(br: 4, tl: 2),
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 5,
-                                  height: 5,
-                                  decoration: BoxDecoration(
-                                    color: court.indoor ? APColors.blue : const Color(0xFF10B981),
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  court.indoor ? 'Indoor' : 'Outdoor',
-                                  style: TextStyle(
-                                    color: court.indoor ? APColors.blue : const Color(0xFF047857),
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              court.indoor ? '8 SLOTS READY' : '4 SLOTS READY',
+                              style: const TextStyle(
+                                fontFamily: 'Display',
+                                fontStyle: FontStyle.italic,
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF0369A1),
+                                letterSpacing: 0.3,
+                              ),
                             ),
                           ),
                           const Spacer(),
                           Text(
                             APFormatters.idrCompact(court.pricePerHour),
-                            style:  TextStyle(
+                            style: TextStyle(
+                              fontFamily: 'Display',
+                              fontStyle: FontStyle.italic,
                               color: APColors.blue,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w800,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w900,
                             ),
                           ),
-                           Text(
+                          Text(
                             ' /jam',
                             style: TextStyle(
                               color: APColors.slate,
                               fontSize: 11,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
@@ -467,7 +513,7 @@ court.image, fallbackUrl: court.imageUrl,
   }
 }
 
-/// Original Ace Padel brand lockup: lime badge + padel paddle glyph + wordmark.
+/// Original Ace Padel brand lockup: athletic lime shield + padel paddle glyph + wordmark.
 class AceLogo extends StatelessWidget {
   final double size;
   const AceLogo({super.key, this.size = 38});
@@ -477,37 +523,47 @@ class AceLogo extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(size * 0.28),
-          child: Image.asset(
-            'assets/images/logo.png',
-            width: size,
-            height: size,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                color: APColors.lime,
-                borderRadius: BorderRadius.circular(size * 0.28),
+        AceLogoEmblem(size: size, withGlow: true),
+        SizedBox(width: size * 0.28),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  fontFamily: 'Display',
+                  fontStyle: FontStyle.italic,
+                  fontSize: size * 0.65,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.4,
+                ),
+                children: [
+                  TextSpan(text: 'ACE', style: TextStyle(color: APColors.ink)),
+                  TextSpan(text: 'PADEL', style: TextStyle(color: APColors.blue)),
+                ],
               ),
-              child: APRacketIcon(size: size * 0.6, color: AP.onLime),
             ),
-          ),
-        ),
-        SizedBox(width: size * 0.26),
-        RichText(
-          text: TextSpan(
-            style: TextStyle(
-              fontSize: size * 0.54,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.6,
+            const SizedBox(width: 5),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+              decoration: ShapeDecoration(
+                color: APColors.blueDark,
+                shape: const ChamferBorder(br: 4, tl: 4),
+              ),
+              child: const Text(
+                'PRO',
+                style: TextStyle(
+                  fontFamily: 'Display',
+                  fontStyle: FontStyle.italic,
+                  color: APColors.lime,
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.8,
+                ),
+              ),
             ),
-            children:  [
-              TextSpan(text: 'Ace', style: TextStyle(color: APColors.ink)),
-              TextSpan(text: ' Padel', style: TextStyle(color: APColors.blue)),
-            ],
-          ),
+          ],
         ),
       ],
     );
@@ -523,24 +579,45 @@ class SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12, top: 8),
+      padding: const EdgeInsets.only(bottom: 12, top: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            width: 6, height: 20, margin: const EdgeInsets.only(right: 10),
-            decoration: const ShapeDecoration(color: APColors.lime, shape: ChamferBorder(br: 4, tl: 4)),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 4.5,
+                height: 18,
+                decoration: const ShapeDecoration(
+                  color: APColors.lime,
+                  shape: ChamferBorder(br: 3, tl: 3),
+                ),
+              ),
+              const SizedBox(width: 3),
+              Container(
+                width: 3.0,
+                height: 18,
+                decoration: ShapeDecoration(
+                  color: APColors.blue,
+                  shape: const ChamferBorder(br: 2, tl: 2),
+                ),
+              ),
+            ],
           ),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               title.toUpperCase(),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style:  TextStyle(fontFamily: 'Display', fontStyle: FontStyle.italic, 
-                fontSize: 20.7,
-                fontWeight: FontWeight.w800,
+              style: TextStyle(
+                fontFamily: 'Display',
+                fontStyle: FontStyle.italic,
+                fontSize: 21,
+                fontWeight: FontWeight.w900,
                 color: APColors.ink,
-                letterSpacing: -0.3,
+                letterSpacing: -0.2,
               ),
             ),
           ),
@@ -550,12 +627,29 @@ class SectionHeader extends StatelessWidget {
                 APHaptics.light();
                 onAction?.call();
               },
-              child: Text(
-                action!,
-                style:  TextStyle(
-                  color: APColors.blue,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 13,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                decoration: ShapeDecoration(
+                  color: APColors.blue.withValues(alpha: 0.1),
+                  shape: const ChamferBorder(br: 6, tl: 4),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      action!.toUpperCase(),
+                      style: TextStyle(
+                        fontFamily: 'Display',
+                        fontStyle: FontStyle.italic,
+                        color: APColors.blue,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 11.5,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(width: 3),
+                    Icon(LucideIcons.arrowRight, size: 12, color: APColors.blue),
+                  ],
                 ),
               ),
             ),

@@ -13,25 +13,25 @@ class APColors {
   static Color _p(Color light, Color dark) => APTheme.isDark ? dark : light;
 
   // Brand
-  static Color get blue => _p(const Color(0xFF2334DB), const Color(0xFF4C5CFF));
-  static const blueDark = Color(0xFF0A0F36); // header/gradient gelap (konstan)
-  static const blueLight = Color(0xFF4D6BFF);
-  static Color get blueSurface => _p(const Color(0xFFE9EDFF), const Color(0xFF1B2552));
+  static Color get blue => _p(const Color(0xFF1632E6), const Color(0xFF4C5CFF));
+  static const blueDark = Color(0xFF070B24); // header/gradient gelap (konstan)
+  static const blueLight = Color(0xFF3B56FF);
+  static Color get blueSurface => _p(const Color(0xFFEEF2FF), const Color(0xFF141C42));
 
-  static const lime = Color(0xFFC7F23C);
-  static const limeDark = Color(0xFF9CC41A);
-  static Color get limeLight => _p(const Color(0xFFF3FCD0), const Color(0xFF263308));
-  /// Teks/ikon di atas permukaan lime: selalu gelap.
-  static const onLime = Color(0xFF1A2300);
+  static const lime = Color(0xFFD4FF00); // Championship neon volt
+  static const limeDark = Color(0xFFA6CC00);
+  static Color get limeLight => _p(const Color(0xFFF7FFE0), const Color(0xFF1E2805));
+  /// Teks/ikon di atas permukaan lime: selalu gelap pekat untuk kontras maksimal.
+  static const onLime = Color(0xFF070B24);
 
   // Neutrals & surfaces
-  static Color get ink => _p(const Color(0xFF12152B), const Color(0xFFEEF0FA));
-  static Color get inkSecondary => _p(const Color(0xFF384061), const Color(0xFFC4CBE6));
-  static Color get slate => _p(const Color(0xFF5A6180), const Color(0xFF98A0C4));
-  static Color get cloud => _p(const Color(0xFFF2F4FB), const Color(0xFF070A16));
-  static Color get surface => _p(Colors.white, const Color(0xFF0E1226));
-  static Color get line => _p(const Color(0xFFE7EAF3), const Color(0xFF1E2548));
-  static Color get lineDark => _p(const Color(0xFFD4D9EA), const Color(0xFF333E68));
+  static Color get ink => _p(const Color(0xFF070B1F), const Color(0xFFF1F3FB));
+  static Color get inkSecondary => _p(const Color(0xFF1E2642), const Color(0xFFB8C0DE));
+  static Color get slate => _p(const Color(0xFF556080), const Color(0xFF8F9BBF));
+  static Color get cloud => _p(const Color(0xFFE9EEF8), const Color(0xFF050816));
+  static Color get surface => _p(Colors.white, const Color(0xFF0D122B));
+  static Color get line => _p(const Color(0xFFD8E0F0), const Color(0xFF1B2245));
+  static Color get lineDark => _p(const Color(0xFFC4D0E8), const Color(0xFF2D3768));
 
   // Status
   static const success = Color(0xFF12A150);
