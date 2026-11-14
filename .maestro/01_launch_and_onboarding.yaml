@@ -1,10 +1,10 @@
 appId: dev.hellens.ace_padel
 ---
 - launchApp:
-    clearState: false
+    clearState: true
 - assertVisible: "ACE"
 - assertVisible: "PADEL"
 - assertVisible: "Lihat-lihat dulu sebagai Tamu"
 - tapOn: "Lihat-lihat dulu sebagai Tamu"
-- assertVisible: "Tennis Action Now"
-- assertVisible: "CARI LAPANGAN"
+- assertVisible: ".*Padel Action Now.*"
+- assertVisible: ".*PESAN LAPANGAN.*"

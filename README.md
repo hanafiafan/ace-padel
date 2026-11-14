@@ -89,19 +89,27 @@ ace-padel/
 
 ## 🧪 Pengujian Otomatis & UAT (UTS Mobile Testing TI23B)
 
-Proyek ini telah dilengkapi dengan artefak pengujian lengkap sesuai silabus UTS Mobile Testing:
+**Identitas** (isi sebelum dikumpulkan)
 
-1. **User Acceptance Testing (UAT)**:
-   - Dokumen lengkap di [`LAPORAN_UAT.md`](LAPORAN_UAT.md) mencakup 5 skenario berorientasi persona pengguna (Casual Player, Competitive Host, Equipment Enthusiast), kriteria penerimaan, data uji, dan status hasil pengujian (100% PASS).
-   - Lembar kerja UAT Excel di [`generate_uat_excel.py`](generate_uat_excel.py).
+| Nama | NIM | Kelas | Peran |
+|:--|:--|:--|:--|
+| [ISI] | [ISI] | TI23B | [ISI] |
 
-2. **Automated E2E Testing dengan Maestro**:
-   - Direktori [`.maestro/`](.maestro/) berisi 4 skenario alur YAML otomatis:
-     - `01_launch_and_onboarding.yaml`: Pengujian peluncuran aplikasi & mode tamu.
-     - `02_navigation_and_explore.yaml`: Navigasi multi-tab & modal Peta Cluster Venue.
-     - `03_booking_and_gear_rental.yaml`: Alur transaksi inti reservasi lapangan & sewa gear resmi turnamen.
-     - `04_validation_and_error_handling.yaml`: Pengujian kondisi gagal & validasi form input.
-   - Panduan eksekusi pengujian Maestro di [`.maestro/README.md`](.maestro/README.md).
+**Tujuan aplikasi**: reservasi lapangan padel, mabar (main bareng), dan komunitas pemain. **Target pengguna**: pemain padel di Jabodetabek dan Bali, serta pemilik lapangan (portal mitra). **Alur utama yang diuji**: tamu, navigasi, daftar akun, pesan lapangan, e-ticket, recap story, validasi form. **Batasan pengujian**: emulator Android 15 saja, Google Sign-In dan pembayaran DOKU tidak diuji (lihat bagian 7 `LAPORAN_UAT.md`).
+
+1. **User Acceptance Testing (UAT)**: [`LAPORAN_UAT.md`](LAPORAN_UAT.md) memuat 6 skenario (tujuan, persona/peran, kriteria penerimaan, prasyarat, langkah, hasil aktual, status, bukti), ringkasan hasil, dan 12 temuan beserta statusnya. Hasil aktual berasal dari eksekusi nyata, termasuk satu skenario yang awalnya gagal lalu lulus setelah perbaikan.
+
+2. **Automated E2E dengan Maestro**: [`.maestro/`](.maestro/) berisi 4 flow YAML dengan assertion:
+   - `01_launch_and_onboarding.yaml`: peluncuran dari state bersih dan mode tamu.
+   - `02_navigation_and_explore.yaml`: navigasi 5 tab dan peta venue.
+   - `03_booking_and_gear_rental.yaml`: daftar akun uji, reservasi, e-ticket, recap story.
+   - `04_validation_and_error_handling.yaml`: validasi form dan kondisi gagal.
+
+   Hasil: **4/4 flow lulus pada dua eksekusi berturut-turut**; log, JUnit XML, dan screenshot ada di `.maestro/results/`. Instalasi dan perintah eksekusi: [`.maestro/README.md`](.maestro/README.md). Flow 03 memerlukan password uji lewat `-e UAT_PASSWORD=...` (tidak disimpan di repository).
+
+3. **APK / cara menjalankan**: `flutter build apk --debug` lalu `adb install -r build/app/outputs/flutter-apk/app-debug.apk`, dengan backend lokal aktif (lihat panduan di bawah).
+
+4. **Tautan** (isi): video penjelasan **[ISI]**, repository **[ISI]**.
 
 ---
 

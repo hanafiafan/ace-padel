@@ -1,116 +1,125 @@
-# LAPORAN USER ACCEPTANCE TESTING (UAT)
-## APLIKASI RESERVASI & KOMUNITAS PADEL: ACE PADEL 🎾
+# LAPORAN USER ACCEPTANCE TESTING (UAT): ACE PADEL
 
-**Mata Kuliah:** Mobile Testing (TI23B)  
-**Dosen Pengampu:** Triyono M.Kom  
-**Proyek:** Pengujian Aplikasi Mobile dengan User Acceptance Testing dan Maestro  
-**Target Aplikasi:** Ace Padel (`dev.hellens.ace_padel`)  
-**Versi:** 1.0 (MVP)  
-**Lingkungan Pengujian:** Android 15 (API 35 Emulator) & Google Pixel 8 Pro  
+| | |
+|:--|:--|
+| **Mata kuliah** | Mobile Testing, TI23B (UTS Ganjil 2026/2027) |
+| **Dosen pengampu** | Triyono M.Kom |
+| **Penyusun** | **[ISI: nama lengkap, NIM, peran]** |
+| **Aplikasi** | Ace Padel (`dev.hellens.ace_padel`), reservasi lapangan dan komunitas padel (Flutter + backend Node.js) |
+| **Versi diuji** | 1.0.0+1 (debug build) |
+| **Tanggal pengujian** | 14 November 2026 |
+| **Lingkungan** | Emulator Android 15 (API 35, AVD `ace_padel`), Flutter 3.47.6, Maestro 2.12.1, OpenJDK 17, backend lokal `localhost:3001` |
 
----
-
-## 1. TUJUAN PENGUJIAN
-Memastikan aplikasi Ace Padel memenuhi kriteria penerimaan pengguna akhir (pemain padel, host mabar, dan penyewa gear) dalam alur penelusuran lapangan, pemesanan slot waktu real-time, sewa perlengkapan asli, penerbitan e-tiket, hingga fitur sosial/pencapaian (*Strava-style match story*).
-
----
-
-## 2. PERSONA PENGGUNA (ROLE)
-1. **Afan Pratama (Casual Player)**: Pengguna yang ingin mencari lapangan terdekat, melihat ketersediaan slot, dan memesan lapangan tanpa ribet.
-2. **Dewi Anggraini (Competitive / Mabar Host)**: Pemain aktif yang ingin bergabung ke slot match doubles dan memantau peringkat DUPR.
-3. **Kevin Sanjaya (Equipment Enthusiast)**: Pemain yang membutuhkan sewa raket turnamen berlisensi (Bullpadel / Babolat) dan bola resmi FIP sebelum bertanding.
+> Semua hasil di bawah berasal dari eksekusi nyata pada tanggal di atas. Hasil otomatis tersimpan di `.maestro/results/` (log, JUnit XML, screenshot). Pengujian hanya dilakukan di **emulator**; tidak ada perangkat fisik.
 
 ---
 
-## 3. SKENARIO USER ACCEPTANCE TESTING (UAT)
+## 1. Tujuan Pengujian
+Memastikan alur utama pemain berjalan sesuai harapan pengguna: masuk sebagai tamu, menelusuri lapangan, memesan lapangan beserta sewa gear, menerima e-ticket, membagikan recap pertandingan, dan ditolaknya input yang tidak valid.
 
-### UAT-01: Onboarding Tamu & Eksplorasi Beranda Turnamen
-* **Tujuan**: Memastikan pengguna baru dapat langsung melihat ringkasan turnamen dan venue tanpa harus mendaftar terlebih dahulu.
-* **Persona**: Afan Pratama (Casual Player)
-* **Prasyarat**: Aplikasi baru dipasang / mode tamu aktif.
-* **Langkah Pengujian**:
-  1. Buka aplikasi Ace Padel.
-  2. Pada halaman pembuka/login, pilih opsi *"Lihat-lihat dulu sebagai Tamu"*.
-  3. Amati tampilan beranda utama (*Tennis Action Now*).
-* **Kriteria Penerimaan**: Beranda memuat header turnamen, pemilih tanggal 7 hari, kartu quick start, dan kategori aksi utama.
-* **Hasil Aktual**: Header biru royal memuat widget turnamen, filter hari aktif, dan kartu quick start tampil presisi tanpa error.
-* **Status**: **PASS (LULUS)**
+## 2. Persona / Peran Pengguna
+| Peran | Deskripsi | Dipakai pada |
+|:--|:--|:--|
+| Tamu | Pengguna baru yang belum punya akun, hanya melihat-lihat | UAT-01, UAT-02 |
+| Pemain terdaftar | Pemain yang sudah masuk dan memesan lapangan | UAT-03, UAT-04, UAT-06 |
+| Calon pengguna | Pengguna yang mendaftar akun baru | UAT-05 |
 
----
+## 3. Prasyarat Umum
+Emulator aktif, backend lokal berjalan di port 3001, APK debug terpasang, data awal (seed) server termuat. Cara menjalankan lengkap ada di `.maestro/README.md`.
 
-### UAT-02: Penelusuran Lapangan & Peta Cluster Venue
-* **Tujuan**: Memastikan pemain dapat menavigasi katalog arena, memfilter berdasarkan kota/jenis lapangan, serta membuka peta cluster venue.
-* **Persona**: Afan Pratama
-* **Prasyarat**: Berada pada tab *Courts*.
-* **Langkah Pengujian**:
-  1. Ketuk tab menu *Courts* pada bilah navigasi bawah.
-  2. Ketuk tombol *PETA* di baris judul atas.
-  3. Periksa daftar cluster regional venue (Jakarta Selatan, Bali Coastal, Tangerang & BSD).
-  4. Pilih salah satu cluster, misalnya *Jakarta Selatan*.
-* **Kriteria Penerimaan**: Modal peta cluster muncul rapi, menampilkan rincian nama arena dan memperbarui filter kota.
-* **Hasil Aktual**: Modal *PETA CLUSTER VENUE* terbuka dengan aksen warna regional, tombol *Pilih* berfungsi responsif.
-* **Status**: **PASS (LULUS)**
+## 4. Skenario UAT
 
----
+### UAT-01: Masuk sebagai tamu dan melihat beranda
+* **Persona**: Tamu. **Prasyarat**: aplikasi dari state bersih.
+* **Langkah**: buka aplikasi, pilih "Lihat-lihat dulu sebagai Tamu", amati beranda.
+* **Kriteria penerimaan**: layar login memuat branding Ace Padel dan opsi tamu; beranda memuat header "Padel Action Now", strip tanggal, Quick Start, dan tombol Pesan Lapangan.
+* **Hasil aktual**: sesuai kriteria. Beranda menyapa "Halo, Tamu".
+* **Bukti**: flow `01_launch_and_onboarding.yaml` (Run 1 dan Run 2 lulus).
+* **Status**: **LULUS**
 
-### UAT-03: Reservasi Lapangan, Pemilihan Slot Waktu & Sewa Gear Resmi
-* **Tujuan**: Memvalidasi alur transaksi utama pemesanan lapangan dan penambahan sewa alat resmi (raket/bola turnamen).
-* **Persona**: Kevin Sanjaya (Equipment Enthusiast)
-* **Prasyarat**: Memilih salah satu venue (misal: *Center Glass Court*).
-* **Langkah Pengujian**:
-  1. Ketuk kartu *Center Glass Court*.
-  2. Buka bagian spesifikasi lapangan dan verifikasi visualizer lapangan FIP.
-  3. Pilih tanggal bermain (misal: Sabtu 14) dan slot waktu yang tersedia (09:00).
-  4. Ketuk *LANJUT KONFIRMASI*.
-  5. Pada bagian *PRO RENTAL GEAR*, pilih kategori *BOLA RESMI (3)* dan tambahkan 1 kaleng bola Head Pro+.
-  6. Pilih metode bayar di tempat dan ketuk *KONFIRMASI BOOKING SEKARANG*.
-* **Kriteria Penerimaan**: Total harga terakumulasi otomatis dengan biaya sewa gear; sistem menyimpan reservasi dan menampilkan halaman sukses booking.
-* **Hasil Aktual**: Harga terhitung tepat, stepper kuantitas responsif, booking tersimpan dengan ID unik dan tombol *Lihat E-Tiket* aktif.
-* **Status**: **PASS (LULUS)**
+### UAT-02: Navigasi tab dan peta venue
+* **Persona**: Tamu.
+* **Langkah**: buka tab Courts, buka Peta venue, kembali, buka Ranking, Bookings, Profile, lalu Home.
+* **Kriteria penerimaan**: tiap tab menampilkan judul yang benar; peta memuat klaster venue (Jakarta Selatan, 6 arena).
+* **Hasil aktual**: sesuai kriteria.
+* **Bukti**: flow `02_navigation_and_explore.yaml` (Run 1 dan Run 2 lulus).
+* **Status**: **LULUS**
 
----
+### UAT-03: Reservasi lapangan dan e-ticket (alur transaksi utama)
+* **Persona**: Pemain terdaftar. **Prasyarat**: akun uji baru dibuat di dalam flow.
+* **Langkah**: daftar akun, buka Courts, pilih Center Glass Court, pilih tanggal besok, pilih slot, Lanjut Konfirmasi, buka kategori Pro Rental Gear, Konfirmasi Booking, buka E-Ticket, buka Match Recap Story.
+* **Kriteria penerimaan**: slot terpilih mengaktifkan tombol lanjut; halaman sukses menampilkan kode reservasi; e-ticket berstatus Terkonfirmasi dengan QR.
+* **Hasil aktual**: sesuai kriteria. Contoh: kode `ACE-C3-2000-6818`, Minggu 15 Nov 2026 pukul 20:00, total Rp260k.
+* **Bukti**: flow `03_booking_and_gear_rental.yaml` (Run 1 dan Run 2 lulus); screenshot `03_01` sampai `03_06` di `.maestro/results/screenshots/`.
+* **Keterbatasan yang jujur**:
+  * Flow otomatis hanya membuka kategori gear, belum menambahkan item sewa. Penambahan raket diuji **manual**: Bullpadel Pro (+Rp30k) membuat total menjadi Rp250k dan tercatat di e-ticket.
+  * Guest yang menekan Lanjut Konfirmasi diarahkan ke layar login. Ini perilaku yang benar, dan sebab flow ini mendaftarkan akun dulu.
+* **Status**: **LULUS (dengan keterbatasan di atas)**
 
-### UAT-04: Digital E-Ticket & Generator Match Recap Story (Strava-Style)
-* **Tujuan**: Memastikan e-tiket menampilkan QR Code check-in yang sah serta menyediakan template story visual yang membanggakan untuk dibagikan ke media sosial.
-* **Persona**: Dewi Anggraini (Competitive Player)
-* **Prasyarat**: Memiliki reservasi aktif yang berhasil dibuat pada UAT-03.
-* **Langkah Pengujian**:
-  1. Pada layar sukses booking (atau tab *Bookings*), ketuk *Lihat E-Tiket*.
-  2. Periksa QR Code check-in, rincian venue, jam, dan item sewa.
-  3. Ketuk tombol *BUAT MATCH RECAP STORY (STRAVA-STYLE)*.
-  4. Sesuaikan toggle kustomisasi (Foto latar lapangan, rating DUPR, kalori KCAL).
-  5. Ketuk *BAGIKAN KE INSTAGRAM STORY & WA*.
-* **Kriteria Penerimaan**: Canvas visual 9:16 tersaji dengan grafis lapangan, metrik DUPR (+0.18), kalori (742 KCAL), dan tautan tersalin ke clipboard.
-* **Hasil Aktual**: Kartu story tampil bergaya athletic-cyberpunk dengan kontras tinggi, toggle kustomisasi bekerja real-time, dan dialog konfirmasi salin berhasil.
-* **Status**: **PASS (LULUS)**
+### UAT-04: E-ticket dan recap story
+* **Persona**: Pemain terdaftar.
+* **Langkah**: dari e-ticket, ketuk "Buat Match Recap Story".
+* **Kriteria penerimaan**: layar "MATCH RECAP // STORY" tampil dengan kartu 9:16 dan opsi kustomisasi.
+* **Hasil aktual**: layar tampil tanpa error layout setelah perbaikan temuan T-03 (lihat bagian 6).
+* **Bukti**: screenshot `03_05_eticket.png`, `03_06_story.png`.
+* **Catatan**: isi kartu story (lawan, skor, DUPR 3.60, 742 kcal, 164 BPM) masih **data contoh tetap**, belum dari pertandingan nyata (lihat T-10).
+* **Status**: **LULUS (tampilan); data masih contoh**
 
----
+### UAT-05: Validasi input form daftar
+* **Persona**: Calon pengguna.
+* **Langkah**: kirim form kosong; isi nama saja; isi nama dan email valid dengan password "123".
+* **Kriteria penerimaan**: masing-masing menampilkan pesan "Nama minimal 2 karakter.", "Format email tidak valid.", "Password minimal 8 karakter."
+* **Hasil aktual**: ketiga pesan muncul sesuai urutan.
+* **Bukti**: flow `04_validation_and_error_handling.yaml` (Run 1 dan Run 2 lulus); screenshot `04_01` sampai `04_03`.
+* **Status**: **LULUS**
 
-### UAT-05: Validasi Input Formulir & Penanganan Error
-* **Tujuan**: Mencegah kesalahan data akun pengguna dengan validasi formulir berlapis (kondisi gagal).
-* **Persona**: Afan Pratama
-* **Prasyarat**: Berada pada formulir pendaftaran akun baru.
-* **Langkah Pengujian**:
-  1. Buka tab *Profile* -> ketuk *Masuk / Daftar* -> pilih *Daftar*.
-  2. Langsung ketuk tombol *Daftar* tanpa mengisi nama.
-  3. Verifikasi munculnya pesan error *"Nama minimal 2 karakter."*.
-  4. Masukkan nama "Afan", biarkan email kosong/salah, ketuk *Daftar*.
-  5. Verifikasi munculnya pesan error *"Format email tidak valid."*.
-* **Kriteria Penerimaan**: Sistem memblokir pengiriman formulir invalid dan menampilkan pesan kesalahan yang jelas dan spesifik.
-* **Hasil Aktual**: Validasi formulir menahan submit dan pesan error merah tampil informatif di atas tombol.
-* **Status**: **PASS (LULUS)**
+### UAT-06: Konsistensi data Profil dan Pengaturan (uji manual)
+* **Persona**: Pemain terdaftar.
+* **Langkah**: buka Profil dan Pengaturan; bandingkan angka dengan data akun; ubah dan periksa fungsi tiap pengaturan.
+* **Hasil aktual awal (GAGAL)**: lihat temuan T-02, T-05, T-06 di bawah. Angka streak, heatmap, dan kalori palsu; status API, ukuran cache, dan tombol ekspor hanya pura-pura.
+* **Hasil setelah perbaikan**: setelah satu booking dibuat, hari main berubah menjadi 1 dan heatmap menyala pada hari yang benar; status API menampilkan ping nyata; cache dihitung dari cache gambar dan benar-benar dibersihkan; ekspor menyalin JSON ke clipboard.
+* **Status awal**: **GAGAL**. **Status ulang uji**: **LULUS**
 
 ---
 
-## 4. RINGKASAN HASIL & STATUS KELAYAKAN
+## 5. Ringkasan Hasil
 
-| No | Skenario UAT | Kategori | Hasil Pengujian | Status |
-|:---|:---|:---|:---|:---|
-| 1 | UAT-01: Onboarding Tamu & Beranda | Eksplorasi & Navigasi | Tampil presisi tanpa hambatan | **PASS** |
-| 2 | UAT-02: Penelusuran Lapangan & Peta | Filter & Discovery | Modal peta & filter responsif | **PASS** |
-| 3 | UAT-03: Reservasi Lapangan & Sewa Gear | Transaksi Inti (CRUD) | Anti double-booking & total kalkulasi akurat | **PASS** |
-| 4 | UAT-04: E-Tiket QR & Strava Story | Fitur Sosial & Tiket | QR code aktif & canvas story premium | **PASS** |
-| 5 | UAT-05: Validasi Input & Error | Validasi & Keamanan | Error dicegah di boundary formulir | **PASS** |
+| No | Skenario | Jenis | Cara uji | Status |
+|:--|:--|:--|:--|:--|
+| 1 | UAT-01 Tamu dan beranda | Alur utama | Maestro (2 eksekusi) | LULUS |
+| 2 | UAT-02 Navigasi dan peta | Alur utama | Maestro (2 eksekusi) | LULUS |
+| 3 | UAT-03 Reservasi dan e-ticket | Transaksi | Maestro (2 eksekusi) + manual | LULUS, dengan keterbatasan |
+| 4 | UAT-04 E-ticket dan story | Fitur sosial | Maestro + manual | LULUS, data story contoh |
+| 5 | UAT-05 Validasi form | Input tidak valid | Maestro (2 eksekusi) | LULUS |
+| 6 | UAT-06 Profil dan Pengaturan | Konsistensi data | Manual | GAGAL lalu LULUS setelah perbaikan |
 
-**Tingkat Kelulusan (Pass Rate):** 100% (5 dari 5 Skenario LULUS)  
-**Kesimpulan:** Aplikasi **Ace Padel v1.0** memenuhi seluruh kriteria penerimaan fungsional, performa visual, dan ketentuan teknis UTS Mobile Testing. Aplikasi dinyatakan **SIAP RILIS (PRODUCTION / DEMO READY)**.
+**Otomasi Maestro**: 4 flow, 2 eksekusi penuh berturut-turut, **4/4 lulus pada keduanya** (2m36s dan 2m49s). Log dan XML ada di `.maestro/results/run1/` dan `run2/`.
+
+---
+
+## 6. Temuan dan Tindak Lanjut
+
+| ID | Temuan | Dampak | Status |
+|:--|:--|:--|:--|
+| T-01 | Beranda memuat konten tenis (Davis Cup, Laver Cup, Hopman Cup) di aplikasi padel | Konten salah | **Diperbaiki** |
+| T-02 | Profil: "24 day streak", heatmap acak, 842 kcal hardcode, bertentangan dengan "Match Time 0:00" | Data menyesatkan | **Diperbaiki** (dari data booking) |
+| T-03 | Kartu statistik di layar story overflow 2,4 px (banner debug merah), badge "+0.18" terpotong | Cacat tampilan | **Diperbaiki** |
+| T-04 | Layar story menyatakan "VERIFIED MATCH // WPT OFFICIAL SENSOR" tanpa sensor | Klaim palsu jika dibagikan | **Diperbaiki** |
+| T-05 | Pengaturan: status API selalu "ONLINE 18ms", ukuran cache selalu 28.4 MB, Bersihkan Cache tidak membersihkan | Fitur pura-pura | **Diperbaiki** |
+| T-06 | Ekspor data hanya menampilkan pesan sukses tanpa ekspor | Fitur pura-pura | **Diperbaiki** (salin JSON ke clipboard) |
+| T-07 | Garis dekoratif pojok atas bertumpuk dengan status bar | Kosmetik | **Diperbaiki** |
+| T-08 | Tombol kembali gelap di atas foto gelap pada layar story dan detail venue, nyaris tak terlihat | Aksesibilitas | Story **diperbaiki**; detail venue **masih terbuka** |
+| T-09 | Layar login menampilkan tautan internal "Panduan & Credentials Google Console" | Teks pengembang terlihat pengguna | **Terbuka** |
+| T-10 | Isi kartu story masih data contoh tetap, bukan dari pertandingan | Fitur belum nyata | **Terbuka** |
+| T-11 | Toggle "Sinkronisasi Apple Health / Health Connect" hanya menyimpan preferensi, belum ada integrasi | Fitur belum nyata | **Terbuka** |
+| T-12 | Flutter menggabungkan teks widget menjadi satu node aksesibilitas | Menyulitkan uji otomatis dan pembaca layar | **Terbuka** (disiasati dengan regex di Maestro) |
+
+## 7. Batasan Pengujian
+* Hanya emulator Android 15 (API 35); tidak ada perangkat fisik dan tidak ada iOS.
+* Masuk dengan Google dan pembayaran DOKU tidak diuji (mode simulasi/lingkungan dev).
+* Pengujian beban dan keamanan mendalam tidak dilakukan.
+* Flow 03 belum menambah item sewa gear secara otomatis (lihat UAT-03).
+* Data seed bersifat contoh; angka ranking dan leaderboard berasal dari data seed server.
+
+## 8. Kesimpulan
+Alur utama (tamu, navigasi, pendaftaran, reservasi, e-ticket, validasi) berjalan dan dapat diulang otomatis (4/4 flow, dua kali). Pengujian manual menemukan tujuh cacat nyata yang sudah diperbaiki dan diuji ulang, serta empat temuan yang masih terbuka (T-08 sebagian, T-09 sampai T-12). Aplikasi layak untuk demo end-to-end dengan catatan keterbatasan di atas, belum layak disebut siap produksi.

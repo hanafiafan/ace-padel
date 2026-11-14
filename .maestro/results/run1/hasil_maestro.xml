@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuites>
+  <testsuite name="Test Suite" device="ace_padel" tests="4" failures="0" time="155.582" timestamp="2026-11-14T21:36:54">
+    <testcase id="03_booking_and_gear_rental" name="03_booking_and_gear_rental" classname="03_booking_and_gear_rental" file="03_booking_and_gear_rental.yaml" time="74.268" timestamp="2026-11-14T21:36:54" status="SUCCESS"/>
+    <testcase id="02_navigation_and_explore" name="02_navigation_and_explore" classname="02_navigation_and_explore" file="02_navigation_and_explore.yaml" time="28.445" timestamp="2026-11-14T21:38:08" status="SUCCESS"/>
+    <testcase id="04_validation_and_error_handling" name="04_validation_and_error_handling" classname="04_validation_and_error_handling" file="04_validation_and_error_handling.yaml" time="35.348" timestamp="2026-11-14T21:38:37" status="SUCCESS"/>
+    <testcase id="01_launch_and_onboarding" name="01_launch_and_onboarding" classname="01_launch_and_onboarding" file="01_launch_and_onboarding.yaml" time="17.5" timestamp="2026-11-14T21:39:12" status="SUCCESS"/>
+  </testsuite>
+</testsuites>

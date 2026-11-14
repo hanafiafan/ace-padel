@@ -1,18 +1,24 @@
 appId: dev.hellens.ace_padel
 ---
-- launchApp
-- tapOn: "Courts"
-- assertVisible: "CARI LAPANGAN"
-- tapOn: "PETA"
-- assertVisible: "PETA CLUSTER VENUE"
-- assertVisible: "JAKARTA SELATAN (6 ARENA)"
+- launchApp:
+    clearState: true
+- runFlow:
+    when:
+      visible: "Lihat-lihat dulu sebagai Tamu"
+    commands:
+      - tapOn: ".*Lihat-lihat dulu sebagai Tamu.*"
+- tapOn: ".*Courts.*Tab.*"
+- assertVisible: ".*CARI LAPANGAN.*"
+- tapOn: ".*PETA.*"
+- assertVisible: ".*PETA CLUSTER VENUE.*"
+- assertVisible: ".*JAKARTA SELATAN \\(6 ARENA\\).*"
 - back
-- tapOn: "Ranking"
-- assertVisible: "LEADERBOARD"
-- tapOn: "Bookings"
-- assertVisible: "BOOKING SAYA"
-- tapOn: "Profile"
-- assertVisible: "PROFIL SAYA"
-- assertVisible: "YOUR MOMENTUM"
-- tapOn: "Home"
-- assertVisible: "Tennis Action Now"
+- tapOn: ".*Ranking.*Tab.*"
+- assertVisible: ".*LEADERBOARD.*"
+- tapOn: ".*Bookings.*Tab.*"
+- assertVisible: ".*BOOKING SAYA.*"
+- tapOn: ".*Profile.*Tab.*"
+- assertVisible: ".*PROFIL SAYA.*"
+- assertVisible: ".*YOUR MOMENTUM.*"
+- tapOn: ".*Home.*Tab.*"
+- assertVisible: ".*Padel Action Now.*"

@@ -1,24 +1,56 @@
 appId: dev.hellens.ace_padel
+env:
+  UAT_PASSWORD: ${UAT_PASSWORD}
 ---
-- launchApp
-- tapOn: "Courts"
-- assertVisible: "CARI LAPANGAN"
-- tapOn: "Center Glass Court"
-- assertVisible: "TENTANG VENUE"
-- assertVisible: "VISUALISASI SPESIFIKASI LAPANGAN"
-- scroll
-- tapOn: "Sab"
-- tapOn: "09:00"
-- assertVisible: "LANJUT KONFIRMASI"
-- tapOn: "LANJUT KONFIRMASI"
-- assertVisible: "Konfirmasi Reservasi"
-- assertVisible: "PRO RENTAL GEAR"
-- tapOn: "BOLA RESMI (3)"
-- tapOn: "KONFIRMASI BOOKING SEKARANG"
-- assertVisible: "Booking Berhasil"
-- assertVisible: "Lihat E-Tiket"
-- tapOn: "Lihat E-Tiket"
-- assertVisible: "E-TIKET DIGITAL"
-- tapOn: "BUAT MATCH RECAP STORY (STRAVA-STYLE)"
-- assertVisible: "MATCH RECAP // STORY"
-- assertVisible: "OFFICIAL MATCH RECAP"
+# Alur transaksi utama: daftar akun uji -> pilih venue -> jam -> sewa gear -> booking -> e-ticket -> story.
+# Jalankan: maestro test -e UAT_PASSWORD=<password-uji> 03_booking_and_gear_rental.yaml
+- launchApp:
+    clearState: true
+- evalScript: ${output.email = 'uat' + Date.now() + '@example.com'}
+- tapOn: ".*Belum punya akun\\? Daftar.*"
+- tapOn: ".*Nama lengkap.*"
+- inputText: "Penguji UAT"
+- tapOn: "Email"
+- inputText: ${output.email}
+- tapOn: ".*Password.*"
+- inputText: ${UAT_PASSWORD}
+- pressKey: Enter
+- assertVisible: ".*PESAN LAPANGAN.*"
+- takeScreenshot: results/screenshots/03_01_beranda_setelah_daftar
+- tapOn: "Courts.*"
+- assertVisible: ".*CARI LAPANGAN.*"
+- tapOn: ".*Center Glass Court.*"
+- assertVisible: ".*TENTANG VENUE.*"
+- scrollUntilVisible:
+    element: ".*PILIH TANGGAL.*"
+- tapOn:
+    text: "(SAB|MIN|SEN|SEL|RAB|KAM|JUM).*"
+    index: 1
+# Slot diacak; bila bentrok dengan slot yang sudah terpesan, tombol tetap nonaktif -> ulangi dengan slot lain.
+- retry:
+    maxRetries: 5
+    commands:
+      - evalScript: ${output.hour = 8 + Math.floor(Math.random() * 14)}
+      - evalScript: "${output.slot = (output.hour < 10 ? '0' : '') + output.hour + ':00'}"
+      - scrollUntilVisible:
+          element: ".*${output.slot}.*"
+      - tapOn: ".*${output.slot}.*"
+      - assertVisible: ".*LANJUT KONFIRMASI.*"
+- scrollUntilVisible:
+    element: ".*VISUALISASI SPESIFIKASI LAPANGAN.*"
+- takeScreenshot: results/screenshots/03_02_slot_dipilih
+- tapOn: ".*LANJUT KONFIRMASI.*"
+- assertVisible: ".*Konfirmasi Reservasi.*"
+- assertVisible: ".*PRO RENTAL GEAR.*"
+- tapOn: ".*BOLA RESMI \\(3\\).*"
+- takeScreenshot: results/screenshots/03_03_konfirmasi_gear
+- tapOn: ".*KONFIRMASI BOOKING SEKARANG.*"
+- assertVisible: ".*BOOKING BERHASIL.*"
+- takeScreenshot: results/screenshots/03_04_booking_berhasil
+- tapOn: ".*LIHAT E-TICKET.*"
+- assertVisible: ".*E-Ticket Reservasi.*"
+- assertVisible: ".*TERKONFIRMASI.*"
+- takeScreenshot: results/screenshots/03_05_eticket
+- tapOn: ".*BUAT MATCH RECAP STORY.*"
+- assertVisible: ".*MATCH RECAP // STORY.*"
+- takeScreenshot: results/screenshots/03_06_story

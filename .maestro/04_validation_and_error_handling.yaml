@@ -1,15 +1,27 @@
 appId: dev.hellens.ace_padel
 ---
-- launchApp
-- tapOn: "Profile"
-- scroll
-- tapOn: "Masuk / Daftar"
-- assertVisible: "Selamat Datang"
+# Validasi input & kondisi gagal pada form daftar.
+- launchApp:
+    clearState: true
+- assertVisible: ".*Selamat Datang.*"
+- tapOn: ".*Belum punya akun\\? Daftar.*"
+- assertVisible: ".*Buat Akun Baru.*"
+# 1. Form kosong -> ditolak
 - tapOn: "Daftar"
-- assertVisible: "Buat Akun Baru"
-- tapOn: "Daftar"
-- assertVisible: "Nama minimal 2 karakter."
+- assertVisible: ".*Nama minimal 2 karakter.*"
+- takeScreenshot: results/screenshots/04_01_nama_kosong
+# 2. Email tidak valid -> ditolak
+- tapOn: ".*Nama lengkap.*"
 - inputText: "Afan"
+- tapOn: ".*Buat Akun Baru.*"
 - tapOn: "Daftar"
-- assertVisible: "Format email tidak valid."
-- back
+- assertVisible: ".*Format email tidak valid.*"
+- takeScreenshot: results/screenshots/04_02_email_salah
+# 3. Password kurang dari 8 karakter -> ditolak
+- tapOn: "Email"
+- inputText: "penguji@example.com"
+- tapOn: ".*Password.*"
+- inputText: "123"
+- pressKey: Enter
+- assertVisible: ".*Password minimal 8 karakter.*"
+- takeScreenshot: results/screenshots/04_03_password_pendek
